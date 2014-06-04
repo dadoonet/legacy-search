@@ -3,10 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-            ">
+       xmlns:elasticsearch="http://www.pilato.fr/schema/elasticsearch"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.pilato.fr/schema/elasticsearch http://www.pilato.fr/schema/elasticsearch/elasticsearch-0.3.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="defaultAutoCommit" value="true" />
@@ -46,5 +46,12 @@
 
     <!-- Jackson Mapper -->
     <bean id="mapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
+
+    <!--  Elasticsearch -->
+    <util:properties id="esproperties"
+                     location="classpath:elasticsearch.properties"/>
+
+    <elasticsearch:client id="esClient" esNodes="127.0.0.1:9300"
+                          properties="esproperties"/>
 
 </beans>

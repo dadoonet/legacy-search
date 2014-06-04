@@ -6,82 +6,48 @@ Introduction
 
 This is a demo project to show how to add elasticsearch to a legacy SQL project.
 
-In this branch, you will find the current legacy version of the project.
-
+This branch connect our project to elasticsearch directly.
 
 Installation
 ------------
 
-You need to have:
+You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
 
-* Maven
-* JDK7 or higher
-* Postgresql up and running
-
-Modify [src/main/resources/jdbc.properties](src/main/resources/jdbc.properties) file to reflect
-your own postgresql settings:
+Download and unzip elasticsearch:
 
 ```
-jdbc.driverClassName=org.postgresql.Driver
-jdbc.url=jdbc:postgresql://localhost:5432/dpilato
-jdbc.username=dpilato
-jdbc.password=
+wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.2.1.tar.gz
+tar xzf elasticsearch-1.2.1.tar.gz
+cd elasticsearch-1.2.1
 ```
 
-Start the server using jetty
+Install Marvel plugin (optionnal):
 
-```sh
-mvn clean install
-mvn jetty:run
+```
+bin/plugin -i elasticsearch/marvel/latest
 ```
 
-Play!
------
+Launch elasticsearch:
 
-### Some CRUD operations
-
-```sh
-# Create one person
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato"}'
-
-# Read that person
-curl http://127.0.0.1:8080/api/1/person/1
-
-# Update (will merge values)
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"children":3}'
-# or update full document
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato", "children":3}'
-
-# Check
-curl http://127.0.0.1:8080/api/1/person/1
-
-# Update (full document)
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato", "children":3}'
-
-# Delete
-curl -XDELETE http://127.0.0.1:8080/api/1/person/1
+```
+bin/elasticsearch
 ```
 
-### Database Initialisation
+You can open [Marvel](http://localhost:9200/_plugin/marvel/) if needed.
 
-```sh
-# Initialize the database with 10 persons
+Run it!
+-------
+
+Compile and restart the application
+
+```
+mvn clean package jetty:run
 curl -XPOST "127.0.0.1:8080/api/1/person/_init?size=10000"
-```
-
-## Search
-
-```sh
-# Search for something (`a la google`)
-curl -XPOST "http://127.0.0.1:8080/api/1/person/_search?q=John&from=0&size=10"
 ```
 
 You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
 
-You can also look at [advanced search](http://127.0.0.1:8080/#/advanced).
-
-
 Next step
 ---------
 
-Look at [branch 01-direct](https://github.com/dadoonet/legacy-search/tree/01-direct)
+Look at [branch 02-bulk](https://github.com/dadoonet/legacy-search/tree/02-bulk)
