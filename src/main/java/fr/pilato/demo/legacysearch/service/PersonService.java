@@ -7,9 +7,7 @@ import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +73,22 @@ public class PersonService {
                     .field("name", 3.0f);
         }
 
+        if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
+            AndFilterBuilder andFilter = FilterBuilders.andFilter();
+            if (Strings.hasText(f_country)) {
+                andFilter.add(FilterBuilders.termFilter("country", f_country));
+            }
+            if (Strings.hasText(f_date)) {
+                String endDate = "" + (Integer.parseInt(f_date) + 10);
+                andFilter.add(FilterBuilders.rangeFilter("dateOfBirth").gte(f_date).lt(endDate));
+            }
+
+            query = QueryBuilders.filteredQuery(query, andFilter);
+        }
+
         SearchResponse response = elasticsearchDao.search(query, from, size);
 
-        if (logger.isDebugEnabled()) logger.debug("search({})={} persons", q, response.getHits().getTotalHits());
+        if (logger.isDebugEnabled()) logger.debug("search({},{},{})={} persons", q, f_country, f_date, response.getHits().getTotalHits());
 
         return response.toString();
     }

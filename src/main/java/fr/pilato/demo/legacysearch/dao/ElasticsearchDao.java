@@ -31,6 +31,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,17 @@ public class ElasticsearchDao {
         SearchResponse response = esClient.prepareSearch("person")
                 .setTypes("person")
                 .setQuery(query)
+                .addAggregation(
+                        AggregationBuilders.terms("by_country").field("country")
+                )
+                .addAggregation(
+                        AggregationBuilders.dateHistogram("by_year")
+                                .field("dateOfBirth")
+                                .minDocCount(0)
+                                .interval(DateHistogram.Interval.YEAR)
+                                .extendedBounds("1940", "2009")
+                                .format("YYYY")
+                )
                 .setFrom(from)
                 .setSize(size)
                 .execute().actionGet();
