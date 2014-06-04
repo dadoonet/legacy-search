@@ -1,0 +1,105 @@
+{
+    "person": {
+        "_all" : {
+            "enabled" : false
+        },
+        "properties": {
+            "fulltext" : {
+                "type" : "string",
+                "index_analyzer": "ngram",
+                "search_analyzer": "simple"
+            },
+            "address": {
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "copy_to": "fulltext",
+                        "fields": {
+                            "autocomplete" : {
+                                "type": "string",
+                                "index_analyzer": "ngram",
+                                "search_analyzer": "simple"
+                            }
+                        }
+                    },
+                    "country": {
+                        "type": "string",
+                        "copy_to": "fulltext",
+                        "fields": {
+                            "autocomplete" : {
+                                "type": "string",
+                                "index_analyzer": "ngram",
+                                "search_analyzer": "simple"
+                            }
+                        }
+                    },
+                    "countrycode": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type" : "geo_point"
+                    },
+                    "zipcode": {
+                        "type": "string"
+                    }
+                }
+            },
+            "children": {
+                "type": "long"
+            },
+            "dateOfBirth": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "gender": {
+                "copy_to": "fulltext",
+                "type": "string"
+            },
+            "marketing": {
+                "properties": {
+                    "cars": {
+                        "type": "long"
+                    },
+                    "electronic": {
+                        "type": "long"
+                    },
+                    "fashion": {
+                        "type": "long"
+                    },
+                    "food": {
+                        "type": "long"
+                    },
+                    "garden": {
+                        "type": "long"
+                    },
+                    "hifi": {
+                        "type": "long"
+                    },
+                    "music": {
+                        "type": "long"
+                    },
+                    "shoes": {
+                        "type": "long"
+                    },
+                    "toys": {
+                        "type": "long"
+                    }
+                }
+            },
+            "name": {
+                "type": "string",
+                "copy_to": "fulltext",
+                "fields": {
+                    "autocomplete" : {
+                        "type": "string",
+                        "index_analyzer": "ngram",
+                        "search_analyzer": "simple"
+                    }
+                }
+            },
+            "reference": {
+                "type": "string"
+            }
+        }
+    }
+}

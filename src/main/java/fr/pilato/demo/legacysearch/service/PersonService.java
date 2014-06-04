@@ -71,10 +71,8 @@ public class PersonService {
             query = QueryBuilders.matchAllQuery();
         } else {
             query = QueryBuilders.simpleQueryString(q)
-                    .field("name")
-                    .field("gender")
-                    .field("country")
-                    .field("city");
+                    .field("fulltext")
+                    .field("name", 3.0f);
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
@@ -94,17 +92,17 @@ public class PersonService {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             if (Strings.hasText(name)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name", name)
+                        QueryBuilders.matchQuery("name.autocomplete", name)
                 );
             }
             if (Strings.hasText(country)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country", country)
+                        QueryBuilders.matchQuery("address.country.autocomplete", country)
                 );
             }
             if (Strings.hasText(city)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city", city)
+                        QueryBuilders.matchQuery("address.city.autocomplete", city)
                 );
             }
 
