@@ -6,34 +6,12 @@ Introduction
 
 This is a demo project to show how to add elasticsearch to a legacy SQL project.
 
-This branch connect our project to elasticsearch directly.
+This branch uses bulk mode to insert data.
 
 Installation
 ------------
 
-You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
-
-Download and unzip elasticsearch:
-
-```
-wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.2.1.tar.gz
-tar xzf elasticsearch-1.2.1.tar.gz
-cd elasticsearch-1.2.1
-```
-
-Install Marvel plugin (optionnal):
-
-```
-bin/plugin -i elasticsearch/marvel/latest
-```
-
-Launch elasticsearch:
-
-```
-bin/elasticsearch
-```
-
-You can open [Marvel](http://localhost:9200/_plugin/marvel/) if needed.
+You need to have completed [branch 01-direct](https://github.com/dadoonet/legacy-search/tree/01-direct)
 
 Run it!
 -------
@@ -41,7 +19,13 @@ Run it!
 Compile and restart the application
 
 ```
+# Compile and launch again
 mvn clean package jetty:run
+
+# Delete the index
+DELETE person
+
+# Inject 10000 docs
 curl -XPOST "127.0.0.1:8080/api/1/person/_init?size=10000"
 ```
 
@@ -50,4 +34,4 @@ You can then access the application using your browser: [http://127.0.0.1:8080/]
 Next step
 ---------
 
-Look at [branch 02-bulk](https://github.com/dadoonet/legacy-search/tree/02-bulk)
+Look at [branch 03-mapping](https://github.com/dadoonet/legacy-search/tree/03-mapping)
