@@ -1,0 +1,101 @@
+<form class="form-horizontal" method="post" id="personForm" name="personForm">
+
+    <input type="hidden" name="id" id="id" ng-model="person.id"   />
+
+    <fieldset>
+        <legend>Person Information</legend>
+        <div class="control-group">
+            <label class="control-label" for="Name">Name</label>
+            <div class="controls">
+                <input ng-model="person.name" type="text" class="input-xlarge" id="name" name="name" autocomplete="off" >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="gender">Gender</label>
+            <div class="controls">
+                <select ng-model="person.gender" class="input-xlarge" id="gender" name="gender" autocomplete="off" >
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="city">Date of Birth</label>
+            <div class="controls">
+                <input ng-model="person.dateOfBirth" type="text" class="input-xlarge" id="dob" name="dob" autocomplete="off" >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="city">City</label>
+            <div class="controls">
+                <input ng-model="person.address.city" type="text" class="input-xlarge" id="city" name="city" autocomplete="off" >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="country">Country</label>
+            <div class="controls">
+                <input ng-model="person.address.country" type="text" class="input-xlarge" id="country" name="country" autocomplete="off" >
+            </div>
+        </div>
+
+
+
+        <legend>Number of Views by Category</legend>
+
+
+        <label class="control-label" for="Name">Cars</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.cars" name="meta.cars" ng-model="person.meta.cars" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Shoes</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.shoes" name="meta.shoes" ng-model="person.meta.shoes" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Toys</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.toys" name="meta.toys" ng-model="person.meta.toys" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Fashion</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.fashion" name="meta.fashion" ng-model="person.meta.fashion" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Music</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.music" name="meta.music" ng-model="person.meta.music" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Garden</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.garden" name="meta.garden"  ng-model="person.meta.garden" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Electronics</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.meta.electronics" name="meta.electronics" ng-model="person.meta.electronic" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Hifi</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.hifi" name="meta.hifi"  ng-model="person.meta.hifi" integer min="0"  autocomplete="off" >
+        </div>
+
+        <label class="control-label" for="Name">Food</label>
+        <div class="controls">
+            <input type="number" class="input" id="meta.food" name="meta.food"  ng-model="person.meta.food" integer min="0"  autocomplete="off" >
+        </div>
+
+
+        <div class="form-actions">
+            <button type="submit" ng-click="save()" class="btn btn-primary" id="actionSave" name="action"  value="save" >Save changes</button>
+            <button type="submit" ng-click="delete()" value="delete" id="actionDelete" name="action" class="btn">Delete</button>
+        </div>
+    </fieldset>
+</form>
