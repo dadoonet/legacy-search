@@ -87,6 +87,14 @@ public class ElasticsearchDao {
                 .setQuery(query)
                 .addAggregation(
                         AggregationBuilders.terms("by_country").field("country")
+                                .subAggregation(AggregationBuilders.dateHistogram("by_year")
+                                                .field("dateOfBirth")
+                                                .minDocCount(0)
+                                                .interval(DateHistogram.Interval.days(3652))
+                                                .extendedBounds("1940", "2009")
+                                                .format("YYYY")
+                                                .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
+                                )
                 )
                 .addAggregation(
                         AggregationBuilders.dateHistogram("by_year")
