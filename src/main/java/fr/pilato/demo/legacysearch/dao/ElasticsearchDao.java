@@ -24,10 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,14 @@ public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     @Autowired ObjectMapper mapper;
-    @Autowired Client esClient;
+    final Client esClient;
+
+    public ElasticsearchDao() {
+        // Create a TransportClient to connect to our running node
+        esClient = new TransportClient().addTransportAddress(
+                new InetSocketTransportAddress("127.0.0.1", 9300)
+        );
+    }
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
