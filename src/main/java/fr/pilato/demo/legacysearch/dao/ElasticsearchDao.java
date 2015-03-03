@@ -29,6 +29,8 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
@@ -43,8 +45,15 @@ public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     @Autowired ObjectMapper mapper;
-    @Autowired Client esClient;
+    final Client esClient;
     BulkProcessor bulkProcessor;
+
+    public ElasticsearchDao() {
+        // Create a TransportClient to connect to our running node
+        esClient = new TransportClient().addTransportAddress(
+                new InetSocketTransportAddress("127.0.0.1", 9300)
+        );
+    }
 
     @PostConstruct
     public void initBulk() {
