@@ -30,7 +30,7 @@
         <spring.version>4.0.6.RELEASE</spring.version>
         <hibernate.version>3.6.10.Final</hibernate.version>
         <elasticsearch.version>1.4.4</elasticsearch.version>
-        <elasticsearch.factory.version>1.4.1</elasticsearch.factory.version>
+        <beyonder.version>1.4.1</beyonder.version>
         <slf4j.version>1.7.2</slf4j.version>
         <log4j.version>2.2</log4j.version>
         <jackson.version>2.1.2</jackson.version>
@@ -109,11 +109,10 @@
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>fr.pilato.spring</groupId>
-            <artifactId>spring-elasticsearch</artifactId>
-            <version>${elasticsearch.factory.version}</version>
+            <groupId>fr.pilato.elasticsearch</groupId>
+            <artifactId>elasticsearch-beyonder</artifactId>
+            <version>${beyonder.version}</version>
         </dependency>
 
         <!-- Standard dependencies -->

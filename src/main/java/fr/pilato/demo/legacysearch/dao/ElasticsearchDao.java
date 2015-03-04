@@ -22,6 +22,7 @@ package fr.pilato.demo.legacysearch.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
+import fr.pilato.elasticsearch.tools.ElasticsearchBeyonder;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -29,6 +30,8 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -45,8 +48,16 @@ public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     @Autowired ObjectMapper mapper;
-    @Autowired Client esClient;
+    final Client esClient;
     BulkProcessor bulkProcessor;
+
+    public ElasticsearchDao() throws Exception {
+        // Create a TransportClient to connect to our running node
+        esClient = new TransportClient().addTransportAddress(
+                new InetSocketTransportAddress("127.0.0.1", 9300)
+        );
+        ElasticsearchBeyonder.start(esClient);
+    }
 
     @PostConstruct
     public void initBulk() {
