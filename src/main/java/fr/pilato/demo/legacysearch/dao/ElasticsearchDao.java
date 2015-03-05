@@ -36,29 +36,30 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import javax.annotation.PostConstruct;
 
 @Repository
 public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    @Autowired ObjectMapper mapper;
+    final ObjectMapper mapper;
     final Client esClient;
-    BulkProcessor bulkProcessor;
+    final BulkProcessor bulkProcessor;
 
-    public ElasticsearchDao() throws Exception {
+    public ElasticsearchDao() {
         // Create a TransportClient to connect to our running node
         esClient = new TransportClient().addTransportAddress(
                 new InetSocketTransportAddress("127.0.0.1", 9300)
         );
-        ElasticsearchBeyonder.start(esClient);
-    }
-
-    @PostConstruct
-    public void initBulk() {
+        // Create a Jackson Object Mapper instance
+        mapper = new ObjectMapper();
+        // Automagically create index and mapping
+        try {
+            ElasticsearchBeyonder.start(esClient);
+        } catch (Exception e) {
+            logger.warn("can not create index and mappings", e);
+        }
+        // Create a bulk processor
         bulkProcessor = BulkProcessor.builder(esClient, new BulkProcessor.Listener() {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
