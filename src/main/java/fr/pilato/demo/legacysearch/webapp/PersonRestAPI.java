@@ -5,10 +5,7 @@ import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.service.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -18,7 +15,11 @@ import java.io.IOException;
 public class PersonRestAPI {
     final Logger logger = LoggerFactory.getLogger(PersonRestAPI.class);
 
-    @Autowired PersonService personService;
+    private final PersonService personService;
+
+    public PersonRestAPI() {
+        personService = new PersonService();
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public @ResponseBody Person get(@PathVariable String id) throws Exception {
@@ -61,7 +62,6 @@ public class PersonRestAPI {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/_search", params = {"q","f_country","f_date","size","from"})
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public @ResponseBody
     String search(@RequestParam String q,
                   @RequestParam String f_country,
@@ -72,7 +72,6 @@ public class PersonRestAPI {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/_search", params = {"name","country","city","size","from"})
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public @ResponseBody
     String advancedSearch(@RequestParam String name,
                           @RequestParam String country,
@@ -84,7 +83,6 @@ public class PersonRestAPI {
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/_init", params = {"size"})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public @ResponseBody JsonResponse init(@RequestParam Integer size) throws IOException {
         return new JsonResponse(personService.init(size));
     }
