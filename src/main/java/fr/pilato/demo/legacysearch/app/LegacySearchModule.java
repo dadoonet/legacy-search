@@ -38,7 +38,7 @@ public class LegacySearchModule implements AutoCloseable {
                         .addAnnotatedClass(Address.class)
                         .addAnnotatedClass(Marketing.class);
 
-                if (System.getProperty("restx.mode", "dev").equalsIgnoreCase("dev")) {
+                if (System.getProperty("restx.mode", "prod").equalsIgnoreCase("dev")) {
                     logger.debug("restx.mode set to dev. Cleaning existing database...");
                     configuration.setProperty("hibernate.hbm2ddl.auto", "create");
                 }
