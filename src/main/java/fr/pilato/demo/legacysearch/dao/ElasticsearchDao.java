@@ -31,22 +31,21 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+import restx.factory.Component;
 
-@Repository
+import javax.inject.Inject;
+
+@Component
 public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    final ObjectMapper mapper;
-    final Client esClient;
+    final private ObjectMapper mapper;
+    final private Client esClient;
 
-    public ElasticsearchDao() {
-        // Create a TransportClient to connect to our running node
-        esClient = new TransportClient().addTransportAddress(
-                new InetSocketTransportAddress("127.0.0.1", 9300)
-        );
-        // Create a Jackson Object Mapper instance
-        mapper = new ObjectMapper();
+    @Inject
+    public ElasticsearchDao(ObjectMapper mapper) {
+        this.esClient = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
+        this.mapper = mapper;
     }
 
     public void save(Person person) throws JsonProcessingException {

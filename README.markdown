@@ -42,7 +42,7 @@ Compile and restart the application
 
 ```
 mvn clean package jetty:run
-curl -XPOST "127.0.0.1:8080/api/1/person/_init?size=10000"
+curl http://127.0.0.1:8080/api/1/person/_init?size=10000
 ```
 
 You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
