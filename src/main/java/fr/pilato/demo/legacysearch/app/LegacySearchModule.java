@@ -24,6 +24,7 @@ public class LegacySearchModule implements AutoCloseable {
         if (dozerBeanMapper == null) {
             logger.debug("creating dozen bean mapper");
             dozerBeanMapper = new DozerBeanMapper();
+            logger.debug("dozen bean mapper created");
         }
         return dozerBeanMapper;
     }
@@ -47,6 +48,7 @@ public class LegacySearchModule implements AutoCloseable {
                         .configure().buildSessionFactory(
                                 new StandardServiceRegistryBuilder().configure().build()
                         );
+                logger.debug("hibernate session factory created");
             }
             catch (Throwable ex) {
                 logger.error("Initial SessionFactory creation failed." + ex);
