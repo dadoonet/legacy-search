@@ -35,6 +35,9 @@ mvn clean install
 mvn jetty:run
 ```
 
+Note that while developing, you would probably prefer running `LegacySearchApp#main()`
+which will scan your modification and will perform hot reload.
+
 Play!
 -----
 
@@ -45,18 +48,13 @@ Play!
 curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato"}'
 
 # Read that person
-curl http://127.0.0.1:8080/api/1/person/1
+curl http://127.0.0.1:8080/api/1/person/_byid/1
 
-# Update (will merge values)
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"children":3}'
-# or update full document
+# Update full document
 curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato", "children":3}'
 
 # Check
 curl http://127.0.0.1:8080/api/1/person/1
-
-# Update (full document)
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -d '{"name":"David Pilato", "children":3}'
 
 # Delete
 curl -XDELETE http://127.0.0.1:8080/api/1/person/1
@@ -65,21 +63,23 @@ curl -XDELETE http://127.0.0.1:8080/api/1/person/1
 ### Database Initialisation
 
 ```sh
-# Initialize the database with 10 persons
-curl -XPOST "127.0.0.1:8080/api/1/person/_init?size=10000"
+# Initialize the database with 1 000 (default) or 10 000 persons
+curl http://127.0.0.1:8080/api/1/person/_init
+curl http://127.0.0.1:8080/api/1/person/_init?size=10000
 ```
 
 ## Search
 
 ```sh
 # Search for something (`a la google`)
-curl -XPOST "http://127.0.0.1:8080/api/1/person/_search?q=John&from=0&size=10"
+curl "http://127.0.0.1:8080/api/1/person/_search?q=Joe&from=0&size=10"
 ```
 
 You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
-
 You can also look at [advanced search](http://127.0.0.1:8080/#/advanced).
 
+RestX provides as well its own interface: [http://127.0.0.1:8080/api/@/ui/](http://127.0.0.1:8080/api/@/ui/).
+Default login / password are: `admin` / `juma`.
 
 Next step
 ---------

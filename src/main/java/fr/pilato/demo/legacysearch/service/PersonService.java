@@ -1,91 +1,126 @@
 package fr.pilato.demo.legacysearch.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.pilato.demo.legacysearch.dao.*;
+import fr.pilato.demo.legacysearch.dao.HibernateService;
+import fr.pilato.demo.legacysearch.dao.PersonDao;
+import fr.pilato.demo.legacysearch.dao.SearchDao;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
+import org.dozer.DozerBeanMapper;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import restx.factory.Component;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Component
 public class PersonService {
     final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
     private final PersonDao personDao;
     private final SearchDao searchDao;
+    private final HibernateService hibernateService;
     private final ObjectMapper mapper;
+    private final DozerBeanMapper dozerBeanMapper;
 
-    public PersonService() {
-        personDao = new PersonDaoImpl();
-        searchDao = new SearchDaoImpl();
-        mapper = new ObjectMapper();
+    @Inject
+    public PersonService(PersonDao personDao, SearchDao searchDao,
+                         HibernateService hibernateService,
+                         ObjectMapper mapper, DozerBeanMapper dozerBeanMapper) {
+        this.personDao = personDao;
+        this.searchDao = searchDao;
+        this.hibernateService = hibernateService;
+        this.mapper = mapper;
+        this.dozerBeanMapper = dozerBeanMapper;
     }
 
-    public Person get(String id) throws Exception {
-        HibernateUtils.beginTransaction();
+    public Person get(String id) {
+        hibernateService.beginTransaction();
 
         Person person = personDao.getByReference(id);
-        if (logger.isDebugEnabled()) logger.debug("get({})={}", id, person);
+        logger.debug("get({})={}", id, person);
 
-        HibernateUtils.commitTransaction();
+        hibernateService.commitTransaction();
         return person;
     }
 
     public Person save(Person person) {
-        HibernateUtils.beginTransaction();
+        hibernateService.beginTransaction();
 
         Person personDb = personDao.save(person);
 
-        HibernateUtils.commitTransaction();
+        hibernateService.commitTransaction();
         return personDb;
     }
 
-    public boolean delete(String id) throws Exception {
-        if (logger.isDebugEnabled()) logger.debug("Person: {}", id);
+    public Person upsert(String id, Person person) {
+        // We try to find an existing document
+        Person personDb = get(id);
+        if (personDb != null) {
+            dozerBeanMapper.map(person, personDb);
+            person = personDb;
+            person.setId(Integer.parseInt(id));
+        }
+        person.setReference(id);
+        person = save(person);
+
+        return person;
+    }
+
+    public boolean delete(String id) {
+        logger.debug("Person: {}", id);
 
         if (id == null) {
             return false;
         }
 
-        HibernateUtils.beginTransaction();
-        Person person = get(id);
+        hibernateService.beginTransaction();
+        Person person = personDao.getByReference(id);
         if (person == null) {
-            if (logger.isDebugEnabled()) logger.debug("Person with reference {} does not exist", id);
-            HibernateUtils.commitTransaction();
+            logger.debug("Person with reference {} does not exist", id);
+            hibernateService.commitTransaction();
             return false;
         }
         personDao.delete(person);
-        HibernateUtils.commitTransaction();
+        hibernateService.commitTransaction();
 
-        if (logger.isDebugEnabled()) logger.debug("Person deleted: {}", id);
+        logger.debug("Person deleted: {}", id);
 
         return true;
     }
 
-    public String search(String q, String f_country, String f_date, Integer from, Integer size) throws Exception {
+    public String search(String q, String f_country, String f_date, Integer from, Integer size) {
         long start = System.currentTimeMillis();
 
-        HibernateUtils.beginTransaction();
+        hibernateService.beginTransaction();
         long total = searchDao.countLikeGoogle(q);
         Collection<Person> personsFound = searchDao.findLikeGoogle(q, from, size);
-        HibernateUtils.commitTransaction();
+        hibernateService.commitTransaction();
         long took = System.currentTimeMillis() - start;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
 
-        if (logger.isDebugEnabled()) logger.debug("search({})={} persons", q, response.getHits().getTotalHits());
+        logger.debug("search({})={} persons", q, response.getHits().getTotalHits());
 
-        return mapper.writeValueAsString(response);
+        String json = null;
+        try {
+            json = mapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            logger.error("can not serialize to json", e);
+        }
+
+        return json;
     }
 
-    public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws Exception {
+    public String advancedSearch(String name, String country, String city, Integer from, Integer size) {
         List<Criterion> criterions = new ArrayList<>();
         if (name != null) {
             criterions.add(Restrictions.ilike("name", "%" + name + "%"));
@@ -99,41 +134,53 @@ public class PersonService {
 
         long start = System.currentTimeMillis();
 
-        HibernateUtils.beginTransaction();
+        hibernateService.beginTransaction();
         long total = searchDao.countWithCriterias(criterions);
         Collection<Person> personsFound = searchDao.findWithCriterias(criterions, from, size);
-        HibernateUtils.commitTransaction();
+        hibernateService.commitTransaction();
         long took = System.currentTimeMillis() - start;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
 
-        if (logger.isDebugEnabled()) logger.debug("advancedSearch({},{},{})={} persons", name, country, city, response.getHits().getTotalHits());
+        logger.debug("advancedSearch({},{},{})={} persons", name, country, city, response.getHits().getTotalHits());
 
-        return mapper.writeValueAsString(response);
+        String json = null;
+        try {
+            json = mapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            logger.error("can not serialize to json", e);
+        }
+
+        return json;
     }
 
-    public boolean init(Integer size) throws IOException {
-        if (logger.isDebugEnabled()) logger.debug("Initializing database for {} persons", size);
+    public boolean init(Integer size) {
+        logger.debug("Initializing database for {} persons", size);
 
         long start = System.currentTimeMillis();
 
-        HibernateUtils.beginTransaction();
-        Person joe = PersonGenerator.personGenerator();
-        joe.setName("Joe Smith");
-        joe.setReference("0");
-        save(joe);
+        try {
+            hibernateService.beginTransaction();
+            Person joe = PersonGenerator.personGenerator();
+            joe.setName("Joe Smith");
+            joe.setReference("0");
+            save(joe);
 
-        // We generate numPersons persons
-        for (int i = 1; i < size; i++) {
-            Person person = PersonGenerator.personGenerator();
-            person.setReference("" + i);
-            save(person);
+            // We generate numPersons persons
+            for (int i = 1; i < size; i++) {
+                Person person = PersonGenerator.personGenerator();
+                person.setReference("" + i);
+                save(person);
+            }
+        } catch (IOException e) {
+            logger.warn("error while generating data", e);
+        } finally {
+            hibernateService.commitTransaction();
         }
-        HibernateUtils.commitTransaction();
 
         long took = System.currentTimeMillis() - start;
 
-        if (logger.isDebugEnabled()) logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
+        logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
                 size, took, 1000 * size / took);
 
         return true;

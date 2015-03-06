@@ -19,7 +19,7 @@ function SearchCtrl($scope, $http) {
     $scope.f_country = "";
 
     $scope.search = function() {
-        $http({method: 'POST', url: '/api/1/person/_search?from=0&size=10&q='+ $scope.query
+        $http({method: 'GET', url: '/api/1/person/_search?from=0&size=10&q='+ $scope.query
             + '&f_date=' + $scope.f_date + '&f_country=' + $scope.f_country })
             .success(function(data, status, headers, config) {
                 $scope.result = data;
@@ -76,7 +76,7 @@ function AdvancedSearchCtrl($scope, $http) {
 
     $scope.advanced_search = function() {
 
-        $http({method: 'POST', url: '/api/1/person/_search?from=0&size=10&country='+$scope.country+'&city='+$scope.city+'&name='+ $scope.name }).success(function(data, status, headers, config) {
+        $http({method: 'GET', url: '/api/1/person/_advanced_search?from=0&size=10&country='+$scope.country+'&city='+$scope.city+'&name='+ $scope.name }).success(function(data, status, headers, config) {
             $scope.result = data;
         })
             .error(function(data, status, headers, config) {
@@ -90,7 +90,7 @@ AdvancedSearchCtrl.$inject = ['$scope', '$http'];
 
 function PersonFormCtrl($rootScope, $scope, $routeParams, $http, $location) {
 
-    $http({method: 'GET', url: '/api/1/person/'+ $routeParams.id }).success(function(data, status, headers, config) {
+    $http({method: 'GET', url: '/api/1/person/_byid/'+ $routeParams.id }).success(function(data, status, headers, config) {
         $scope.person = data;
     })
         .error(function(data, status, headers, config) {

@@ -113,7 +113,9 @@ public class Person {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Person{");
-        sb.append("name='").append(name).append('\'');
+        sb.append("id=").append(id);
+        sb.append(", reference='").append(reference).append('\'');
+        sb.append(", name='").append(name).append('\'');
         sb.append(", dateOfBirth=").append(dateOfBirth);
         sb.append(", gender='").append(gender).append('\'');
         sb.append(", children=").append(children);
