@@ -14,20 +14,20 @@ public interface SearchDao {
     /**
      * Find person using criteria
      */
-    public Collection<Person> findWithCriterias(Collection<Criterion> criterions, Integer from, Integer size) throws Exception;
+    public Collection<Person> findWithCriterias(Collection<Criterion> criterions, Integer from, Integer size);
 
     /**
      * Count persons using criteria
      */
-    public long countWithCriterias(Collection<Criterion> criterions) throws Exception;
+    public long countWithCriterias(Collection<Criterion> criterions);
 
     /**
      * Find persons with a google like search.
      */
-    public Collection<Person> findLikeGoogle(String query, Integer from, Integer size) throws Exception;
+    public Collection<Person> findLikeGoogle(String query, Integer from, Integer size);
 
     /**
      * Count persons with a google like search.
      */
-    public long countLikeGoogle(String query) throws Exception;
+    public long countLikeGoogle(String query);
 }

@@ -9,6 +9,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import restx.factory.Component;
 
 import java.util.Collection;
 
@@ -18,15 +19,22 @@ import java.util.Collection;
  * 
  * @author David Pilato
  */
+@Component
 public class SearchDaoImpl implements SearchDao {
     final Logger logger = LoggerFactory.getLogger(SearchDaoImpl.class);
+
+    private final HibernateService hibernateService;
+
+    public SearchDaoImpl(HibernateService hibernateService) {
+        this.hibernateService = hibernateService;
+    }
 
     /**
      * Find persons by any column (like full text).
      */
     @SuppressWarnings("unchecked")
     public Collection<Person> findLikeGoogle(String query, Integer from, Integer size) {
-        Criteria criteria = generateQuery(HibernateUtils.getSession(), Person.class, query);
+        Criteria criteria = generateQuery(hibernateService.getSession(), Person.class, query);
         criteria.setFirstResult(from);
         criteria.setMaxResults(size);
         return criteria.list();
@@ -36,8 +44,8 @@ public class SearchDaoImpl implements SearchDao {
      * Generate a google like query
      */
     @Override
-    public long countLikeGoogle(String query) throws Exception {
-        int size = generateQuery(HibernateUtils.getSession(), Person.class, query).list().size();
+    public long countLikeGoogle(String query) {
+        int size = generateQuery(hibernateService.getSession(), Person.class, query).list().size();
         return size;
     }
 
@@ -45,8 +53,8 @@ public class SearchDaoImpl implements SearchDao {
      * Find persons by criterias.
      */
     @SuppressWarnings("unchecked")
-    public Collection<Person> findWithCriterias(Collection<Criterion> criterions, Integer from, Integer size) throws Exception {
-        Criteria criteria = HibernateUtils.getSession().createCriteria(Person.class);
+    public Collection<Person> findWithCriterias(Collection<Criterion> criterions, Integer from, Integer size) {
+        Criteria criteria = hibernateService.getSession().createCriteria(Person.class);
         criteria.createAlias("address", "address");
 
         for (Criterion crit : criterions) {
@@ -63,8 +71,8 @@ public class SearchDaoImpl implements SearchDao {
      * Find persons by criterias.
      */
     @SuppressWarnings("unchecked")
-    public long countWithCriterias(Collection<Criterion> criterions) throws Exception {
-        Criteria criteria = HibernateUtils.getSession().createCriteria(Person.class);
+    public long countWithCriterias(Collection<Criterion> criterions) {
+        Criteria criteria = hibernateService.getSession().createCriteria(Person.class);
         criteria.createAlias("address", "address");
 
         for (Criterion crit : criterions) {

@@ -18,7 +18,7 @@ public interface PersonDao {
     /**
      * Get person by reference
      */
-    public Person getByReference(String reference) throws Exception;
+    public Person getByReference(String reference);
 
     /**
      * Saves person.
