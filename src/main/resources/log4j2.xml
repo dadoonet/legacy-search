@@ -9,7 +9,11 @@
 		<Logger name="fr.pilato" level="debug"/>
         <Logger name="org.elasticsearch" level="error"/>
         <Logger name="org.hibernate" level="error"/>
-		<Root level="error">
+        <Logger name="restx.factory" level="error"/>
+        <Logger name="restx" level="error"/>
+        <Logger name="restx.classloader" level="info"/>
+        <Logger name="org.dozer" level="error"/>
+		<Root level="info">
 			<AppenderRef ref="Console" />
 		</Root>
 	</Loggers>
