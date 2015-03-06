@@ -6,7 +6,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger name="fr.pilato" level="debug"/>
+		<Logger name="fr.pilato.demo.legacysearch" level="debug"/>
         <Logger name="org.elasticsearch" level="error"/>
         <Logger name="org.hibernate" level="error"/>
         <Logger name="restx.factory" level="error"/>
