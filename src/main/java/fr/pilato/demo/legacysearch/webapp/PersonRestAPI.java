@@ -1,112 +1,72 @@
 package fr.pilato.demo.legacysearch.webapp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.service.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import restx.annotations.*;
+import restx.factory.Component;
+import restx.security.PermitAll;
 
-import java.io.IOException;
+import javax.inject.Inject;
 
-@Controller
-@RequestMapping("/1/person")
+@Component
+@RestxResource("/1/person")
 public class PersonRestAPI {
     final Logger logger = LoggerFactory.getLogger(PersonRestAPI.class);
 
     private final PersonService personService;
 
-    public PersonRestAPI() {
-        personService = new PersonService();
+    @Inject
+    public PersonRestAPI(PersonService personService) {
+        this.personService = personService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public @ResponseBody Person get(@PathVariable String id) throws Exception {
-        return personService.get(id);
+    @GET("/_byid/{id}")
+    @PermitAll
+    public Optional<Person> get(String id) {
+        return Optional.fromNullable(personService.get(id));
     }
 
     /**
      * Create or update an entity
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public @ResponseBody JsonResponse upsert(@PathVariable String id, @RequestBody String json) throws Exception {
-        if (logger.isDebugEnabled()) logger.debug("create({}, {})", id, json);
-
-        // We try to find an existing document
-        ObjectMapper mapper = new ObjectMapper();
-        Person person = get(id);
-
-        if (person == null) {
-            person = mapper.readValue(json, Person.class);
-            person.setReference(id);
-        } else {
-            mapper.readerForUpdating(person).readValue(json);
-        }
-
-        if (logger.isDebugEnabled()) logger.debug("create/update {}: {}", id, person);
-        person = personService.save(person);
-
-        return new JsonResponse(true, person.getReference());
+    @PUT("/{id}")
+    @Consumes("application/json")
+    @PermitAll
+    public Person upsert(String id, Person person) {
+        logger.debug("upsert({}, {})", id, person);
+        Person upsert = personService.upsert(id, person);
+        logger.debug("created/updated {}: {}", id, upsert);
+        return upsert;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public @ResponseBody JsonResponse delete(@PathVariable String id) throws Exception {
-        if (logger.isDebugEnabled()) logger.debug("Person: {}", id);
-
-        if (id == null) {
-            return new JsonResponse(false);
-        }
-
-        return new JsonResponse(personService.delete(id));
+    @DELETE("/{id}")
+    @PermitAll
+    public void delete(String id) {
+        logger.debug("Person: {}", id);
+        personService.delete(id);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/_search", params = {"q","f_country","f_date","size","from"})
-    public @ResponseBody
-    String search(@RequestParam String q,
-                  @RequestParam String f_country,
-                  @RequestParam String f_date,
-                  @RequestParam Integer from,
-                  @RequestParam Integer size) throws Exception {
-        return personService.search(q, f_country, f_date, from, size);
+    @GET("/_search")
+    @PermitAll
+    public String search(Optional<String> q, Optional<String> f_country, Optional<String> f_date,
+                         Optional<Integer> from, Optional<Integer> size) {
+        return personService.search(q.orNull(), f_country.orNull(), f_date.orNull(), from.or(0), size.or(10));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/_search", params = {"name","country","city","size","from"})
-    public @ResponseBody
-    String advancedSearch(@RequestParam String name,
-                          @RequestParam String country,
-                          @RequestParam String city,
-                          @RequestParam Integer from,
-                          @RequestParam Integer size) throws Exception {
-        return personService.advancedSearch(name, country, city, from, size);
+    @GET("/_advanced_search")
+    @PermitAll
+    public String advancedSearch(Optional<String> name, Optional<String> country, Optional<String> city,
+                                 Optional<Integer> from, Optional<Integer> size) {
+        return personService.advancedSearch(name.orNull(), country.orNull(), city.orNull(), from.or(0), size.or(10));
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/_init", params = {"size"})
-    public @ResponseBody JsonResponse init(@RequestParam Integer size) throws IOException {
-        return new JsonResponse(personService.init(size));
-    }
-
-    class JsonResponse {
-        private boolean ok;
-        private String reference;
-
-        JsonResponse(boolean ok) {
-            this.ok = ok;
-            this.reference = null;
-        }
-
-        JsonResponse(boolean ok, String reference) {
-            this.ok = ok;
-            this.reference = reference;
-        }
-
-        public String getReference() {
-            return reference;
-        }
-
-        public boolean isOk() {
-            return ok;
-        }
+    @GET("/_init")
+    @PermitAll
+    public void init(Optional<Integer> size) {
+        personService.init(size.or(1000));
     }
 }

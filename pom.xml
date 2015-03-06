@@ -27,13 +27,13 @@
     <properties>
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.source>1.7</maven.compiler.source>
-        <spring.version>4.0.6.RELEASE</spring.version>
+        <restx.version>0.34</restx.version>
         <hibernate.version>4.3.8.Final</hibernate.version>
         <elasticsearch.version>1.4.4</elasticsearch.version>
         <beyonder.version>1.4.1</beyonder.version>
         <slf4j.version>1.7.2</slf4j.version>
         <log4j.version>2.2</log4j.version>
-        <jackson.version>2.1.2</jackson.version>
+        <jackson.version>2.3.5</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -45,26 +45,56 @@
             <version>${hibernate.version}</version>
         </dependency>
 
-        <!-- Spring -->
+        <!-- RESTX dependencies -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-core</artifactId>
+            <version>${restx.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-core-annotation-processor</artifactId>
+            <version>${restx.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-factory</artifactId>
+            <version>${restx.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-monitor-codahale</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-monitor-admin</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-server-jetty</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-apidocs</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-barbarywatch</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-specs-admin</artifactId>
+            <version>${restx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-admin</artifactId>
+            <version>${restx.version}</version>
         </dependency>
 
         <!-- JDBC Driver -->
@@ -79,6 +109,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>5.5.1</version>
         </dependency>
 
         <!-- Elasticsearch -->

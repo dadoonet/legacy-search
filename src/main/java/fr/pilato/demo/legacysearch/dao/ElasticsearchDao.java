@@ -36,31 +36,29 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+import restx.factory.Component;
 
-@Repository
+import javax.inject.Inject;
+
+@Component
 public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    final ObjectMapper mapper;
-    final Client esClient;
-    final BulkProcessor bulkProcessor;
+    final private ObjectMapper mapper;
+    final private Client esClient;
+    final private BulkProcessor bulkProcessor;
 
-    public ElasticsearchDao() {
-        // Create a TransportClient to connect to our running node
-        esClient = new TransportClient().addTransportAddress(
-                new InetSocketTransportAddress("127.0.0.1", 9300)
-        );
-        // Create a Jackson Object Mapper instance
-        mapper = new ObjectMapper();
+    @Inject
+    public ElasticsearchDao(ObjectMapper mapper) {
+        this.esClient = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
         // Automagically create index and mapping
         try {
             ElasticsearchBeyonder.start(esClient);
         } catch (Exception e) {
             logger.warn("can not create index and mappings", e);
         }
-        // Create a bulk processor
-        bulkProcessor = BulkProcessor.builder(esClient, new BulkProcessor.Listener() {
+        this.mapper = mapper;
+        this.bulkProcessor = BulkProcessor.builder(esClient, new BulkProcessor.Listener() {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.debug("going to execute bulk of {} requests", request.numberOfActions());
