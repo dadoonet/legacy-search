@@ -1,0 +1,19 @@
+<div class="container">
+
+    <div class="row">
+        <div class="span4">
+            <input ng-model="persons" type="text" class="input-medium search-query span4"
+                   name="persons"  placeholder="Number of persons to inject" autocomplete="off">
+        </div>
+        <div class="span2">
+            <button ng-click="init()" type="submit" class="btn btn-primary span2">Inject</button>
+        </div>
+        <div class="span5 offset1">
+            <span class="badge badge-info" ng-show="result==false">injecting {{persons}} persons...</span>
+            <span class="badge badge-success" ng-show="result==true">injecting {{persons}} persons done!</span>
+            <span class="badge badge-success" ng-show="result==true && error==true">with errors</span>
+        </div>
+    </div>
+</div>
+
+
