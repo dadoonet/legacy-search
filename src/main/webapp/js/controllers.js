@@ -121,3 +121,21 @@ function PersonFormCtrl($rootScope, $scope, $routeParams, $http, $location) {
 
 }
 PersonFormCtrl.$inject = ['$rootScope', '$scope', '$routeParams','$http', '$location'];
+
+function InitCtrl($scope, $http) {
+    $scope.persons = "";
+    $scope.result = null;
+
+    $scope.init = function() {
+        $scope.result = false;
+        $http({method: 'GET', url: '/api/1/person/_init?size='+$scope.persons }).success(function(data, status, headers, config) {
+            $scope.result = true;
+        })
+            .error(function(data, status, headers, config) {
+                $scope.log = 'Error!';
+                $scope.error = true;
+            });
+    }
+}
+InitCtrl.$inject = ['$scope', '$http'];
+
