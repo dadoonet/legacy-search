@@ -114,8 +114,8 @@ public class PersonService {
             query = QueryBuilders.simpleQueryString(q)
                     .field("name")
                     .field("gender")
-                    .field("country")
-                    .field("city");
+                    .field("address.country")
+                    .field("address.city");
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
