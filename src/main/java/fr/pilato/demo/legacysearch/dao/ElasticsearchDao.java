@@ -96,7 +96,7 @@ public class ElasticsearchDao {
                 .setTypes("person")
                 .setQuery(query)
                 .addAggregation(
-                        AggregationBuilders.terms("by_country").field("country")
+                        AggregationBuilders.terms("by_country").field("address.country")
                                 .subAggregation(AggregationBuilders.dateHistogram("by_year")
                                                 .field("dateOfBirth")
                                                 .minDocCount(0)
