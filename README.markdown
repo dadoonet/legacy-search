@@ -18,14 +18,14 @@ You need to have:
 * JDK7 or higher
 * Postgresql up and running
 
-Modify [src/main/resources/jdbc.properties](src/main/resources/jdbc.properties) file to reflect
+Modify [src/main/resources/hibernate.cfg.xml](src/main/resources/hibernate.cfg.xml) file to reflect
 your own postgresql settings:
 
-```
-jdbc.driverClassName=org.postgresql.Driver
-jdbc.url=jdbc:postgresql://localhost:5432/dpilato
-jdbc.username=dpilato
-jdbc.password=
+```xml
+<!-- Database connection settings -->
+<property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/dpilato</property>
+<property name="hibernate.connection.username">dpilato</property>
+<property name="hibernate.connection.password"></property>
 ```
 
 Start the server using jetty
