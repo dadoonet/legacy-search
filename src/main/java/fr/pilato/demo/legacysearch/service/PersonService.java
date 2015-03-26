@@ -117,7 +117,7 @@ public class PersonService {
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
             AndFilterBuilder andFilter = FilterBuilders.andFilter();
             if (Strings.hasText(f_country)) {
-                andFilter.add(FilterBuilders.termFilter("country", f_country));
+                andFilter.add(FilterBuilders.termFilter("address.country", f_country));
             }
             if (Strings.hasText(f_date)) {
                 String endDate = "" + (Integer.parseInt(f_date) + 10);
