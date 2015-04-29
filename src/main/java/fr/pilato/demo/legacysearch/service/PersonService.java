@@ -111,7 +111,7 @@ public class PersonService {
         if (!Strings.hasText(q)) {
             query = QueryBuilders.matchAllQuery();
         } else {
-            query = QueryBuilders.simpleQueryString(q)
+            query = QueryBuilders.simpleQueryStringQuery(q)
                     .field("name")
                     .field("gender")
                     .field("address.country")
