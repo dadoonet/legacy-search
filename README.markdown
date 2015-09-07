@@ -16,17 +16,40 @@ You need to have:
 
 * Maven
 * JDK7 or higher
-* Postgresql up and running
+* Postgresql or MySQL up and running
 
 Modify [src/main/resources/hibernate.cfg.xml](src/main/resources/hibernate.cfg.xml) file to reflect
-your own postgresql settings:
+your own database settings:
 
 ```xml
-<!-- Database connection settings -->
+<!-- Database connection settings - postgresql -->
+<property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
 <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/dpilato</property>
 <property name="hibernate.connection.username">dpilato</property>
 <property name="hibernate.connection.password"></property>
+<property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
 ```
+
+or
+
+```xml
+<!-- Database connection settings - MySQL -->
+<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+<property name="hibernate.connection.url">jdbc:mysql://127.0.0.1:3306/person</property>
+<property name="hibernate.connection.username">root</property>
+<property name="hibernate.connection.password"></property>
+<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+```
+
+If you did not create your database yet, just run:
+
+```sh
+# Postgresql
+createdb person
+# MySQL
+mysqladmin -uroot create person
+```
+
 
 Start the server using jetty
 
