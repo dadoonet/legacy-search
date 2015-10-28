@@ -27,11 +27,11 @@
     <properties>
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.source>1.7</maven.compiler.source>
-        <restx.version>0.34</restx.version>
+        <restx.version>0.35-SNAPSHOT</restx.version>
         <hibernate.version>4.3.8.Final</hibernate.version>
         <slf4j.version>1.7.2</slf4j.version>
         <log4j.version>2.2</log4j.version>
-        <jackson.version>2.3.5</jackson.version>
+        <jackson.version>2.6.1</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
