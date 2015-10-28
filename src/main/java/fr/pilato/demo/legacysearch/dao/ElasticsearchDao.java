@@ -35,12 +35,13 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
 
 import javax.inject.Inject;
+import java.net.InetSocketAddress;
 
 @Component
 public class ElasticsearchDao {
@@ -52,7 +53,8 @@ public class ElasticsearchDao {
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
-        this.esClient = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
+        this.esClient = TransportClient.builder().build()
+                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
         // Automagically create index and mapping
         try {
             ElasticsearchBeyonder.start(esClient);
@@ -102,7 +104,7 @@ public class ElasticsearchDao {
                         AggregationBuilders.dateHistogram("by_year")
                                 .field("dateOfBirth")
                                 .minDocCount(0)
-                                .interval(DateHistogram.Interval.YEAR)
+                                .interval(DateHistogramInterval.YEAR)
                                 .extendedBounds("1940", "2009")
                                 .format("YYYY")
                 )
