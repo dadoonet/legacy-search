@@ -10,7 +10,9 @@ import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import org.dozer.DozerBeanMapper;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
@@ -115,16 +117,14 @@ public class PersonService {
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
-            AndFilterBuilder andFilter = FilterBuilders.andFilter();
+            query = QueryBuilders.boolQuery().must(query);
             if (Strings.hasText(f_country)) {
-                andFilter.add(FilterBuilders.termFilter("address.country", f_country));
+                ((BoolQueryBuilder) query).must(QueryBuilders.termQuery("address.country", f_country));
             }
             if (Strings.hasText(f_date)) {
                 String endDate = "" + (Integer.parseInt(f_date) + 10);
-                andFilter.add(FilterBuilders.rangeFilter("dateOfBirth").gte(f_date).lt(endDate));
+                ((BoolQueryBuilder) query).must(QueryBuilders.rangeQuery("dateOfBirth").gte(f_date).lt(endDate));
             }
-
-            query = QueryBuilders.filteredQuery(query, andFilter);
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
