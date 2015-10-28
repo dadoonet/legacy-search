@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import restx.factory.Component;
 
 import javax.inject.Inject;
+import java.net.InetSocketAddress;
 
 @Component
 public class ElasticsearchDao {
@@ -50,7 +51,8 @@ public class ElasticsearchDao {
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
-        this.esClient = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
+        this.esClient = TransportClient.builder().build()
+                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
         // Automagically create index and mapping
         try {
             ElasticsearchBeyonder.start(esClient);

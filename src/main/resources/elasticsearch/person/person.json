@@ -6,7 +6,7 @@
         "properties": {
             "fulltext" : {
                 "type" : "string",
-                "index_analyzer": "ngram",
+                "analyzer": "ngram",
                 "search_analyzer": "simple"
             },
             "address": {
@@ -17,7 +17,7 @@
                         "fields": {
                             "autocomplete" : {
                                 "type": "string",
-                                "index_analyzer": "ngram",
+                                "analyzer": "ngram",
                                 "search_analyzer": "simple"
                             }
                         }
@@ -28,7 +28,7 @@
                         "fields": {
                             "autocomplete" : {
                                 "type": "string",
-                                "index_analyzer": "ngram",
+                                "analyzer": "ngram",
                                 "search_analyzer": "simple"
                             }
                         }
@@ -92,7 +92,7 @@
                 "fields": {
                     "autocomplete" : {
                         "type": "string",
-                        "index_analyzer": "ngram",
+                        "analyzer": "ngram",
                         "search_analyzer": "simple"
                     }
                 }
