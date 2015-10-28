@@ -16,15 +16,16 @@ You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy
 Download and unzip elasticsearch:
 
 ```
-wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.2.tar.gz
+wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.0.0-rc1/elasticsearch-2.0.0-rc1.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
 
-Install Marvel plugin (optionnal):
+Install Marvel plugin (optional):
 
 ```
-bin/plugin -i elasticsearch/marvel/latest
+bin/plugin install license
+bin/plugin install marvel
 ```
 
 Launch elasticsearch:
