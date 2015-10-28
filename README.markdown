@@ -21,12 +21,25 @@ tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
 
-Install Marvel plugin (optional):
+### Optional (Kibana, Marvel and Sense)
+
+Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
+
+```
+wget https://download.elastic.co/kibana/kibana/kibana-4.2.0-darwin-x64.tar.gz
+tar xzf kibana-*.tar.gz
+cd kibana-*
+bin/kibana plugin --install elastic/sense
+bin/kibana plugin --install elasticsearch/marvel/latest
+```
+
+Install Marvel plugin:
 
 ```
 bin/plugin install license
-bin/plugin install marvel
+bin/plugin install marvel-agent
 ```
+### Launch elasticsearch
 
 Launch elasticsearch:
 
@@ -34,7 +47,14 @@ Launch elasticsearch:
 bin/elasticsearch
 ```
 
-You can open [Marvel](http://localhost:9200/_plugin/marvel/) if needed.
+### Launch Kibana (optional)
+
+```
+bin/kibana
+```
+
+You can open [Marvel](http://localhost:5601/app/marvel) and [Sense](http://localhost:5601/app/sense) if needed.
+
 
 Run it!
 -------
