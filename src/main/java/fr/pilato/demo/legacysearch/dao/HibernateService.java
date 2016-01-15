@@ -3,6 +3,7 @@ package fr.pilato.demo.legacysearch.dao;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
@@ -25,13 +26,13 @@ public class HibernateService {
 
     public void beginTransaction() {
         // Create a transaction if no one is opened yet
-        if (getSession().getTransaction() == null || !getSession().getTransaction().isActive()) {
+        if (getSession().getTransaction() == null || getSession().getTransaction().getStatus().isOneOf(TransactionStatus.NOT_ACTIVE)) {
             getSession().beginTransaction();
         }
     }
 
     public void commitTransaction() {
-        if (getSession().getTransaction() != null && getSession().getTransaction().isActive()) {
+        if (getSession().getTransaction() != null && getSession().getTransaction().getStatus().isOneOf(TransactionStatus.ACTIVE)) {
             getSession().getTransaction().commit();
         }
     }
