@@ -16,7 +16,7 @@ You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy
 Download and unzip elasticsearch:
 
 ```
-wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.0.0/elasticsearch-2.0.0.tar.gz
+wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.1.1/elasticsearch-2.1.1.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
@@ -26,7 +26,7 @@ cd elasticsearch-*
 Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
 
 ```
-wget https://download.elastic.co/kibana/kibana/kibana-4.2.0-darwin-x64.tar.gz
+wget https://download.elastic.co/kibana/kibana/kibana-4.3.1-darwin-x64.tar.gz
 tar xzf kibana-*.tar.gz
 cd kibana-*
 bin/kibana plugin --install elastic/sense
