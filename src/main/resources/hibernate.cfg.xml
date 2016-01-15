@@ -31,7 +31,7 @@
         <property name="current_session_context_class">thread</property>
 
         <!-- Clean DB before starting -->
-        <property name="hbm2ddl.auto">create</property>
+        <property name="hbm2ddl.auto">create-drop</property>
 
     </session-factory>
 
