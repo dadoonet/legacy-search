@@ -36,6 +36,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
@@ -98,14 +99,14 @@ public class ElasticsearchDao {
                 .setTypes("person")
                 .setQuery(query)
                 .addAggregation(
-                        AggregationBuilders.terms("by_country").field("address.country")
+                        AggregationBuilders.terms("by_country").field("address.country.aggs")
                 )
                 .addAggregation(
                         AggregationBuilders.dateHistogram("by_year")
                                 .field("dateOfBirth")
                                 .minDocCount(0)
-                                .interval(DateHistogramInterval.YEAR)
-                                .extendedBounds("1940", "2009")
+                                .dateHistogramInterval(DateHistogramInterval.YEAR)
+                                .extendedBounds(new ExtendedBounds(1940L, 2009L))
                                 .format("YYYY")
                 )
                 .setFrom(from)
