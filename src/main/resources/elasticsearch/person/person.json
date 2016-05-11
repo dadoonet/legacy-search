@@ -5,36 +5,42 @@
         },
         "properties": {
             "fulltext" : {
-                "type" : "string",
+                "type" : "text",
                 "analyzer": "ngram",
                 "search_analyzer": "simple"
             },
             "address": {
                 "properties": {
                     "city": {
-                        "type": "string",
+                        "type": "text",
                         "copy_to": "fulltext",
                         "fields": {
                             "autocomplete" : {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "ngram",
                                 "search_analyzer": "simple"
+                            },
+                            "aggs" : {
+                                "type": "keyword"
                             }
                         }
                     },
                     "country": {
-                        "type": "string",
+                        "type": "text",
                         "copy_to": "fulltext",
                         "fields": {
                             "autocomplete" : {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "ngram",
                                 "search_analyzer": "simple"
+                            },
+                            "aggs" : {
+                                "type": "keyword"
                             }
                         }
                     },
                     "countrycode": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "location": {
                         "type" : "geo_point"
@@ -53,7 +59,12 @@
             },
             "gender": {
                 "copy_to": "fulltext",
-                "type": "string"
+                "type": "text",
+                "fields": {
+                    "aggs" : {
+                        "type": "keyword"
+                    }
+                }
             },
             "marketing": {
                 "properties": {
@@ -87,18 +98,18 @@
                 }
             },
             "name": {
-                "type": "string",
+                "type": "text",
                 "copy_to": "fulltext",
                 "fields": {
                     "autocomplete" : {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "ngram",
                         "search_analyzer": "simple"
                     }
                 }
             },
             "reference": {
-                "type": "string"
+                "type": "text"
             }
         }
     }
