@@ -16,29 +16,21 @@ You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy
 Download and unzip elasticsearch:
 
 ```
-wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.1.1/elasticsearch-2.1.1.tar.gz
+wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha2/elasticsearch-5.0.0-alpha2.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
 
-### Optional (Kibana, Marvel and Sense)
+### Optional (Kibana)
 
 Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
 
 ```
-wget https://download.elastic.co/kibana/kibana/kibana-4.3.1-darwin-x64.tar.gz
+wget https://download.elastic.co/kibana/kibana/kibana-5.0.0-alpha2-darwin-x64.tar.gz
 tar xzf kibana-*.tar.gz
 cd kibana-*
-bin/kibana plugin --install elastic/sense
-bin/kibana plugin --install elasticsearch/marvel/latest
 ```
 
-Install Marvel plugin:
-
-```
-bin/plugin install license
-bin/plugin install marvel-agent
-```
 ### Launch elasticsearch
 
 Launch elasticsearch:
@@ -53,7 +45,7 @@ bin/elasticsearch
 bin/kibana
 ```
 
-You can open [Marvel](http://localhost:5601/app/marvel) and [Sense](http://localhost:5601/app/sense) if needed.
+You can open [Console](http://localhost:5601/app/console) if needed.
 
 
 Run it!
