@@ -119,11 +119,11 @@ public class PersonService {
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
             query = QueryBuilders.boolQuery().must(query);
             if (Strings.hasText(f_country)) {
-                ((BoolQueryBuilder) query).must(QueryBuilders.termQuery("address.country.aggs", f_country));
+                ((BoolQueryBuilder) query).filter(QueryBuilders.termQuery("address.country.aggs", f_country));
             }
             if (Strings.hasText(f_date)) {
                 String endDate = "" + (Integer.parseInt(f_date) + 10);
-                ((BoolQueryBuilder) query).must(QueryBuilders.rangeQuery("dateOfBirth").gte(f_date).lt(endDate));
+                ((BoolQueryBuilder) query).filter(QueryBuilders.rangeQuery("dateOfBirth").gte(f_date).lt(endDate));
             }
         }
 
