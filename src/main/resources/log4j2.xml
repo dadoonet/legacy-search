@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="5">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%-5level] %C{1.} - %msg%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		<Logger name="fr.pilato.demo.legacysearch" level="debug"/>
+        <Logger name="org.elasticsearch" level="error"/>
+        <Logger name="org.hibernate" level="error"/>
+        <Logger name="restx.factory" level="error"/>
+        <Logger name="restx" level="error"/>
+        <Logger name="restx.classloader" level="info"/>
+        <Logger name="org.dozer" level="error"/>
+		<Root level="info">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+</Configuration>
