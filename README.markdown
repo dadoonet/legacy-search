@@ -16,7 +16,7 @@ You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy
 Download and unzip elasticsearch:
 
 ```
-wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha2/elasticsearch-5.0.0-alpha2.tar.gz
+wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha4/elasticsearch-5.0.0-alpha4.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
@@ -26,7 +26,7 @@ cd elasticsearch-*
 Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
 
 ```
-wget https://download.elastic.co/kibana/kibana/kibana-5.0.0-alpha2-darwin-x64.tar.gz
+wget https://download.elastic.co/kibana/kibana/kibana-5.0.0-alpha4-darwin-x64.tar.gz
 tar xzf kibana-*.tar.gz
 cd kibana-*
 ```
