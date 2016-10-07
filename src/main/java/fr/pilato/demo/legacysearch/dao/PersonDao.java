@@ -16,11 +16,6 @@ public interface PersonDao {
     public Person get(Integer id);
 
     /**
-     * Get person by reference
-     */
-    public Person getByReference(String reference);
-
-    /**
      * Saves person.
      */
     public Person save(Person person);

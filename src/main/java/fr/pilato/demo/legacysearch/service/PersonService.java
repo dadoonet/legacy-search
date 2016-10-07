@@ -42,10 +42,10 @@ public class PersonService {
         this.dozerBeanMapper = dozerBeanMapper;
     }
 
-    public Person get(String id) {
+    public Person get(Integer id) {
         hibernateService.beginTransaction();
 
-        Person person = personDao.getByReference(id);
+        Person person = personDao.get(id);
         logger.debug("get({})={}", id, person);
 
         hibernateService.commitTransaction();
@@ -61,21 +61,20 @@ public class PersonService {
         return personDb;
     }
 
-    public Person upsert(String id, Person person) {
+    public Person upsert(Integer id, Person person) {
         // We try to find an existing document
         Person personDb = get(id);
         if (personDb != null) {
             dozerBeanMapper.map(person, personDb);
             person = personDb;
-            person.setId(Integer.parseInt(id));
+            person.setId(id);
         }
-        person.setReference(id);
         person = save(person);
 
         return person;
     }
 
-    public boolean delete(String id) {
+    public boolean delete(Integer id) {
         logger.debug("Person: {}", id);
 
         if (id == null) {
@@ -83,7 +82,7 @@ public class PersonService {
         }
 
         hibernateService.beginTransaction();
-        Person person = personDao.getByReference(id);
+        Person person = personDao.get(id);
         if (person == null) {
             logger.debug("Person with reference {} does not exist", id);
             hibernateService.commitTransaction();
@@ -163,13 +162,11 @@ public class PersonService {
             hibernateService.beginTransaction();
             Person joe = PersonGenerator.personGenerator();
             joe.setName("Joe Smith");
-            joe.setReference("0");
             save(joe);
 
             // We generate numPersons persons
             for (int i = 1; i < size; i++) {
                 Person person = PersonGenerator.personGenerator();
-                person.setReference("" + i);
                 save(person);
             }
         } catch (IOException e) {
@@ -197,6 +194,7 @@ public class PersonService {
         for (Person person : persons) {
             RestSearchHit hit = new RestSearchHit();
             hit.set_source(person);
+            hit.set_id(person.idAsString());
             hitsItems[i++] = hit;
         }
         hits.setHits(hitsItems).setTotal(total);
@@ -236,6 +234,7 @@ public class PersonService {
 
     public static class RestSearchHit<T> {
         private T _source;
+        private String _id;
 
         public void set_source(T _source) {
             this._source = _source;
@@ -243,6 +242,14 @@ public class PersonService {
 
         public T get_source() {
             return _source;
+        }
+
+        public void set_id(String _id) {
+            this._id = _id;
+        }
+
+        public String get_id() {
+            return _id;
         }
     }
 

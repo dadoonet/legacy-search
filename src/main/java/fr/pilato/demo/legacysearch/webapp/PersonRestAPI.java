@@ -25,7 +25,7 @@ public class PersonRestAPI {
 
     @GET("/_byid/{id}")
     @PermitAll
-    public Optional<Person> get(String id) {
+    public Optional<Person> get(Integer id) {
         return Optional.fromNullable(personService.get(id));
     }
 
@@ -35,7 +35,7 @@ public class PersonRestAPI {
     @PUT("/{id}")
     @Consumes("application/json")
     @PermitAll
-    public Person upsert(String id, Person person) {
+    public Person upsert(Integer id, Person person) {
         logger.debug("upsert({}, {})", id, person);
         Person upsert = personService.upsert(id, person);
         logger.debug("created/updated {}: {}", id, upsert);
@@ -44,7 +44,7 @@ public class PersonRestAPI {
 
     @DELETE("/{id}")
     @PermitAll
-    public void delete(String id) {
+    public void delete(Integer id) {
         logger.debug("Person: {}", id);
         personService.delete(id);
     }
