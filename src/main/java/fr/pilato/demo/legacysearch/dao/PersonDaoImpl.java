@@ -33,21 +33,6 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     /**
-     * Find person by reference.
-     */
-    public Person getByReference(String reference) {
-        List persons = hibernateService.find("from Person p where p.reference = ?", reference);
-
-        if (persons.size() == 0) return null;
-
-        if (persons.size() > 1) {
-            logger.warn("we have {} persons for reference {}. Getting the first one...", persons.size(), reference);
-        }
-
-        return (Person) persons.get(0);
-    }
-
-    /**
      * Saves person.
      */
     public Person save(Person person) {

@@ -99,7 +99,7 @@ function PersonFormCtrl($rootScope, $scope, $routeParams, $http, $location) {
 
 
     $scope.save = function() {
-        $http.put('/api/1/person/'+ $scope.person.reference , $scope.person)
+        $http.put('/api/1/person/'+ $routeParams.id , $scope.person)
             .success(function(data, status, headers, config) { console.log( $scope.person ); })
             .error(function(data, status, headers, config) {
                 $scope.name = 'Error!'

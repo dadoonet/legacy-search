@@ -31,7 +31,6 @@ public class Person {
 
     private Integer id = null;
 
-    private String reference = null;
     private String name = null;
     private Date dateOfBirth = null;
     private String gender = null;
@@ -51,12 +50,9 @@ public class Person {
         this.id = id;
     }
 
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
+    @JsonIgnore
+    public String idAsString() {
+        return "" + id;
     }
 
     public String getName() {
@@ -114,7 +110,6 @@ public class Person {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Person{");
         sb.append("id=").append(id);
-        sb.append(", reference='").append(reference).append('\'');
         sb.append(", name='").append(name).append('\'');
         sb.append(", dateOfBirth=").append(dateOfBirth);
         sb.append(", gender='").append(gender).append('\'');

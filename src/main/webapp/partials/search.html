@@ -73,8 +73,8 @@
 			     </thead>  
 		        <tbody>
 		          <tr ng-repeat="entry in result.hits.hits" >
-                      <td>{{entry._source.reference}}</td>
-                      <td><a href="#/person/{{entry._source.reference}}">{{entry._source.name}}</a></td>
+                      <td>{{entry._id}}</td>
+                      <td><a href="#/person/{{entry._id}}">{{entry._source.name}}</a></td>
                       <td>{{entry._source.dateOfBirth}}</td>
                       <td>{{entry._source.address.city}}</td>
                       <td>{{entry._source.address.country}}</td>
