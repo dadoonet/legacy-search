@@ -84,7 +84,7 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        bulkProcessor.add(new IndexRequest("person", "person", person.getReference()).source(bytes));
+        bulkProcessor.add(new IndexRequest("person", "person", person.idAsString()).source(bytes));
     }
 
     public void delete(String reference) {
