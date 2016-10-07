@@ -53,7 +53,7 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person", "person", person.getReference()).source(bytes)).actionGet();
+        esClient.index(new IndexRequest("person", "person", person.idAsString()).source(bytes)).actionGet();
     }
 
     public void delete(String reference) {
