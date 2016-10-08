@@ -2,56 +2,62 @@
 
 
     <div class="row">
-        <div class="span7">
-            <input ng-model="name" type="text" class="input-medium search-query span2"
+        <div class="col-md-2">
+            <input ng-model="name" type="text" class="form-control"
                    name="name"  placeholder="Name..." autocomplete="off"
                    z-keypress="advanced_search()">
-            <input ng-model="country" type="text" class="input-medium search-query span2"
+        </div>
+        <div class="col-md-2">
+            <input ng-model="country" type="text" class="form-control"
                    name="country"  placeholder="Country..." autocomplete="off"
                    z-keypress="advanced_search()">
-            <input ng-model="city" type="text" class="input-medium search-query span2"
+        </div>
+        <div class="col-md-2">
+            <input ng-model="city" type="text" class="form-control"
                    name="city"  placeholder="City..." autocomplete="off"
                    z-keypress="advanced_search()">
         </div>
-        <div class="span2 offset1">
+        <div class="col-md-2">
             <button ng-click="advanced_search()" type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
     <div class="row">
-        <div class="span12">
+        <div class="col-md-12">
             <p class="text-info">
-                Found <span class="badge badge-info">{{result.hits.total}}</span> hits in
-                <span class="badge badge-info">{{result.took}} ms</span>
+                Found <span class="label label-primary">{{result.hits.total}}</span> hits in
+                <span class="label label-primary">{{result.took}} ms</span>
             </p>
         </div>
     </div>
 
 
     <div class="row">
-		<div class="span12">
-		      <table class="table" >
-		        <thead>  
-		          <tr>
-                      <th>Id</th>
-                      <th>Name</th>
-                      <th>Date Of Birth</th>
-                      <th>City</th>
-                      <th>Country</th>
-		          </tr>
-			     </thead>  
-		        <tbody>
-                    <tr ng-repeat="entry in result.hits.hits" >
-                        <td>{{entry._id}}</td>
-                        <td><a href="#/person/{{entry._id}}">{{entry._source.name}}</a></td>
-                        <td>{{entry._source.dateOfBirth}}</td>
-                        <td>{{entry._source.address.city}}</td>
-                        <td>{{entry._source.address.country}}</td>
-                    </tr>
-		
-		        <tbody>
-			</table>
-		</div>
-	</div>
+        <div class="col-md-12">
+            <table class="table" >
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Date Of Birth</th>
+                    <th>City</th>
+                    <th>Country</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="entry in result.hits.hits" >
+                    <td>{{entry._id}}</td>
+                    <td><a href="#/person/{{entry._id}}">{{entry._source.name}}</a></td>
+                    <td>{{entry._source.gender}}</td>
+                    <td>{{entry._source.dateOfBirth}}</td>
+                    <td>{{entry._source.address.city}}</td>
+                    <td>{{entry._source.address.country}}</td>
+                </tr>
+
+                <tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
 
