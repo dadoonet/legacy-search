@@ -4,31 +4,36 @@
     <title>Contacts</title>
     <link rel='stylesheet' href='/css/style.css'/>
     <link rel='stylesheet' href='/css/bootstrap.min.css'/>
+    <link rel='stylesheet' href='/css/bootstrap-theme.min.css'/>
 
 </head>
 <body ng-controller='AppCtrl' >
 
-<div class="navbar navbar-fixed-top" ng-controller="NavBarController">
-    <div class="navbar-inner">
-        <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+<nav class="navbar navbar-fixed-top" ng-controller="NavBarController">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="#">Contacts</a>
-            <div class="nav-collapse">
-                <ul class="nav">
-                    <li><a href="/#/init">Init</a></li>
-                    <li><a href="/">Search</a></li>
-                    <li><a href="/#/advanced">Advanced</a></li>
-                    <!-- For future use in latest branch -->
-                    <!--li><a href="/#/compute">Compute</a></li-->
-                </ul>
-            </div><!-- /.nav-collapse -->
+            </button>
+            <a class="navbar-brand" href="#">Contacts</a>
         </div>
-    </div><!-- /navbar-inner -->
-</div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/#/init">Init</a></li>
+                <li class="active"><a href="/">Search</a></li>
+                <li><a href="/#/advanced">Advanced</a></li>
+                <!-- For future use in latest branch -->
+                <!--li><a href="/#/compute">Compute</a></li-->
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
 
 <div ng-view>
 </div>

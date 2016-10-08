@@ -1,17 +1,19 @@
 <div class="container">
 
     <div class="row">
-        <div class="span4">
-            <input ng-model="persons" type="text" class="input-medium search-query span4"
+        <div class="col-md-4">
+            <input ng-model="persons" type="text" class="form-control"
                    name="persons"  placeholder="Number of persons to inject" autocomplete="off">
         </div>
-        <div class="span2">
-            <button ng-click="init()" type="submit" class="btn btn-primary span2">Inject</button>
+        <div class="col-md-1">
+            <button ng-click="init()" type="submit" class="btn btn-primary">Inject</button>
         </div>
-        <div class="span5 offset1">
-            <span class="badge badge-info" ng-show="result==false">injecting {{persons}} persons...</span>
-            <span class="badge badge-success" ng-show="result==true">injecting {{persons}} persons done!</span>
-            <span class="badge badge-success" ng-show="result==true && error==true">with errors</span>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <span class="label label-info" ng-show="result==false">injecting {{persons}} persons...</span>
+            <span class="label label-success" ng-show="result==true">injecting {{persons}} persons done!</span>
+            <span class="label label-warning" ng-show="result==true && error==true">with errors</span>
         </div>
     </div>
 </div>
