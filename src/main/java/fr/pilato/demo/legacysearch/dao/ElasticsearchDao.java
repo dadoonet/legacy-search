@@ -87,8 +87,8 @@ public class ElasticsearchDao {
         bulkProcessor.add(new IndexRequest("person", "person", person.idAsString()).source(bytes));
     }
 
-    public void delete(String reference) {
-        bulkProcessor.add(new DeleteRequest("person", "person", reference));
+    public void delete(String id) {
+        bulkProcessor.add(new DeleteRequest("person", "person", id));
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) {
