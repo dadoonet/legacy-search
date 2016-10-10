@@ -56,8 +56,8 @@ public class ElasticsearchDao {
         esClient.index(new IndexRequest("person", "person", person.idAsString()).source(bytes)).actionGet();
     }
 
-    public void delete(String reference) {
-        esClient.delete(new DeleteRequest("person", "person", reference)).actionGet();
+    public void delete(String id) {
+        esClient.delete(new DeleteRequest("person", "person", id)).actionGet();
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) {
