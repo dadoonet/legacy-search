@@ -52,7 +52,7 @@ public class Person {
 
     @JsonIgnore
     public String idAsString() {
-        return "" + id;
+        return id != null ? "" + id : null;
     }
 
     public String getName() {
