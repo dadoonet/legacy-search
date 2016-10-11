@@ -1,0 +1,59 @@
+<div class="container" >
+
+  <div class="row">
+    <div class="col-md-2">
+      <input ng-model="$ctrl.name" type="text" class="form-control"
+             name="name"  placeholder="Name..." autocomplete="off"
+             ng-keyup="$ctrl.advanced_search()">
+    </div>
+    <div class="col-md-2">
+      <input ng-model="$ctrl.country" type="text" class="form-control"
+             name="country"  placeholder="Country..." autocomplete="off"
+             ng-keyup="$ctrl.advanced_search()">
+    </div>
+    <div class="col-md-2">
+      <input ng-model="$ctrl.city" type="text" class="form-control"
+             name="city"  placeholder="City..." autocomplete="off"
+             ng-keyup="$ctrl.advanced_search()">
+    </div>
+    <div class="col-md-2">
+      <button ng-click="$ctrl.advanced_search()" type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <p class="text-info">
+        Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
+        <span class="label label-primary">{{$ctrl.result.took}} ms</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table" >
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Date Of Birth</th>
+          <th>Country</th>
+          <th>City</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="entry in $ctrl.result.hits.hits" >
+          <td><a href="#!/person/{{entry._id}}">{{entry._source.name}}</a></td>
+          <td>{{entry._source.gender}}</td>
+          <td>{{entry._source.dateOfBirth}}</td>
+          <td>{{entry._source.address.country}}</td>
+          <td>{{entry._source.address.city}}</td>
+        </tr>
+
+        <tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

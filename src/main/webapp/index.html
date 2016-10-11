@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<html ng-app="legacyApp">
 <head>
-    <title>Contacts</title>
-    <link rel='stylesheet' href='/css/style.css'/>
+    <title>Advanced search for your legacy application</title>
     <link rel='stylesheet' href='/css/bootstrap.min.css'/>
     <link rel='stylesheet' href='/css/bootstrap-theme.min.css'/>
+    <link rel='stylesheet' href='/css/app.css'/>
 
+    <script src="js/angular/angular.min.js"></script>
+    <script src="js/angular-route/angular-route.min.js"></script>
+    <script src="js/jquery/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <script src="app.module.js"></script>
+    <script src="app.config.js"></script>
+    <script src="init/init.module.js"></script>
+    <script src="init/init.component.js"></script>
+    <script src="search/search.module.js"></script>
+    <script src="search/search.component.js"></script>
+    <script src="advanced/advanced.module.js"></script>
+    <script src="advanced/advanced.component.js"></script>
+    <script src="compute/compute.module.js"></script>
+    <script src="compute/compute.component.js"></script>
+    <script src="person-detail/person-detail.module.js"></script>
+    <script src="person-detail/person-detail.component.js"></script>
 </head>
-<body ng-controller='AppCtrl' >
+<body>
 
-<nav class="navbar navbar-fixed-top" ng-controller="NavBarController">
-    <div class="container-fluid">
+<nav class="navbar navbar-fixed-top">
+    <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -25,32 +41,17 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/#/init">Init</a></li>
+                <li><a href="/#!/init">Init</a></li>
                 <li class="active"><a href="/">Search</a></li>
-                <li><a href="/#/advanced">Advanced</a></li>
+                <li><a href="/#!/advanced">Advanced</a></li>
                 <!-- For future use in latest branch -->
-                <!--li><a href="/#/compute">Compute</a></li-->
+                <!--li><a href="/#!/compute">Compute</a></li-->
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
 
-<div ng-view>
-</div>
-
-
+<div ng-view></div>
 
 </body>
-<script type="text/javascript" src="js/lib/jquery/jquery-3.1.1.min.js"></script>
-<script src="js/lib/angular/angular.min.js"></script>
-<script src="js/lib/bootstrap/bootstrap.min.js"></script>
-<script src="js/app.js"></script>
-<script src="js/services.js"></script>
-<script src="js/controllers.js"></script>
-<script src="js/filters.js"></script>
-<script src="js/directives.js"></script>
-
-
-
-
 </html>

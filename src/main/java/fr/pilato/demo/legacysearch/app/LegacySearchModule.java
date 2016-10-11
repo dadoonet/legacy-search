@@ -1,5 +1,8 @@
 package fr.pilato.demo.legacysearch.app;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.Marketing;
 import fr.pilato.demo.legacysearch.domain.Person;
@@ -11,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Module;
 import restx.factory.Provides;
+import restx.security.CORSAuthorizer;
+import restx.security.StdCORSAuthorizer;
 
 @Module
 public class LegacySearchModule implements AutoCloseable {
@@ -59,6 +64,16 @@ public class LegacySearchModule implements AutoCloseable {
         return sessionFactory;
     }
 
+    @Provides
+    public CORSAuthorizer cors() {
+        return StdCORSAuthorizer.builder()
+                .setOriginMatcher(Predicates.<CharSequence>alwaysTrue())
+                .setPathMatcher(Predicates.<CharSequence>alwaysTrue())
+                .setAllowedMethods(ImmutableList.of("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"))
+                .setAllowedHeaders(ImmutableList.of("Origin", "X-Requested-With", "Content-Type", "Accept", "Access-Control-Allow-Origin"))
+                .setAllowCredentials(Optional.of(Boolean.TRUE))
+                .build();
+    }
     @Override
     public void close() throws Exception {
         if (sessionFactory != null) {
