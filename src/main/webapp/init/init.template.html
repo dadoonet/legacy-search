@@ -1,0 +1,21 @@
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-4">
+      <input ng-model="$ctrl.persons" type="text" class="form-control"
+             name="persons"  placeholder="Number of persons to inject" autocomplete="off">
+    </div>
+    <div class="col-md-1">
+      <button ng-click="$ctrl.init()" type="submit" class="btn btn-primary">Inject</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      <span class="label label-info" ng-show="$ctrl.result==false">injecting {{$ctrl.persons}} persons...</span>
+      <span class="label label-success" ng-show="$ctrl.result==true">injecting {{$ctrl.injected}} persons done!</span>
+      <span class="label label-warning" ng-show="$ctrl.result==true && $ctrl.error==true">with errors</span>
+    </div>
+  </div>
+</div>
+
+
