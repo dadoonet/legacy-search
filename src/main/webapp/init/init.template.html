@@ -18,13 +18,29 @@
     <div class="col-md-6 col-md-offset-2">
       <div class="progress">
         <div class="progress-bar progress-bar-striped {{$ctrl.status}}" role="progressbar"
-             aria-valuenow="{{$ctrl.progress/$ctrl.persons}}" aria-valuemin="0" aria-valuemax="{{$ctrl.goal}}"
-             style="width: {{$ctrl.progress/$ctrl.goal*100}}%;">
-          {{$ctrl.progress}} on {{$ctrl.goal}}
+             aria-valuenow="{{$ctrl.progress.current/$ctrl.persons}}" aria-valuemin="0" aria-valuemax="{{$ctrl.goal}}"
+             style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%;">
+          <span ng-show="$ctrl.progress.current>0">{{$ctrl.progress.current}} on {{$ctrl.goal}}</span>
         </div>
       </div>
     </div>
-</div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Elapsed: <span class="label label-primary">{{$ctrl.progress.took / 1000}} s</span></h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Estimated time left: <span class="label label-warning">{{$ctrl.remaining}} s</span></h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Rate: <span class="label label-danger">{{$ctrl.progress.rate}} persons per sec</span></h2>
+    </div>
+  </div>
 
 </div>
 

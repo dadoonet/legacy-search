@@ -159,12 +159,13 @@ public class PersonService {
     }
 
     private AtomicInteger currentItem = new AtomicInteger();
+    private long start = 0;
 
     public InitResult init(Integer size) {
         currentItem.set(0);
 
         logger.debug("Initializing database for {} persons", size);
-        long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
 
         try {
             hibernateService.beginTransaction();
@@ -190,10 +191,12 @@ public class PersonService {
         logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
                 size, took, 1000 * size / took);
 
-        return new InitResult(took, 1000 * size / took);
+        return new InitResult(took, 1000 * size / took, size);
     }
 
-    public int getInitCurrentAchievement() {
-        return currentItem.get();
+    public InitResult getInitCurrentAchievement() {
+        int current = currentItem.get();
+        long took = System.currentTimeMillis() - start;
+        return new InitResult(took, 1000 * current / took, current);
     }
 }
