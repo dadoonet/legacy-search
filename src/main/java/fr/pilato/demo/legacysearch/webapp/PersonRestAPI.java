@@ -75,7 +75,7 @@ public class PersonRestAPI {
 
     @GET("/_init_status")
     @PermitAll
-    public Integer initStatus() {
+    public InitResult initStatus() {
         return personService.getInitCurrentAchievement();
     }
 }
