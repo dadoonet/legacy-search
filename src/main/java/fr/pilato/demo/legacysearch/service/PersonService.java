@@ -7,6 +7,7 @@ import fr.pilato.demo.legacysearch.dao.PersonDao;
 import fr.pilato.demo.legacysearch.dao.SearchDao;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
+import fr.pilato.demo.legacysearch.webapp.InitResult;
 import org.dozer.DozerBeanMapper;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
@@ -19,6 +20,7 @@ import restx.factory.Component;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class PersonService {
@@ -156,9 +158,12 @@ public class PersonService {
         return response.toString();
     }
 
-    public boolean init(Integer size) {
-        logger.debug("Initializing database for {} persons", size);
+    private AtomicInteger currentItem = new AtomicInteger();
 
+    public InitResult init(Integer size) {
+        currentItem.set(0);
+
+        logger.debug("Initializing database for {} persons", size);
         long start = System.currentTimeMillis();
 
         try {
@@ -166,11 +171,13 @@ public class PersonService {
             Person joe = PersonGenerator.personGenerator();
             joe.setName("Joe Smith");
             save(joe);
+            currentItem.incrementAndGet();
 
             // We generate numPersons persons
             for (int i = 1; i < size; i++) {
                 Person person = PersonGenerator.personGenerator();
                 save(person);
+                currentItem.incrementAndGet();
             }
         } catch (IOException e) {
             logger.warn("error while generating data", e);
@@ -183,6 +190,10 @@ public class PersonService {
         logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
                 size, took, 1000 * size / took);
 
-        return true;
+        return new InitResult(took, 1000 * size / took);
+    }
+
+    public int getInitCurrentAchievement() {
+        return currentItem.get();
     }
 }
