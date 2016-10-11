@@ -17,6 +17,7 @@ public class PersonRestAPI {
     final Logger logger = LoggerFactory.getLogger(PersonRestAPI.class);
 
     private final PersonService personService;
+    private Integer size;
 
     @Inject
     public PersonRestAPI(PersonService personService) {
@@ -63,10 +64,18 @@ public class PersonRestAPI {
         return personService.advancedSearch(name.orNull(), country.orNull(), city.orNull(), from.or(0), size.or(10));
     }
 
-
     @GET("/_init")
     @PermitAll
-    public void init(Optional<Integer> size) {
-        personService.init(size.or(1000));
+    public InitResult init(Optional<Integer> size) {
+        this.size = size.or(1000);
+        InitResult result = personService.init(this.size);
+        this.size = 0;
+        return result;
+    }
+
+    @GET("/_init_status")
+    @PermitAll
+    public Integer initStatus() {
+        return personService.getInitCurrentAchievement();
     }
 }
