@@ -14,3 +14,7 @@ body {
     -o-transition: none;
     transition: none;
 }​
+
+.nav, .pagination, .carousel, .panel-title a {
+     cursor: pointer;
+}

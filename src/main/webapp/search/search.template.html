@@ -4,10 +4,10 @@
     <div class="col-md-6">
       <input ng-model="$ctrl.query" type="text" class="form-control"
              name="query"  placeholder="Type something..." autocomplete="off"
-             ng-keyup="$ctrl.search()">
+             ng-keyup="$ctrl.search(1)">
     </div>
     <div class="col-md-2">
-      <button ng-click="$ctrl.search()" type="submit" class="btn btn-primary">Search</button>
+      <button ng-click="$ctrl.search(1)" type="submit" class="btn btn-primary">Search</button>
     </div>
 
   </div>
@@ -17,8 +17,8 @@
       <p class="text-info">
         Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
         <span class="label label-primary">{{$ctrl.result.took}} ms</span>
-        <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search();">{{$ctrl.f_country}}</span>
-        <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search();">{{$ctrl.f_date}}</span>
+        <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
+        <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>
       </p>
     </div>
   </div>
@@ -82,6 +82,13 @@
         <tbody>
       </table>
     </div>
-  </div>
+
+    <div class="col-md-12">
+      <div>
+        <ul uib-pagination total-items="$ctrl.totalItems" ng-model="$ctrl.currentPage"
+            class="pagination-sm" force-ellipses="true" max-size="5"
+            ng-change="$ctrl.changePage()"></ul>
+      </div>
+    </div>
 
 </div>
