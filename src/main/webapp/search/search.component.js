@@ -10,13 +10,16 @@ angular.
       self.query = "";
       self.f_date = "";
       self.f_country = "";
+      self.currentPage = 1;
+      self.totalItems = 0;
 
-      self.search = function() {
-        $http({method: 'GET', url: '/api/1/person/_search?from=0&size=10&q='+ self.query
-        + '&f_date=' + self.f_date + '&f_country=' + self.f_country })
-            .success(function(data, status, headers, config) {
+      self.search = function(page) {
+        self.currentPage = page;
+        $http({method: 'GET', url: '/api/1/person/_search?size=10&q='+ self.query
+        + '&f_date=' + self.f_date + '&f_country=' + self.f_country + '&from=' + (page-1)*10 })
+            .success(function(data) {
               self.result = data;
-
+              self.totalItems = data.hits.total;
               // Group data every 10 years (facets don't support it yet)
               self.dates = new Array();
 
@@ -49,15 +52,19 @@ angular.
       self.addFilterCountry = function(bucket) {
         console.log(bucket.key);
         self.f_country = bucket.key;
-        self.search();
+        self.search(1);
       };
 
       self.addFilterDate = function(bucket) {
         console.log(bucket.key+"0");
         self.f_date = bucket.key+"0";
-        self.search();
+        self.search(1);
       };
 
-      self.search();
+      self.changePage = function() {
+        self.search(self.currentPage);
+      };
+
+      self.search(1);
     }]
   });
