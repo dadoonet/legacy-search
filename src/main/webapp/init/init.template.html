@@ -1,7 +1,7 @@
 <div class="container">
 
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3 col-md-offset-2">
       <input ng-model="$ctrl.persons" type="text" class="form-control"
              name="persons"  placeholder="Number of persons to inject" autocomplete="off">
     </div>
@@ -9,13 +9,23 @@
       <button ng-click="$ctrl.init()" type="submit" class="btn btn-primary">Inject</button>
     </div>
   </div>
+
   <div class="row">
-    <div class="col-md-5">
-      <span class="label label-info" ng-show="$ctrl.result==false">injecting {{$ctrl.persons}} persons...</span>
-      <span class="label label-success" ng-show="$ctrl.result==true">injecting {{$ctrl.injected}} persons done!</span>
-      <span class="label label-warning" ng-show="$ctrl.result==true && $ctrl.error==true">with errors</span>
-    </div>
+    &nbsp;
   </div>
+
+  <div class="row">
+    <div class="col-md-6 col-md-offset-2">
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped {{$ctrl.status}}" role="progressbar"
+             aria-valuenow="{{$ctrl.progress/$ctrl.persons}}" aria-valuemin="0" aria-valuemax="{{$ctrl.goal}}"
+             style="width: {{$ctrl.progress/$ctrl.goal*100}}%;">
+          {{$ctrl.progress}} on {{$ctrl.goal}}
+        </div>
+      </div>
+    </div>
+</div>
+
 </div>
 
 
