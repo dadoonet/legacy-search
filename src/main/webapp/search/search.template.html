@@ -1,0 +1,87 @@
+<div class="container" >
+
+  <div class="row">
+    <div class="col-md-6">
+      <input ng-model="$ctrl.query" type="text" class="form-control"
+             name="query"  placeholder="Type something..." autocomplete="off"
+             ng-keyup="$ctrl.search()">
+    </div>
+    <div class="col-md-2">
+      <button ng-click="$ctrl.search()" type="submit" class="btn btn-primary">Search</button>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <p class="text-info">
+        Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
+        <span class="label label-primary">{{$ctrl.result.took}} ms</span>
+        <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search();">{{$ctrl.f_country}}</span>
+        <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search();">{{$ctrl.f_date}}</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="row" ng-show="$ctrl.result.aggregations != null">
+    <div class="col-md-3">
+      <table class="table table-striped table-bordered table-hover table-condensed" >
+        <thead>
+        <tr>
+          <th>Country</th>
+          <th>Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="bucket in $ctrl.result.aggregations.by_country.buckets" ng-click="$ctrl.addFilterCountry(bucket);">
+          <td>{{bucket.key}}</td>
+          <td>{{bucket.doc_count}}</td>
+        </tr>
+
+        <tbody>
+      </table>
+    </div>
+    <div class="col-md-9">
+      <table class="table table-striped table-bordered table-hover table-condensed" >
+        <thead>
+        <tr>
+          <th ng-repeat="bucket in $ctrl.dates" ng-click="$ctrl.addFilterDate(bucket);">{{bucket.key}}0</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td ng-repeat="bucket in $ctrl.dates" ng-click="$ctrl.addFilterDate(bucket);">{{bucket.docs}}</td>
+        </tr>
+
+        <tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table" >
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Date Of Birth</th>
+          <th>Country</th>
+          <th>City</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="entry in $ctrl.result.hits.hits" >
+          <td><a href="#!/person/{{entry._id}}">{{entry._source.name}}</a></td>
+          <td>{{entry._source.gender}}</td>
+          <td>{{entry._source.dateOfBirth}}</td>
+          <td>{{entry._source.address.country}}</td>
+          <td>{{entry._source.address.city}}</td>
+        </tr>
+
+        <tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
