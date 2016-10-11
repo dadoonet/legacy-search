@@ -16,6 +16,7 @@ angular.
       };
       self.remaining = 0;
       self.goal = 0;
+      self.took = 0;
       self.result = null;
 
       var stop;
@@ -30,6 +31,7 @@ angular.
                 // Remaining docs
                 var remaining_docs = self.persons - data.current;
                 self.remaining = Math.round(remaining_docs / data.rate);
+                self.took = Math.round(data.took / 1000);
               });
         }, 100);
       };
@@ -51,6 +53,7 @@ angular.
         };
         self.remaining = 0;
         self.goal = self.persons;
+        self.took = 0;
         self.startWatch();
         $http({method: 'GET', url: config.backend + '/api/1/person/_init?size='+self.persons })
             .success(function(data) {
