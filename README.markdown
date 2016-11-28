@@ -27,3 +27,7 @@ mvn clean package jetty:run
 
 You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
 
+Next step
+---------
+
+Look at [branch 06-fuzziness](https://github.com/dadoonet/legacy-search/tree/06-fuzziness)
