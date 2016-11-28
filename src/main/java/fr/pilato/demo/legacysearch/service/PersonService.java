@@ -112,9 +112,10 @@ public class PersonService {
         if (!Strings.hasText(q)) {
             query = QueryBuilders.matchAllQuery();
         } else {
-            query = QueryBuilders.simpleQueryStringQuery(q)
-                    .field("fulltext")
-                    .field("name", 3.0f);
+            query = QueryBuilders
+                    .multiMatchQuery(q,
+                            "fulltext",
+                            "name^3.0");
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
