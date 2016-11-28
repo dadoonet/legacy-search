@@ -115,7 +115,8 @@ public class PersonService {
             query = QueryBuilders
                     .multiMatchQuery(q,
                             "fulltext",
-                            "name^3.0");
+                            "name^3.0")
+                    .fuzziness(1);
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
@@ -146,17 +147,17 @@ public class PersonService {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             if (Strings.hasText(name)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name.autocomplete", name)
+                        QueryBuilders.matchQuery("name.autocomplete", name).fuzziness(1)
                 );
             }
             if (Strings.hasText(country)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country.autocomplete", country)
+                        QueryBuilders.matchQuery("address.country.autocomplete", country).fuzziness(1)
                 );
             }
             if (Strings.hasText(city)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city.autocomplete", city)
+                        QueryBuilders.matchQuery("address.city.autocomplete", city).fuzziness(1)
                 );
             }
 
