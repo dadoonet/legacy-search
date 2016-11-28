@@ -112,11 +112,12 @@ public class PersonService {
         if (!Strings.hasText(q)) {
             query = QueryBuilders.matchAllQuery();
         } else {
-            query = QueryBuilders.simpleQueryStringQuery(q)
-                    .field("name")
-                    .field("gender")
-                    .field("address.country")
-                    .field("address.city");
+            query = QueryBuilders
+                    .multiMatchQuery(q,
+                            "name",
+                            "gender",
+                            "address.country",
+                            "address.city");
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
