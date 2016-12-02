@@ -93,8 +93,6 @@ public class SearchDaoImpl implements SearchDao {
                         .add(Restrictions.ilike("address.city", toLikeQuery))
         );
 
-        c.addOrder(Order.asc("name"));
-
         return c;
     }
 }
