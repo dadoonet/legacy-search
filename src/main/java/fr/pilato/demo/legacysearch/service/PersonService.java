@@ -168,11 +168,21 @@ public class PersonService {
             hibernateService.beginTransaction();
             Person joe = PersonGenerator.personGenerator();
             joe.setName("Joe Smith");
+            joe.getAddress().setCountry("France");
+            joe.getAddress().setCity("Paris");
             save(joe);
             currentItem.incrementAndGet();
 
+            Person franceGall = PersonGenerator.personGenerator();
+            franceGall.setName("France Gall");
+            franceGall.setGender("female");
+            franceGall.getAddress().setCountry("Italy");
+            franceGall.getAddress().setCity("Ischia");
+            save(franceGall);
+            currentItem.incrementAndGet();
+
             // We generate numPersons persons
-            for (int i = 1; i < size; i++) {
+            for (int i = 2; i < size; i++) {
                 Person person = PersonGenerator.personGenerator();
                 save(person);
                 currentItem.incrementAndGet();
