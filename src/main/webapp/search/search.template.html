@@ -14,12 +14,14 @@
 
   <div class="row">
     <div class="col-md-12">
-      <p class="text-info">
+      <p class="text-info" ng-if="!$ctrl.error">
         Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
         <span class="label label-primary">{{$ctrl.result.took}} ms</span>
         <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
         <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>
-        <span class="label label-danger" ng-if="$ctrl.error" >{{$ctrl.error}}</span>
+      </p>
+      <p class="text-info" ng-if="$ctrl.error">
+        <span class="label label-danger">{{$ctrl.error}}</span>
       </p>
     </div>
   </div>
