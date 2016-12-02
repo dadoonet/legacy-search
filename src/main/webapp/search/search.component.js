@@ -18,6 +18,7 @@ angular.
         $http({method: 'GET', url: '/api/1/person/_search?size=10&q='+ self.query
         + '&f_date=' + self.f_date + '&f_country=' + self.f_country + '&from=' + (page-1)*10 })
             .success(function(data) {
+              self.error = null;
               self.result = data;
               self.totalItems = data.hits.total;
               // Group data every 10 years (facets don't support it yet)
@@ -45,7 +46,7 @@ angular.
               }
             })
             .error(function(data, status, headers, config) {
-              self.name = 'Error!'
+              self.error = "Backend not available";
             });
       };
 

@@ -26,6 +26,7 @@
       <p class="text-info">
         Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
         <span class="label label-primary">{{$ctrl.result.took}} ms</span>
+        <span class="label label-danger" ng-if="$ctrl.error" >{{$ctrl.error}}</span>
       </p>
     </div>
   </div>
