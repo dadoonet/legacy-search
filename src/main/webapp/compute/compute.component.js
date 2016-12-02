@@ -15,6 +15,7 @@ angular.
         $http({method: 'GET', url: '/api/1/person/_search?from=0&size=10&q='+ self.query
         + '&f_date=' + self.f_date + '&f_country=' + self.f_country })
             .success(function(data, status, headers, config) {
+              self.error = null;
               self.result = data;
 
               // Group data every 10 years (facets don't support it yet)
@@ -42,7 +43,7 @@ angular.
               }
             })
             .error(function(data, status, headers, config) {
-              self.name = 'Error!'
+              self.error = "Backend not available";
             });
       };
 

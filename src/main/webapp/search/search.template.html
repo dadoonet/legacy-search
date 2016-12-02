@@ -19,6 +19,7 @@
         <span class="label label-primary">{{$ctrl.result.took}} ms</span>
         <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
         <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>
+        <span class="label label-danger" ng-if="$ctrl.error" >{{$ctrl.error}}</span>
       </p>
     </div>
   </div>
