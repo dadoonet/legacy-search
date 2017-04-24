@@ -29,7 +29,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <restx.version>0.35-SNAPSHOT</restx.version>
         <hibernate.version>5.0.7.Final</hibernate.version>
-        <elasticsearch.version>5.0.2</elasticsearch.version>
+        <elasticsearch.version>5.3.1</elasticsearch.version>
         <slf4j.version>1.7.13</slf4j.version>
         <log4j.version>2.6.2</log4j.version>
         <jackson.version>2.6.4</jackson.version>
