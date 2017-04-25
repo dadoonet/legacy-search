@@ -33,6 +33,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -87,7 +88,7 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        bulkProcessor.add(new IndexRequest("person", "person", person.idAsString()).source(bytes));
+        bulkProcessor.add(new IndexRequest("person", "person", person.idAsString()).source(bytes, XContentType.JSON));
     }
 
     public void delete(String id) {
