@@ -109,7 +109,7 @@ public class PersonService {
     public String search(String q, String f_country, String f_date, Integer from, Integer size) {
         QueryBuilder query;
         // If the user does not provide any text to query, let's match all documents
-        if (!Strings.hasText(q)) {
+        if (Strings.isEmpty(q)) {
             query = QueryBuilders.matchAllQuery();
         } else {
             query = QueryBuilders
@@ -131,7 +131,7 @@ public class PersonService {
         QueryBuilder query;
 
         // If the user does not provide any text to query, let's match all documents
-        if (!Strings.hasText(name) && !Strings.hasText(country) && !Strings.hasText(city)) {
+        if (Strings.isEmpty(name) && Strings.isEmpty(country) && Strings.isEmpty(city)) {
             query = QueryBuilders.matchAllQuery();
         } else {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
