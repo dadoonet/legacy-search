@@ -113,11 +113,11 @@ public class PersonService {
             query = QueryBuilders.matchAllQuery();
         } else {
             query = QueryBuilders
-                    .multiMatchQuery(q,
-                            "name",
-                            "gender",
-                            "address.country",
-                            "address.city");
+                    .multiMatchQuery(q)
+                        .field("name")
+                        .field("gender")
+                        .field("address.country")
+                        .field("address.city");
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
