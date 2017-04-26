@@ -113,10 +113,10 @@ public class PersonService {
             query = QueryBuilders.matchAllQuery();
         } else {
             query = QueryBuilders
-                    .multiMatchQuery(q,
-                            "fulltext",
-                            "name^3.0")
-                    .fuzziness(1);
+                    .multiMatchQuery(q)
+                        .field("fulltext")
+                        .field("name", 3.0f)
+                        .fuzziness(1);
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
