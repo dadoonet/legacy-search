@@ -113,9 +113,9 @@ public class PersonService {
             query = QueryBuilders.matchAllQuery();
         } else {
             query = QueryBuilders
-                    .multiMatchQuery(q,
-                            "fulltext",
-                            "name^3.0");
+                    .multiMatchQuery(q)
+                        .field("fulltext")
+                        .field("name", 3.0f);
         }
 
         SearchResponse response = elasticsearchDao.search(query, from, size);
