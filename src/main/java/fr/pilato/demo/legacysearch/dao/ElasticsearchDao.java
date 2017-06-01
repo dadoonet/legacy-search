@@ -115,7 +115,7 @@ public class ElasticsearchDao {
                 .setSize(size)
                 .execute().actionGet();
 
-        logger.debug("elasticsearch response: {} hits", response.getHits().totalHits());
+        logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
         logger.trace("elasticsearch response: {} hits", response.toString());
 
         return response;
