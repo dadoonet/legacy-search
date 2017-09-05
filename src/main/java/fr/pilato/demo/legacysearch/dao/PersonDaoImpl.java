@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import restx.factory.Component;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Person DAO implementation.
