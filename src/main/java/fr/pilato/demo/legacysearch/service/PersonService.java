@@ -106,7 +106,7 @@ public class PersonService {
         return true;
     }
 
-    public String search(String q, String f_country, String f_date, Integer from, Integer size) {
+    public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
         QueryBuilder query;
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(q)) {
@@ -137,7 +137,7 @@ public class PersonService {
         return response.toString();
     }
 
-    public String advancedSearch(String name, String country, String city, Integer from, Integer size) {
+    public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws IOException {
         QueryBuilder query;
 
         // If the user does not provide any text to query, let's match all documents
