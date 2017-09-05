@@ -16,7 +16,7 @@ You need to have:
 
 * Maven
 * JDK7 or higher
-* Postgresql or MySQL up and running
+* Postgresql or MySQL 5.7+ up and running
 
 Modify [src/main/resources/hibernate.cfg.xml](src/main/resources/hibernate.cfg.xml) file to reflect
 your own database settings:
@@ -34,11 +34,11 @@ or
 
 ```xml
 <!-- Database connection settings - MySQL -->
-<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-<property name="hibernate.connection.url">jdbc:mysql://127.0.0.1:3306/person</property>
+<property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+<property name="hibernate.connection.url">jdbc:mysql://127.0.0.1:3306/person?serverTimezone=UTC&amp;useSSL=false</property>
 <property name="hibernate.connection.username">root</property>
 <property name="hibernate.connection.password"></property>
-<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+<property name="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</property>
 ```
 
 If you did not create your database yet, just run:
