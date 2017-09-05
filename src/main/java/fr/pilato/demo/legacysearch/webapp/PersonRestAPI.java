@@ -10,6 +10,7 @@ import restx.factory.Component;
 import restx.security.PermitAll;
 
 import javax.inject.Inject;
+import java.io.IOException;
 
 @Component
 @RestxResource("/1/person")
@@ -45,7 +46,7 @@ public class PersonRestAPI {
 
     @DELETE("/{id}")
     @PermitAll
-    public void delete(Integer id) {
+    public void delete(Integer id) throws IOException {
         logger.debug("Person: {}", id);
         personService.delete(id);
     }
@@ -53,14 +54,14 @@ public class PersonRestAPI {
     @GET("/_search")
     @PermitAll
     public String search(Optional<String> q, Optional<String> f_country, Optional<String> f_date,
-                         Optional<Integer> from, Optional<Integer> size) {
+                         Optional<Integer> from, Optional<Integer> size) throws IOException {
         return personService.search(q.orNull(), f_country.orNull(), f_date.orNull(), from.or(0), size.or(10));
     }
 
     @GET("/_advanced_search")
     @PermitAll
     public String advancedSearch(Optional<String> name, Optional<String> country, Optional<String> city,
-                                 Optional<Integer> from, Optional<Integer> size) {
+                                 Optional<Integer> from, Optional<Integer> size) throws IOException {
         return personService.advancedSearch(name.orNull(), country.orNull(), city.orNull(), from.or(0), size.or(10));
     }
 

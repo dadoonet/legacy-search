@@ -76,7 +76,7 @@ public class PersonService {
         return person;
     }
 
-    public boolean delete(Integer id) {
+    public boolean delete(Integer id) throws IOException {
         logger.debug("Person: {}", id);
 
         if (id == null) {
@@ -98,7 +98,7 @@ public class PersonService {
         return true;
     }
 
-    public String search(String q, String f_country, String f_date, Integer from, Integer size) {
+    public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
         long start = System.currentTimeMillis();
 
         hibernateService.beginTransaction();
@@ -121,7 +121,7 @@ public class PersonService {
         return json;
     }
 
-    public String advancedSearch(String name, String country, String city, Integer from, Integer size) {
+    public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws IOException {
         List<Criterion> criterions = new ArrayList<>();
         if (name != null) {
             criterions.add(Restrictions.ilike("name", "%" + name + "%"));

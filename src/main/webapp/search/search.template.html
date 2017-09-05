@@ -36,7 +36,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="bucket in $ctrl.result.aggregations.by_country.buckets" ng-click="$ctrl.addFilterCountry(bucket);">
+        <tr ng-repeat="bucket in $ctrl.result.aggregations['sterms#by_country'].buckets" ng-click="$ctrl.addFilterCountry(bucket);">
           <td>{{bucket.key}}</td>
           <td>{{bucket.doc_count}}</td>
         </tr>
