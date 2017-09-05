@@ -28,9 +28,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <restx.version>0.35-SNAPSHOT</restx.version>
-        <hibernate.version>5.0.7.Final</hibernate.version>
-        <slf4j.version>1.7.13</slf4j.version>
-        <log4j.version>2.6.2</log4j.version>
+        <hibernate.version>5.2.10.Final</hibernate.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>2.9.0</log4j.version>
         <jackson.version>2.6.4</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.38</version>
+            <version>6.0.6</version>
         </dependency>
 
         <!-- Jackson -->
@@ -172,7 +172,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
             </plugin>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
