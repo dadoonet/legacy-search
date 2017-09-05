@@ -19,56 +19,55 @@
 
 package fr.pilato.demo.legacysearch.dao;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
+import org.apache.http.HttpHost;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
 
 import javax.inject.Inject;
-import java.net.InetSocketAddress;
+import java.io.IOException;
 
 @Component
 public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     final private ObjectMapper mapper;
-    final private Client esClient;
+    final private RestHighLevelClient esClient;
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
-        this.esClient = new PreBuiltTransportClient(Settings.EMPTY)
-                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200")));
         this.mapper = mapper;
     }
 
-    public void save(Person person) throws JsonProcessingException {
+    public void save(Person person) throws IOException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person", "person", person.idAsString()).source(bytes, XContentType.JSON)).actionGet();
+        esClient.index(new IndexRequest("person", "person", person.idAsString()).source(bytes, XContentType.JSON));
     }
 
-    public void delete(String id) {
-        esClient.delete(new DeleteRequest("person", "person", id)).actionGet();
+    public void delete(String id) throws IOException {
+        esClient.delete(new DeleteRequest("person", "person", id));
     }
 
-    public SearchResponse search(QueryBuilder query, Integer from, Integer size) {
+    public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
         logger.debug("elasticsearch query: {}", query.toString());
-        SearchResponse response = esClient.prepareSearch("person")
-                .setTypes("person")
-                .setQuery(query)
-                .setFrom(from)
-                .setSize(size)
-                .execute().actionGet();
+        SearchResponse response = esClient.search(new SearchRequest("person")
+                .source(new SearchSourceBuilder()
+                        .query(query)
+                        .from(from)
+                        .size(size)
+                ));
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
         logger.trace("elasticsearch response: {} hits", response.toString());

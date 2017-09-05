@@ -23,7 +23,7 @@ angular.
 
               // If we have aggs, compute (for future use)
               if (data.aggregations) {
-                var buckets = data.aggregations.by_year.buckets;
+                  var buckets = data.aggregations['date_histogram#by_year'].buckets;
 
                 var i = -1;
                 for (var idx in buckets) {

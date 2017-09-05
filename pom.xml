@@ -25,11 +25,11 @@
     </licenses>
 
     <properties>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <restx.version>0.35-SNAPSHOT</restx.version>
         <hibernate.version>5.0.7.Final</hibernate.version>
-        <elasticsearch.version>5.5.2</elasticsearch.version>
+        <elasticsearch.version>6.0.0-beta2</elasticsearch.version>
         <slf4j.version>1.7.13</slf4j.version>
         <log4j.version>2.6.2</log4j.version>
         <jackson.version>2.6.4</jackson.version>
@@ -125,7 +125,7 @@
         <!-- Elasticsearch -->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
-            <artifactId>transport</artifactId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
 
@@ -189,5 +189,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>elastic-lucene-snapshots</id>
+            <name>Elastic Lucene Snapshots</name>
+            <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/00142c9</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
 
 </project>
