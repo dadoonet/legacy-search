@@ -22,40 +22,43 @@ package fr.pilato.demo.legacysearch.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
+import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.threadpool.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
 
 import javax.inject.Inject;
-import java.net.InetSocketAddress;
+import java.io.IOException;
 
 @Component
 public class ElasticsearchDao {
     final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     final private ObjectMapper mapper;
-    final private Client esClient;
+    final private RestHighLevelClient esClient;
     final private BulkProcessor bulkProcessor;
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
-        this.esClient = new PreBuiltTransportClient(Settings.EMPTY)
-                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200")));
         this.mapper = mapper;
-        this.bulkProcessor = BulkProcessor.builder(esClient, new BulkProcessor.Listener() {
+        this.bulkProcessor = new BulkProcessor.Builder(esClient::bulkAsync, new BulkProcessor.Listener() {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.debug("going to execute bulk of {} requests", request.numberOfActions());
@@ -70,7 +73,7 @@ public class ElasticsearchDao {
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                 logger.warn("error while executing bulk", failure);
             }
-        })
+        }, new ThreadPool(Settings.builder().put(Node.NODE_NAME_SETTING.getKey(), "high-level-client").build()))
                 .setBulkActions(10000)
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .build();
@@ -85,14 +88,14 @@ public class ElasticsearchDao {
         bulkProcessor.add(new DeleteRequest("person", "person", id));
     }
 
-    public SearchResponse search(QueryBuilder query, Integer from, Integer size) {
+    public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
         logger.debug("elasticsearch query: {}", query.toString());
-        SearchResponse response = esClient.prepareSearch("person")
-                .setTypes("person")
-                .setQuery(query)
-                .setFrom(from)
-                .setSize(size)
-                .execute().actionGet();
+        SearchResponse response = esClient.search(new SearchRequest("person")
+                .source(new SearchSourceBuilder()
+                        .query(query)
+                        .from(from)
+                        .size(size)
+                ));
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
         logger.trace("elasticsearch response: {} hits", response.toString());
