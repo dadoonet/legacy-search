@@ -21,7 +21,7 @@ package fr.pilato.demo.legacysearch.app;
 
 
 import com.google.common.base.Optional;
-import restx.server.JettyWebServer;
+import restx.server.Jetty8WebServer;
 import restx.server.WebServer;
 
 public class LegacySearchApp {
@@ -31,7 +31,7 @@ public class LegacySearchApp {
     public static void main(String[] args) throws Exception {
 
         int port = Integer.valueOf(Optional.fromNullable(System.getenv("PORT")).or("8080"));
-        WebServer server = new JettyWebServer(WEB_INF_LOCATION, WEB_APP_LOCATION, port, "0.0.0.0");
+        WebServer server = new Jetty8WebServer(WEB_INF_LOCATION, WEB_APP_LOCATION, port, "0.0.0.0");
 
         System.setProperty("restx.mode", System.getProperty("restx.mode", "prod"));
         System.setProperty("restx.app.package", "fr.pilato.demo.legacysearch");
