@@ -27,7 +27,7 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <restx.version>0.35-SNAPSHOT</restx.version>
+        <restx.version>0.35-rc1</restx.version>
         <hibernate.version>5.2.10.Final</hibernate.version>
         <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>2.9.0</log4j.version>
@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>io.restx</groupId>
-            <artifactId>restx-server-jetty</artifactId>
+            <artifactId>restx-server-jetty8</artifactId>
             <version>${restx.version}</version>
         </dependency>
         <dependency>
