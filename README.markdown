@@ -15,7 +15,7 @@ Installation
 You need to have:
 
 * Maven
-* JDK7 or higher
+* JDK8 or higher
 * Postgresql or MySQL 5.7+ up and running
 
 Modify [src/main/resources/hibernate.cfg.xml](src/main/resources/hibernate.cfg.xml) file to reflect
