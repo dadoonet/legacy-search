@@ -27,11 +27,11 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <restx.version>0.35-rc1</restx.version>
-        <hibernate.version>5.2.10.Final</hibernate.version>
+        <restx.version>0.35-rc2</restx.version>
+        <hibernate.version>5.2.11.Final</hibernate.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <log4j.version>2.9.0</log4j.version>
-        <jackson.version>2.6.4</jackson.version>
+        <log4j.version>2.9.1</log4j.version>
+        <jackson.version>2.9.2</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -116,6 +116,16 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.sf.dozer</groupId>
             <artifactId>dozer</artifactId>
             <version>5.5.1</version>
@@ -172,7 +182,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
