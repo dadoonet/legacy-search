@@ -68,7 +68,7 @@ public class ElasticsearchDao {
             logger.warn("can not create index and mappings", e);
         }
         this.mapper = mapper;
-        this.bulkProcessor = new BulkProcessor.Builder(esClient::bulkAsync, new BulkProcessor.Listener() {
+        this.bulkProcessor = BulkProcessor.builder(esClient::bulkAsync, new BulkProcessor.Listener() {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.debug("going to execute bulk of {} requests", request.numberOfActions());
@@ -83,7 +83,7 @@ public class ElasticsearchDao {
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                 logger.warn("error while executing bulk", failure);
             }
-        }, new ThreadPool(Settings.builder().put(Node.NODE_NAME_SETTING.getKey(), "high-level-client").build()))
+        })
                 .setBulkActions(10000)
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .build();
