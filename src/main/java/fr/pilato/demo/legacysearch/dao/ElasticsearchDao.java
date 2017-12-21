@@ -88,11 +88,11 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        bulkProcessor.add(new IndexRequest("person", "person", person.idAsString()).source(bytes, XContentType.JSON));
+        bulkProcessor.add(new IndexRequest("person", "doc", person.idAsString()).source(bytes, XContentType.JSON));
     }
 
     public void delete(String id) {
-        bulkProcessor.add(new DeleteRequest("person", "person", id));
+        bulkProcessor.add(new DeleteRequest("person", "doc", id));
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
