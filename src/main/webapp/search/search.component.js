@@ -17,16 +17,16 @@ angular.
         self.currentPage = page;
         $http({method: 'GET', url: '/api/1/person/_search?size=10&q='+ self.query
         + '&f_date=' + self.f_date + '&f_country=' + self.f_country + '&from=' + (page-1)*10 })
-            .success(function(data) {
+            .then(function successCallback(response) {
               self.error = null;
-              self.result = data;
-              self.totalItems = data.hits.total;
+              self.result = response.data;
+              self.totalItems = self.result.hits.total;
               // Group data every 10 years (facets don't support it yet)
               self.dates = new Array();
 
               // If we have aggs, compute (for future use)
-              if (data.aggregations) {
-                var buckets = data.aggregations['date_histogram#by_year'].buckets;
+              if (self.result.aggregations) {
+                var buckets = self.result.aggregations['date_histogram#by_year'].buckets;
 
                 var i = -1;
                 for (var idx in buckets) {
@@ -44,8 +44,7 @@ angular.
                   }
                 }
               }
-            })
-            .error(function(data, status, headers, config) {
+            }, function errorCallback(response) {
               self.error = "Backend not available";
             });
       };
