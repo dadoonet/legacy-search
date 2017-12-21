@@ -14,16 +14,16 @@ angular.
       self.search = function() {
         $http({method: 'GET', url: '/api/1/person/_search?from=0&size=10&q='+ self.query
         + '&f_date=' + self.f_date + '&f_country=' + self.f_country })
-            .success(function(data, status, headers, config) {
+            .then(function successCallback(response) {
               self.error = null;
-              self.result = data;
+              self.result = response.data;
 
               // Group data every 10 years (facets don't support it yet)
               self.dates = new Array();
 
               // If we have aggs, compute (for future use)
-              if (data.aggregations) {
-                  var buckets = data.aggregations['date_histogram#by_year'].buckets;
+              if (self.result.aggregations) {
+                  var buckets = self.result.aggregations['date_histogram#by_year'].buckets;
 
                 var i = -1;
                 for (var idx in buckets) {
@@ -41,9 +41,8 @@ angular.
                   }
                 }
               }
-            })
-            .error(function(data, status, headers, config) {
-              self.error = "Backend not available";
+            }, function errorCallback(response) {
+                self.error = "Backend not available";
             });
       };
 
