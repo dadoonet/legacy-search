@@ -26,12 +26,12 @@ angular.
         stop = $interval(function() {
           // Poll the status API
           $http({method: 'GET', url: config.backend + '/api/1/person/_init_status' })
-              .success(function(data) {
-                self.progress = data;
+              .then(function successCallback(response) {
+                self.progress = response.data;
                 // Remaining docs
-                var remaining_docs = self.persons - data.current;
-                self.remaining = Math.round(remaining_docs / data.rate);
-                self.took = Math.round(data.took / 1000);
+                var remaining_docs = self.persons - self.progress.current;
+                self.remaining = Math.round(remaining_docs / self.progress.rate);
+                self.took = Math.round(self.progress.took / 1000);
               });
         }, 100);
       };
@@ -56,11 +56,11 @@ angular.
         self.took = 0;
         self.startWatch();
         $http({method: 'GET', url: config.backend + '/api/1/person/_init?size='+self.persons })
-            .success(function(data) {
-              self.progress = data;
+            .then(function successCallback(response) {
+              self.result = response.data;
+              self.progress = self.result;
               self.status = "progress-bar-success";
               self.stopWatch();
-              self.result = data;
         });
       }
     }]
