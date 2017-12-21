@@ -16,6 +16,7 @@ angular.
       };
       self.remaining = 0;
       self.goal = 0;
+      self.took = 0;
       self.result = null;
 
       var stop;
@@ -25,11 +26,12 @@ angular.
         stop = $interval(function() {
           // Poll the status API
           $http({method: 'GET', url: config.backend + '/api/1/person/_init_status' })
-              .success(function(data) {
-                self.progress = data;
+              .then(function successCallback(response) {
+                self.progress = response.data;
                 // Remaining docs
-                var remaining_docs = self.persons - data.current;
-                self.remaining = Math.round(remaining_docs / data.rate);
+                var remaining_docs = self.persons - self.progress.current;
+                self.remaining = Math.round(remaining_docs / self.progress.rate);
+                self.took = Math.round(self.progress.took / 1000);
               });
         }, 100);
       };
@@ -51,13 +53,14 @@ angular.
         };
         self.remaining = 0;
         self.goal = self.persons;
+        self.took = 0;
         self.startWatch();
         $http({method: 'GET', url: config.backend + '/api/1/person/_init?size='+self.persons })
-            .success(function(data) {
-              self.progress = data;
+            .then(function successCallback(response) {
+              self.result = response.data;
+              self.progress = self.result;
               self.status = "progress-bar-success";
               self.stopWatch();
-              self.result = data;
         });
       }
     }]
