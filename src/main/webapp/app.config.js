@@ -17,5 +17,7 @@ angular.
         when('/advanced', {template: '<advanced></advanced>' }).
         when('/person/:id', {template: '<person-detail></person-detail>'}).
         otherwise({redirectTo: '/search'});
+
+      console.log("Project running with AngularJS " + angular.version.full);
     }
   ]);

@@ -13,12 +13,11 @@ angular.
 
       self.advanced_search = function() {
         $http({method: 'GET', url: '/api/1/person/_advanced_search?from=0&size=10&country='+self.country+'&city='+self.city+'&name='+ self.name })
-            .success(function(data, status, headers, config) {
+            .then(function successCallback(response) {
               self.error = null;
-              console.log(data.hits.total);
-              self.result = data;
-            })
-            .error(function(data, status, headers, config) {
+              self.result = response.data;
+              console.log(self.result.hits.total);
+            }, function errorCallback(response) {
                 self.error = "Backend not available";
             });
       };
