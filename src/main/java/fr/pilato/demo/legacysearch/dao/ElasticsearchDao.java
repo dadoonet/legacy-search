@@ -33,16 +33,13 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.threadpool.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import restx.factory.Component;
@@ -52,11 +49,11 @@ import java.io.IOException;
 
 @Component
 public class ElasticsearchDao {
-    final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
+    private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    final private ObjectMapper mapper;
-    final private RestHighLevelClient esClient;
-    final private BulkProcessor bulkProcessor;
+    private final ObjectMapper mapper;
+    private final RestHighLevelClient esClient;
+    private final BulkProcessor bulkProcessor;
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
