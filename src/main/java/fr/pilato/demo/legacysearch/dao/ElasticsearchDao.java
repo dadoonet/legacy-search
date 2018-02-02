@@ -40,10 +40,10 @@ import java.io.IOException;
 
 @Component
 public class ElasticsearchDao {
-    final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
+    private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    final private ObjectMapper mapper;
-    final private RestHighLevelClient esClient;
+    private final ObjectMapper mapper;
+    private final RestHighLevelClient esClient;
 
     @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
