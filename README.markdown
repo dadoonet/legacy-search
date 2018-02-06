@@ -8,10 +8,31 @@ This is a demo project to show how to add elasticsearch to a legacy SQL project.
 
 This branch connect our project to elasticsearch directly.
 
-Installation
+You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
+
+Docker Compose Installation
 ------------
 
-You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
+You must have Docker installed obviously and 4gb memory assigned to it.
+Or you can edit `docker-compose.yml` file and replace the following line depending on what memory you assigned:
+
+```
+- "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+```
+
+Best practice: no more than the half of available RAM.
+
+Then run:
+
+```sh
+docker-compose up
+```
+
+You can open [Kibana](http://localhost:5601/) after some seconds.
+
+
+Manual Installation
+------------
 
 Download and unzip elasticsearch:
 
