@@ -71,21 +71,22 @@
           <th>Date Of Birth</th>
           <th>Country</th>
           <th>City</th>
+          <th>Score</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="entry in $ctrl.result.hits.hits" >
+        <tr ng-repeat="entry in $ctrl.result.hits.hits">
           <td><a href="#!/person/{{entry._id}}">{{entry._source.name}}</a></td>
           <td>{{entry._source.gender}}</td>
           <td>{{entry._source.dateOfBirth}}</td>
           <td>{{entry._source.address.country}}</td>
           <td>{{entry._source.address.city}}</td>
+          <td><span ng-if="entry._score != null && entry._score != 1">{{entry._score}}</span></td>
         </tr>
 
         <tbody>
       </table>
     </div>
-
     <div class="col-md-12">
       <div>
         <ul uib-pagination total-items="$ctrl.totalItems" ng-model="$ctrl.currentPage"
