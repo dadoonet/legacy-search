@@ -1,0 +1,174 @@
+[
+  {
+    "_id": "5cd7d460-0804-11e8-b819-894531f66507",
+    "_type": "dashboard",
+    "_source": {
+      "title": "Persons",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":4,\"y\":0,\"w\":8,\"h\":3,\"i\":\"1\"},\"id\":\"d6939380-0803-11e8-b819-894531f66507\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":0,\"y\":6,\"w\":4,\"h\":4,\"i\":\"2\"},\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 400\":\"rgb(247,252,245)\",\"1,200 - 1,600\":\"rgb(35,139,69)\",\"400 - 800\":\"rgb(199,233,192)\",\"800 - 1,200\":\"rgb(116,196,118)\"},\"legendOpen\":false}},\"id\":\"466362d0-0804-11e8-b819-894531f66507\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":8,\"y\":3,\"w\":4,\"h\":3,\"i\":\"3\"},\"id\":\"cee17900-0802-11e8-b819-894531f66507\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":3,\"w\":4,\"h\":3,\"i\":\"4\"},\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"id\":\"37ab2540-0802-11e8-b819-894531f66507\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":4,\"y\":6,\"w\":8,\"h\":4,\"i\":\"5\"},\"id\":\"eb8f20b0-0803-11e8-b819-894531f66507\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"6\",\"gridData\":{\"x\":0,\"y\":10,\"w\":12,\"h\":8,\"i\":\"6\"},\"id\":\"13f76fa0-0802-11e8-b819-894531f66507\",\"type\":\"search\",\"version\":\"6.1.3\"},{\"panelIndex\":\"7\",\"gridData\":{\"x\":0,\"y\":0,\"w\":4,\"h\":3,\"i\":\"7\"},\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 25\":\"rgb(8,48,107)\",\"25 - 50\":\"rgb(55,135,192)\",\"50 - 75\":\"rgb(171,208,230)\",\"75 - 100\":\"rgb(247,251,255)\"},\"legendOpen\":false}},\"id\":\"47cc9a50-0805-11e8-b819-894531f66507\",\"title\":\"Persons\",\"type\":\"visualization\",\"version\":\"6.1.3\"},{\"panelIndex\":\"8\",\"gridData\":{\"x\":4,\"y\":3,\"w\":4,\"h\":3,\"i\":\"8\"},\"version\":\"6.2.0\",\"type\":\"visualization\",\"id\":\"f8deeb60-0b78-11e8-9544-e71632f3e896\"}]",
+      "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":false}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "Fri Jan 01 2010 00:00:00 GMT+0100",
+      "timeFrom": "Mon Jan 01 1940 00:00:00 GMT+0100",
+      "refreshInterval": {
+        "display": "Off",
+        "pause": false,
+        "value": 0
+      },
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "13f76fa0-0802-11e8-b819-894531f66507",
+    "_type": "search",
+    "_source": {
+      "title": "Persons",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "name",
+        "gender",
+        "children",
+        "address.country",
+        "address.city"
+      ],
+      "sort": [
+        "dateOfBirth",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "466362d0-0804-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons per cars children and gender",
+      "visState": "{\"title\":\"Persons per cars children and gender\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":4,\"colorSchema\":\"Greens\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"marketing.cars\",\"interval\":100,\"extended_bounds\":{},\"customLabel\":\"Cars\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"group\",\"params\":{\"field\":\"children\",\"interval\":1,\"min_doc_count\":true,\"extended_bounds\":{}}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"gender.aggs\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Gender\",\"row\":true}}]}",
+      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 400\":\"rgb(247,252,245)\",\"400 - 800\":\"rgb(199,233,192)\",\"800 - 1,200\":\"rgb(116,196,118)\",\"1,200 - 1,600\":\"rgb(35,139,69)\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "d6939380-0803-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons average number of children per cars",
+      "visState": "{\"title\":\"Persons average number of children per cars\",\"type\":\"line\",\"params\":{\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":false,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Average children\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"stacked\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"data\":{\"id\":\"4\",\"label\":\"Average children\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"dateOfBirth\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{},\"customLabel\":\"Per year\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"group\",\"params\":{\"field\":\"marketing.cars\",\"interval\":500,\"extended_bounds\":{},\"customLabel\":\"\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"children\"}}]}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "47cc9a50-0805-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons number",
+      "visState": "{\"title\":\"Persons number\",\"type\":\"gauge\",\"params\":{\"type\":\"gauge\",\"addTooltip\":true,\"addLegend\":false,\"isDisplayWarning\":false,\"gauge\":{\"verticalSplit\":false,\"extendRange\":true,\"percentageMode\":true,\"gaugeType\":\"Arc\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Blues\",\"gaugeColorMode\":\"Labels\",\"colorsRange\":[{\"from\":0,\"to\":250000},{\"from\":250000,\"to\":500000},{\"from\":500000,\"to\":750000},{\"from\":750000,\"to\":1000000}],\"invertColors\":true,\"labels\":{\"show\":true,\"color\":\"black\"},\"scale\":{\"show\":true,\"labels\":false,\"color\":\"#333\"},\"type\":\"meter\",\"style\":{\"bgWidth\":0.9,\"width\":0.9,\"mask\":false,\"bgMask\":false,\"maskBars\":50,\"bgFill\":\"#eee\",\"bgColor\":false,\"subText\":\"\",\"fontSize\":60,\"labelColor\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"persons\"}}]}",
+      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 25\":\"rgb(8,48,107)\",\"25 - 50\":\"rgb(55,135,192)\",\"50 - 75\":\"rgb(171,208,230)\",\"75 - 100\":\"rgb(247,251,255)\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "eb8f20b0-0803-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons per location",
+      "visState": "{\"title\":\"Persons per location\",\"type\":\"tile_map\",\"params\":{\"mapType\":\"Scaled Circle Markers\",\"isDesaturated\":true,\"addTooltip\":true,\"heatClusterSize\":1.5,\"legendPosition\":\"bottomright\",\"mapZoom\":2,\"mapCenter\":[0,0],\"wms\":{\"enabled\":false,\"options\":{\"format\":\"image/png\",\"transparent\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"address.location\",\"autoPrecision\":true,\"isFilteredByCollar\":true,\"useGeocentroid\":true,\"precision\":3}}]}",
+      "uiStateJSON": "{\"mapZoom\":5,\"mapCenter\":[47.48822075439992,4.881420372985303]}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "37ab2540-0802-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons per gender",
+      "visState": "{\"title\":\"Persons per gender\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":false,\"labels\":{\"show\":true,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"gender.aggs\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"female\":\"#BA43A9\",\"male\":\"#1F78C1\"}}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "cee17900-0802-11e8-b819-894531f66507",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons per country and city",
+      "visState": "{\"title\":\"Persons per country and city\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"left\",\"isDonut\":true,\"labels\":{\"show\":true,\"values\":false,\"last_level\":false,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"address.country.aggs\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"address.city.aggs\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+      "uiStateJSON": "{\"vis\":{\"colors\":{\"Italy\":\"#E0F9D7\",\"Turin\":\"#3F6833\",\"Ischia\":\"#508642\",\"Rome\":\"#629E51\",\"France\":\"#CFFAFF\",\"Nantes\":\"#2F575E\",\"Paris\":\"#447EBC\",\"Cergy\":\"#64B0C8\",\"England\":\"#FCE2DE\",\"Plymouth\":\"#58140C\",\"London\":\"#890F02\",\"Liverpool\":\"#BF1B00\",\"Germany\":\"#F9D9F9\",\"Bonn\":\"#511749\",\"Berlin\":\"#6D1F62\",\"Munich\":\"#962D82\"},\"legendOpen\":false}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  },
+  {
+    "_id": "f8deeb60-0b78-11e8-9544-e71632f3e896",
+    "_type": "visualization",
+    "_source": {
+      "title": "Persons city tags",
+      "visState": "{\"title\":\"Persons city tags\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"multiple\",\"minFontSize\":6,\"maxFontSize\":30,\"hideLabel\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"address.city.aggs\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":15,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"8527cfc0-0b78-11e8-9544-e71632f3e896\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+      }
+    },
+    "_meta": {
+      "savedObjectVersion": 2
+    }
+  }
+]
