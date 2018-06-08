@@ -53,11 +53,11 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws IOException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person", "doc", person.idAsString()).source(bytes, XContentType.JSON));
+        esClient.index(new IndexRequest("person", "_doc", person.idAsString()).source(bytes, XContentType.JSON));
     }
 
     public void delete(String id) throws IOException {
-        esClient.delete(new DeleteRequest("person", "doc", id));
+        esClient.delete(new DeleteRequest("person", "_doc", id));
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
