@@ -30,6 +30,7 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
@@ -55,22 +56,24 @@ public class ElasticsearchDao {
     public ElasticsearchDao(ObjectMapper mapper) {
         this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200")));
         this.mapper = mapper;
-        this.bulkProcessor = BulkProcessor.builder(esClient::bulkAsync, new BulkProcessor.Listener() {
-            @Override
-            public void beforeBulk(long executionId, BulkRequest request) {
-                logger.debug("going to execute bulk of {} requests", request.numberOfActions());
-            }
+        this.bulkProcessor = BulkProcessor.builder(
+                (request, bulkListener) -> esClient.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
+                new BulkProcessor.Listener() {
+                    @Override
+                    public void beforeBulk(long executionId, BulkRequest request) {
+                        logger.debug("going to execute bulk of {} requests", request.numberOfActions());
+                    }
 
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                logger.debug("bulk executed {} failures", response.hasFailures() ? "with" : "without");
-            }
+                    @Override
+                    public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+                        logger.debug("bulk executed {} failures", response.hasFailures() ? "with" : "without");
+                    }
 
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                logger.warn("error while executing bulk", failure);
-            }
-        })
+                    @Override
+                    public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                        logger.warn("error while executing bulk", failure);
+                    }
+                })
                 .setBulkActions(10000)
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .build();
@@ -92,7 +95,7 @@ public class ElasticsearchDao {
                         .query(query)
                         .from(from)
                         .size(size)
-                ));
+                ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
         logger.trace("elasticsearch response: {} hits", response.toString());
