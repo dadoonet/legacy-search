@@ -26,6 +26,7 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -53,11 +54,11 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws IOException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person", "_doc", person.idAsString()).source(bytes, XContentType.JSON));
+        esClient.index(new IndexRequest("person", "_doc", person.idAsString()).source(bytes, XContentType.JSON), RequestOptions.DEFAULT);
     }
 
     public void delete(String id) throws IOException {
-        esClient.delete(new DeleteRequest("person", "_doc", id));
+        esClient.delete(new DeleteRequest("person", "_doc", id), RequestOptions.DEFAULT);
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
@@ -67,7 +68,7 @@ public class ElasticsearchDao {
                         .query(query)
                         .from(from)
                         .size(size)
-                ));
+                ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
         logger.trace("elasticsearch response: {} hits", response.toString());

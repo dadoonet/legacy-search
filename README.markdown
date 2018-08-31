@@ -37,7 +37,7 @@ Manual Installation
 Download and unzip elasticsearch:
 
 ```
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.3.0.tar.gz
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
@@ -47,7 +47,7 @@ cd elasticsearch-*
 Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
 
 ```
-wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-darwin-x86_64.tar.gz
+wget https://artifacts.elastic.co/downloads/kibana/kibana-6.4.0-darwin-x86_64.tar.gz
 tar xzf kibana-*.tar.gz
 cd kibana-*
 ```
