@@ -1,0 +1,209 @@
+### Step 0 : INIT
+DELETE test
+DELETE person
+
+### Step 1
+
+GET /
+
+GET _cat/indices/person*?v&h=index,docs.count,store.size
+
+GET person/_search
+
+GET person/_mapping
+
+
+### Step 2 : Play with analyzers
+
+# What happens at index time?
+POST _analyze
+{
+  "text": "JoE SMith",
+  "analyzer": "standard"
+}
+# What happens at search time?
+POST _analyze
+{
+  "text": "JO",
+  "analyzer": "standard"
+}
+POST _analyze
+{
+  "text": "JOE",
+  "analyzer": "standard"
+}
+
+DELETE test
+PUT test
+{
+    "analysis": {
+        "analyzer": {
+            "ngram": {
+                "tokenizer": "ngram_tokenizer"
+            }
+        },
+        "tokenizer": {
+            "ngram_tokenizer": {
+                "type": "edgeNGram",
+                "min_gram": "1",
+                "max_gram": "10",
+                "token_chars": [ "letter", "digit" ]
+            }
+        }
+    }
+}
+# What happens at index time?
+POST test/_analyze
+{
+  "text": "joe smith",
+  "analyzer": "ngram"
+} 
+# What happens at search time?
+POST _analyze
+{
+  "text": "JO",
+  "analyzer": "simple"
+} 
+DELETE test
+
+DELETE person
+# We could manually run that
+PUT person
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ngram": {
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "edgeNGram",
+          "min_gram": "1",
+          "max_gram": "10",
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "fulltext": {
+          "type": "text",
+          "analyzer": "ngram",
+          "search_analyzer": "simple"
+        },
+        "address": {
+          "properties": {
+            "city": {
+              "type": "text",
+              "copy_to": "fulltext",
+              "fields": {
+                "autocomplete": {
+                  "type": "text",
+                  "analyzer": "ngram",
+                  "search_analyzer": "simple"
+                },
+                "aggs": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "country": {
+              "type": "text",
+              "copy_to": "fulltext",
+              "fields": {
+                "autocomplete": {
+                  "type": "text",
+                  "analyzer": "ngram",
+                  "search_analyzer": "simple"
+                },
+                "aggs": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "countrycode": {
+              "type": "keyword"
+            },
+            "location": {
+              "type": "geo_point"
+            },
+            "zipcode": {
+              "type": "keyword"
+            }
+          }
+        },
+        "children": {
+          "type": "long"
+        },
+        "dateOfBirth": {
+          "type": "date",
+          "format": "dateOptionalTime"
+        },
+        "gender": {
+          "copy_to": "fulltext",
+          "type": "text",
+          "fields": {
+            "aggs": {
+              "type": "keyword"
+            }
+          }
+        },
+        "marketing": {
+          "properties": {
+            "cars": {
+              "type": "long"
+            },
+            "electronic": {
+              "type": "long"
+            },
+            "fashion": {
+              "type": "long"
+            },
+            "food": {
+              "type": "long"
+            },
+            "garden": {
+              "type": "long"
+            },
+            "hifi": {
+              "type": "long"
+            },
+            "music": {
+              "type": "long"
+            },
+            "shoes": {
+              "type": "long"
+            },
+            "toys": {
+              "type": "long"
+            }
+          }
+        },
+        "name": {
+          "type": "text",
+          "copy_to": "fulltext",
+          "fields": {
+            "autocomplete": {
+              "type": "text",
+              "analyzer": "ngram",
+              "search_analyzer": "simple"
+            }
+          }
+        },
+        "reference": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}

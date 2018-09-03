@@ -8,5 +8,6 @@ angular.module('legacyApp', [
   'search',
   'advanced',
   'compute',
+  'kibana',
   'personDetail'
 ]);
