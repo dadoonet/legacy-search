@@ -15,6 +15,7 @@ angular.
         when('/init', {template: '<init></init>' }).
         when('/compute', {template: '<compute></compute>' }).
         when('/advanced', {template: '<advanced></advanced>' }).
+        when('/kibana', {template: '<kibana></kibana>' }).
         when('/person/:id', {template: '<person-detail></person-detail>'}).
         otherwise({redirectTo: '/search'});
 
