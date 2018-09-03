@@ -174,6 +174,7 @@ public class PersonService {
             joe.setName("Joe Smith");
             joe.getAddress().setCountry("France");
             joe.getAddress().setCity("Paris");
+            joe.getAddress().setCountrycode("FR");
             save(joe);
             currentItem.incrementAndGet();
 
@@ -182,6 +183,7 @@ public class PersonService {
             franceGall.setGender("female");
             franceGall.getAddress().setCountry("Italy");
             franceGall.getAddress().setCity("Ischia");
+            joe.getAddress().setCountrycode("IT");
             save(franceGall);
             currentItem.incrementAndGet();
 
