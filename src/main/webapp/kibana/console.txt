@@ -132,7 +132,7 @@ PUT person
               }
             },
             "countrycode": {
-              "type": "text"
+              "type": "keyword"
             },
             "location": {
               "type": "geo_point"
