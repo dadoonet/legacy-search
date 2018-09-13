@@ -20,10 +20,11 @@ Run it!
 Compile and restart the application
 
 ```
-# Delete the index
+# Delete the index from Kibana Dev Console
 DELETE person
 
-mvn clean package jetty:run
+# Compile and launch again
+mvn clean spring-boot:run
 
 # Inject 10000 docs
 curl http://127.0.0.1:8080/api/1/person/_init?size=10000
