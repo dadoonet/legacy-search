@@ -20,9 +20,9 @@ Compile and restart the application
 
 ```
 # Compile and launch again
-mvn clean package jetty:run
+mvn clean spring-boot:run
 
-# Delete the index
+# Delete the index from Kibana Dev Console
 DELETE person
 
 # Inject 10000 docs

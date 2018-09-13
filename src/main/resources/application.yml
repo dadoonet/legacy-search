@@ -1,0 +1,13 @@
+# Give the project a nice name
+spring.application.name: person
+
+# Enable all the actuator endpoints for HTTP (keep them under the base path) and JMX
+management.endpoints:
+  web:
+    base-path: /
+    exposure.include: "*"
+
+spring.jpa.hibernate.ddl-auto: create
+spring.datasource.url: jdbc:mysql://localhost:3306/person?serverTimezone=UTC&useSSL=false
+spring.datasource.username: root
+spring.datasource.password:
