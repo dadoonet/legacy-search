@@ -29,6 +29,8 @@ import java.util.Date;
 @Entity
 public class Person {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id = null;
 
     private String name = null;
@@ -36,11 +38,12 @@ public class Person {
     private String gender = null;
     private Integer children;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private Marketing marketing;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     @JsonIgnore
     public Integer getId() {
         return id;
@@ -80,7 +83,6 @@ public class Person {
         this.gender = gender;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
     public Marketing getMarketing() {
         return marketing;
     }
@@ -89,7 +91,6 @@ public class Person {
         this.marketing = marketing;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
     public Address getAddress() {
         return address;
     }
@@ -108,15 +109,13 @@ public class Person {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Person{");
-        sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", dateOfBirth=").append(dateOfBirth);
-        sb.append(", gender='").append(gender).append('\'');
-        sb.append(", children=").append(children);
-        sb.append(", marketing=").append(marketing);
-        sb.append(", address=").append(address);
-        sb.append('}');
-        return sb.toString();
+        return "Person{" + "id=" + id +
+                ", name='" + name + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", gender='" + gender + '\'' +
+                ", children=" + children +
+                ", marketing=" + marketing +
+                ", address=" + address +
+                '}';
     }
 }

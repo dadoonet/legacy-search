@@ -23,6 +23,7 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class GeoPoint {
+
     private double lat;
     private double lon;
 
