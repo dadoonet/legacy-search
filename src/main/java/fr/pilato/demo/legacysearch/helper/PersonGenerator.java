@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class PersonGenerator {
 
-    public static ArrayList<String> names;
+    private static ArrayList<String> names;
 
     static {
         try {
