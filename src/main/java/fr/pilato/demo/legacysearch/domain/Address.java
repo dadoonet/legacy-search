@@ -19,13 +19,18 @@
 
 package fr.pilato.demo.legacysearch.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Address {
-    private Integer id = null;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
 
     private String country;
     private String zipcode;
@@ -33,16 +38,10 @@ public class Address {
     private String countrycode;
     private GeoPoint location;
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    @JsonIgnore
     public Integer getId() {
         return id;
     }
 
-    /**
-     * Sets id (primary key).
-     */
     public void setId(Integer id) {
         this.id = id;
     }
@@ -86,17 +85,5 @@ public class Address {
 
     public void setLocation(GeoPoint location) {
         this.location = location;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Address{");
-        sb.append("country='").append(country).append('\'');
-        sb.append(", zipcode='").append(zipcode).append('\'');
-        sb.append(", city='").append(city).append('\'');
-        sb.append(", countrycode='").append(countrycode).append('\'');
-        sb.append(", location=").append(location);
-        sb.append('}');
-        return sb.toString();
     }
 }

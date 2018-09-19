@@ -1,110 +1,113 @@
+/*
+ * Licensed to Elasticsearch under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package fr.pilato.demo.legacysearch.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.pilato.demo.legacysearch.dao.HibernateService;
-import fr.pilato.demo.legacysearch.dao.PersonDao;
-import fr.pilato.demo.legacysearch.dao.SearchDao;
+import fr.pilato.demo.legacysearch.dao.PersonRepository;
+import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
+import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
+import org.apache.logging.log4j.util.Strings;
 import org.dozer.DozerBeanMapper;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import restx.factory.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
-public class PersonService {
-    final Logger logger = LoggerFactory.getLogger(PersonService.class);
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.contains;
 
-    private final PersonDao personDao;
-    private final SearchDao searchDao;
-    private final HibernateService hibernateService;
+@Service
+public class PersonService {
+    private final Logger logger = LoggerFactory.getLogger(PersonService.class);
+
+    private final PersonRepository personRepository;
     private final ObjectMapper mapper;
     private final DozerBeanMapper dozerBeanMapper;
 
-    @Inject
-    public PersonService(PersonDao personDao, SearchDao searchDao,
-                         HibernateService hibernateService,
-                         ObjectMapper mapper, DozerBeanMapper dozerBeanMapper) {
-        this.personDao = personDao;
-        this.searchDao = searchDao;
-        this.hibernateService = hibernateService;
+    @Autowired
+    public PersonService(PersonRepository personRepository, ObjectMapper mapper, DozerBeanMapper dozerBeanMapper) {
+        this.personRepository = personRepository;
         this.mapper = mapper;
         this.dozerBeanMapper = dozerBeanMapper;
     }
 
     public Person get(Integer id) {
-        hibernateService.beginTransaction();
-
-        Person person = personDao.get(id);
+        Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
         logger.debug("get({})={}", id, person);
-
-        hibernateService.commitTransaction();
         return person;
     }
 
     public Person save(Person person) {
-        hibernateService.beginTransaction();
+        Person personDb = personRepository.save(person);
 
-        Person personDb = personDao.save(person);
-
-        hibernateService.commitTransaction();
+        logger.debug("Saved person [{}]", personDb.getId());
         return personDb;
     }
 
     public Person upsert(Integer id, Person person) {
         // We try to find an existing document
-        Person personDb = get(id);
-        if (personDb != null) {
+        try {
+            Person personDb = get(id);
             dozerBeanMapper.map(person, personDb);
             person = personDb;
             person.setId(id);
-        }
+        } catch (PersonNotFoundException ignored) { }
         person = save(person);
 
         return person;
     }
 
-    public boolean delete(Integer id) throws IOException {
+    public void delete(Integer id) throws IOException {
         logger.debug("Person: {}", id);
 
-        if (id == null) {
-            return false;
+        if (id != null) {
+            personRepository.deleteById(id);
         }
-
-        hibernateService.beginTransaction();
-        Person person = personDao.get(id);
-        if (person == null) {
-            logger.debug("Person with reference {} does not exist", id);
-            hibernateService.commitTransaction();
-            return false;
-        }
-        personDao.delete(person);
-        hibernateService.commitTransaction();
 
         logger.debug("Person deleted: {}", id);
-
-        return true;
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
         long start = System.currentTimeMillis();
 
-        hibernateService.beginTransaction();
-        long total = searchDao.countLikeGoogle(q);
-        Collection<Person> personsFound = searchDao.findLikeGoogle(q, from, size);
-        hibernateService.commitTransaction();
+        Page<Person> page;
+
+        if (Strings.isEmpty(q)) {
+            page = personRepository.findAll(PageRequest.of(from / size, size));
+        } else {
+            page = personRepository.findLikeGoogle(q, PageRequest.of(from / size, size));
+        }
+
+        long total = page.getTotalElements();
+        Collection<Person> personsFound = page.getContent();
         long took = System.currentTimeMillis() - start;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
@@ -122,23 +125,35 @@ public class PersonService {
     }
 
     public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws IOException {
-        List<Criterion> criterions = new ArrayList<>();
+        Person person = new Person();
         if (name != null) {
-            criterions.add(Restrictions.ilike("name", "%" + name + "%"));
+            person.setName(name);
         }
-        if (country != null) {
-            criterions.add(Restrictions.ilike("address.country", "%" + country + "%"));
+
+        if (country != null || city != null) {
+            Address address = new Address();
+            if (country != null) {
+                address.setCountry(country);
+            }
+            if (city != null) {
+                address.setCity(city);
+            }
+            person.setAddress(address);
         }
-        if (city != null) {
-            criterions.add(Restrictions.ilike("address.city", "%" + city + "%"));
-        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("name", contains().ignoreCase())
+                .withMatcher("address.country", contains().ignoreCase())
+                .withMatcher("address.city", contains().ignoreCase());
+
+        Example<Person> example = Example.of(person, matcher);
 
         long start = System.currentTimeMillis();
 
-        hibernateService.beginTransaction();
-        long total = searchDao.countWithCriterias(criterions);
-        Collection<Person> personsFound = searchDao.findWithCriterias(criterions, from, size);
-        hibernateService.commitTransaction();
+        Page<Person> page = personRepository.findAll(example, PageRequest.of(from / size, size));
+
+        long total = page.getTotalElements();
+        Collection<Person> personsFound = page.getContent();
         long took = System.currentTimeMillis() - start;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
@@ -158,39 +173,36 @@ public class PersonService {
     private AtomicInteger currentItem = new AtomicInteger();
     private long start = 0;
 
-    public InitResult init(Integer size) {
+    public InitResult init(Integer size) throws IOException {
         currentItem.set(0);
 
         logger.debug("Initializing database for {} persons", size);
         start = System.currentTimeMillis();
 
-        try {
-            hibernateService.beginTransaction();
-            Person joe = PersonGenerator.personGenerator();
-            joe.setName("Joe Smith");
-            joe.getAddress().setCountry("France");
-            joe.getAddress().setCity("Paris");
-            save(joe);
-            currentItem.incrementAndGet();
+        Person joe = PersonGenerator.personGenerator();
+        joe.setName("Joe Smith");
+        joe.getAddress().setCountry("France");
+        joe.getAddress().setCity("Paris");
+        joe.getAddress().setCountrycode("FR");
 
-            Person franceGall = PersonGenerator.personGenerator();
-            franceGall.setName("France Gall");
-            franceGall.setGender("female");
-            franceGall.getAddress().setCountry("Italy");
-            franceGall.getAddress().setCity("Ischia");
-            save(franceGall);
-            currentItem.incrementAndGet();
+        save(joe);
+        currentItem.incrementAndGet();
 
-            // We generate numPersons persons
-            for (int i = 2; i < size; i++) {
-                Person person = PersonGenerator.personGenerator();
-                save(person);
-                currentItem.incrementAndGet();
-            }
-        } catch (IOException e) {
-            logger.warn("error while generating data", e);
-        } finally {
-            hibernateService.commitTransaction();
+        Person franceGall = PersonGenerator.personGenerator();
+        franceGall.setName("France Gall");
+        franceGall.setGender("female");
+        franceGall.getAddress().setCountry("Italy");
+        franceGall.getAddress().setCity("Ischia");
+        franceGall.getAddress().setCountrycode("IT");
+
+        save(franceGall);
+        currentItem.incrementAndGet();
+
+        // We generate numPersons persons
+        for (int i = 2; i < size; i++) {
+            Person person = PersonGenerator.personGenerator();
+            save(person);
+            currentItem.incrementAndGet();
         }
 
         long took = System.currentTimeMillis() - start;
