@@ -17,37 +17,11 @@
  * under the License.
  */
 
-package fr.pilato.demo.legacysearch.domain;
+package fr.pilato.demo.legacysearch.webapp;
 
-import javax.persistence.Embeddable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@Embeddable
-public class GeoPoint {
-
-    private double lat;
-    private double lon;
-
-    public GeoPoint() {
-    }
-
-    public GeoPoint(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public final double getLat() {
-        return this.lat;
-    }
-
-    public final double getLon() {
-        return this.lon;
-    }
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "person not found")
+public class PersonNotFoundException extends RuntimeException  {
 }

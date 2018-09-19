@@ -1,13 +1,29 @@
+/*
+ * Licensed to Elasticsearch under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package fr.pilato.demo.legacysearch.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
-import fr.pilato.demo.legacysearch.dao.HibernateService;
-import fr.pilato.demo.legacysearch.dao.PersonDao;
-import fr.pilato.demo.legacysearch.dao.SearchDao;
+import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
+import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
 import org.dozer.DozerBeanMapper;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
@@ -16,94 +32,69 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import restx.factory.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
+@Service
 public class PersonService {
-    final Logger logger = LoggerFactory.getLogger(PersonService.class);
+    private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
-    private final PersonDao personDao;
-    private final SearchDao searchDao;
-    private final HibernateService hibernateService;
-    private final ObjectMapper mapper;
+    private final PersonRepository personRepository;
     private final DozerBeanMapper dozerBeanMapper;
     private final ElasticsearchDao elasticsearchDao;
 
-    @Inject
-    public PersonService(PersonDao personDao, SearchDao searchDao,
-                         HibernateService hibernateService,
+    @Autowired
+    public PersonService(PersonRepository personRepository,
                          ElasticsearchDao elasticsearchDao,
-                         ObjectMapper mapper, DozerBeanMapper dozerBeanMapper) {
-        this.personDao = personDao;
-        this.searchDao = searchDao;
-        this.hibernateService = hibernateService;
-        this.mapper = mapper;
+                         DozerBeanMapper dozerBeanMapper) {
+        this.personRepository = personRepository;
         this.dozerBeanMapper = dozerBeanMapper;
         this.elasticsearchDao = elasticsearchDao;
     }
 
     public Person get(Integer id) {
-        hibernateService.beginTransaction();
-
-        Person person = personDao.get(id);
+        Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
         logger.debug("get({})={}", id, person);
-
-        hibernateService.commitTransaction();
         return person;
     }
 
     public Person save(Person person) {
-        hibernateService.beginTransaction();
-
-        Person personDb = personDao.save(person);
+        Person personDb = personRepository.save(person);
         try {
             elasticsearchDao.save(personDb);
         } catch (Exception e) {
             logger.error("Houston, we have a problem!", e);
         }
 
-        hibernateService.commitTransaction();
+        logger.debug("Saved person [{}]", personDb.getId());
         return personDb;
     }
 
     public Person upsert(Integer id, Person person) {
         // We try to find an existing document
-        Person personDb = get(id);
-        if (personDb != null) {
+        try {
+            Person personDb = get(id);
             dozerBeanMapper.map(person, personDb);
             person = personDb;
             person.setId(id);
-        }
+        } catch (PersonNotFoundException ignored) { }
         person = save(person);
 
         return person;
     }
 
-    public boolean delete(Integer id) {
+    public void delete(Integer id) {
         logger.debug("Person: {}", id);
 
-        if (id == null) {
-            return false;
+        if (id != null) {
+            personRepository.deleteById(id);
+            elasticsearchDao.delete("" + id);
         }
-
-        hibernateService.beginTransaction();
-        Person person = personDao.get(id);
-        if (person == null) {
-            logger.debug("Person with reference {} does not exist", id);
-            hibernateService.commitTransaction();
-            return false;
-        }
-        personDao.delete(person);
-        elasticsearchDao.delete(person.idAsString());
-        hibernateService.commitTransaction();
 
         logger.debug("Person deleted: {}", id);
-
-        return true;
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
@@ -164,39 +155,36 @@ public class PersonService {
     private AtomicInteger currentItem = new AtomicInteger();
     private long start = 0;
 
-    public InitResult init(Integer size) {
+    public InitResult init(Integer size) throws IOException {
         currentItem.set(0);
 
         logger.debug("Initializing database for {} persons", size);
         start = System.currentTimeMillis();
 
-        try {
-            hibernateService.beginTransaction();
-            Person joe = PersonGenerator.personGenerator();
-            joe.setName("Joe Smith");
-            joe.getAddress().setCountry("France");
-            joe.getAddress().setCity("Paris");
-            save(joe);
-            currentItem.incrementAndGet();
+        Person joe = PersonGenerator.personGenerator();
+        joe.setName("Joe Smith");
+        joe.getAddress().setCountry("France");
+        joe.getAddress().setCity("Paris");
+        joe.getAddress().setCountrycode("FR");
 
-            Person franceGall = PersonGenerator.personGenerator();
-            franceGall.setName("France Gall");
-            franceGall.setGender("female");
-            franceGall.getAddress().setCountry("Italy");
-            franceGall.getAddress().setCity("Ischia");
-            save(franceGall);
-            currentItem.incrementAndGet();
+        save(joe);
+        currentItem.incrementAndGet();
 
-            // We generate numPersons persons
-            for (int i = 2; i < size; i++) {
-                Person person = PersonGenerator.personGenerator();
-                save(person);
-                currentItem.incrementAndGet();
-            }
-        } catch (IOException e) {
-            logger.warn("error while generating data", e);
-        } finally {
-            hibernateService.commitTransaction();
+        Person franceGall = PersonGenerator.personGenerator();
+        franceGall.setName("France Gall");
+        franceGall.setGender("female");
+        franceGall.getAddress().setCountry("Italy");
+        franceGall.getAddress().setCity("Ischia");
+        franceGall.getAddress().setCountrycode("IT");
+
+        save(franceGall);
+        currentItem.incrementAndGet();
+
+        // We generate numPersons persons
+        for (int i = 2; i < size; i++) {
+            Person person = PersonGenerator.personGenerator();
+            save(person);
+            currentItem.incrementAndGet();
         }
 
         long took = System.currentTimeMillis() - start;

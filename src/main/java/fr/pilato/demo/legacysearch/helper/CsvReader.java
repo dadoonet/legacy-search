@@ -4,32 +4,28 @@ package fr.pilato.demo.legacysearch.helper;
 import java.io.*;
 import java.util.ArrayList;
 
-public class CsvReader {
-    public static ArrayList readAsStrings(String url) throws FileNotFoundException, IOException {
-        /**returns all of the data in a file as Strings given the File object*/
-        ArrayList data = new ArrayList();
-        InputStream ips= CsvReader.class.getResourceAsStream(url);
-        InputStreamReader ipsr = new InputStreamReader(ips);
-        BufferedReader reader = new BufferedReader(ipsr);
-        String nextLine = reader.readLine();
-        while (nextLine != null) {
-            data.add(nextLine);
-            nextLine = reader.readLine();
+class CsvReader {
+
+    static ArrayList<String> readAsStrings(String url) throws IOException {
+        ArrayList<String> data = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(CsvReader.class.getResourceAsStream(url)))) {
+            String nextLine = reader.readLine();
+            while (nextLine != null) {
+                data.add(nextLine);
+                nextLine = reader.readLine();
+            }
         }
-        reader.close();//just a good idea aparently
 
         return data;
     }
 
-    public static ArrayList extractFromCommas(String dataLine) {
+    static ArrayList extractFromCommas(String dataLine) {
         //Gives back the data that is found between commas in a String
-        ArrayList data = new ArrayList();
+        ArrayList<String> data = new ArrayList<>();
         String theString = "";
         for (int i = 0; i < dataLine.length(); i++) { //go down the whole string
             if (dataLine.charAt(i) == ',') {
-                if (i == 0) {
-                    //do nothing
-                } else {
+                if (i != 0) {
                     data.add(theString); //this means that the next comma has been reached
                     theString = ""; //reset theString Variable
                 }
