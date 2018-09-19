@@ -16,38 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package fr.pilato.demo.legacysearch.dao;
 
-package fr.pilato.demo.legacysearch.domain;
+import fr.pilato.demo.legacysearch.domain.Person;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
-import javax.persistence.Embeddable;
 
-@Embeddable
-public class GeoPoint {
+/**
+ * Person Repository.
+ */
+public interface PersonRepository extends PagingAndSortingRepository<Person, Integer>, QueryByExampleExecutor<Person> {
 
-    private double lat;
-    private double lon;
-
-    public GeoPoint() {
-    }
-
-    public GeoPoint(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public final double getLat() {
-        return this.lat;
-    }
-
-    public final double getLon() {
-        return this.lon;
-    }
+    @Query("select p from Person p where p.name like %?1% or p.address.country like %?1% or p.address.city like %?1%")
+    Page<Person> findLikeGoogle(String name, Pageable pageable);
 }

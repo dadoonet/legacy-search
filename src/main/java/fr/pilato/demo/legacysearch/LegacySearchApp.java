@@ -17,25 +17,28 @@
  * under the License.
  */
 
-package fr.pilato.demo.legacysearch.app;
+package fr.pilato.demo.legacysearch;
 
 
-import com.google.common.base.Optional;
-import restx.server.Jetty8WebServer;
-import restx.server.WebServer;
+import org.dozer.DozerBeanMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
+@SpringBootApplication
 public class LegacySearchApp {
-    public static final String WEB_INF_LOCATION = "src/main/webapp/WEB-INF/web.xml";
-    public static final String WEB_APP_LOCATION = "src/main/webapp";
+    private static final Logger logger = LoggerFactory.getLogger(LegacySearchApp.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        logger.info("Starting LegacySearch demo application");
+        SpringApplication.run(LegacySearchApp.class, args);
+    }
 
-        int port = Integer.valueOf(Optional.fromNullable(System.getenv("PORT")).or("8080"));
-        WebServer server = new Jetty8WebServer(WEB_INF_LOCATION, WEB_APP_LOCATION, port, "0.0.0.0");
-
-        System.setProperty("restx.mode", System.getProperty("restx.mode", "prod"));
-        System.setProperty("restx.app.package", "fr.pilato.demo.legacysearch");
-
-        server.startAndAwait();
+    @Bean
+    public DozerBeanMapper dozerBeanMapper() {
+        logger.debug("creating dozen bean mapper");
+        return new DozerBeanMapper();
     }
 }
