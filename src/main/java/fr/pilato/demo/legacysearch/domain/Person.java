@@ -19,16 +19,22 @@
 
 package fr.pilato.demo.legacysearch.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.pilato.demo.legacysearch.serializer.CustomDateSerializer;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.util.Date;
 
 @Entity
 public class Person {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id = null;
 
     private String name = null;
@@ -36,12 +42,12 @@ public class Person {
     private String gender = null;
     private Integer children;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private Marketing marketing;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    @JsonIgnore
     public Integer getId() {
         return id;
     }
@@ -50,7 +56,6 @@ public class Person {
         this.id = id;
     }
 
-    @JsonIgnore
     public String idAsString() {
         return id != null ? "" + id : null;
     }
@@ -80,7 +85,6 @@ public class Person {
         this.gender = gender;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
     public Marketing getMarketing() {
         return marketing;
     }
@@ -89,7 +93,6 @@ public class Person {
         this.marketing = marketing;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
     public Address getAddress() {
         return address;
     }
@@ -104,19 +107,5 @@ public class Person {
 
     public void setChildren(Integer children) {
         this.children = children;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Person{");
-        sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", dateOfBirth=").append(dateOfBirth);
-        sb.append(", gender='").append(gender).append('\'');
-        sb.append(", children=").append(children);
-        sb.append(", marketing=").append(marketing);
-        sb.append(", address=").append(address);
-        sb.append('}');
-        return sb.toString();
     }
 }

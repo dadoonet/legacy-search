@@ -40,9 +40,8 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import restx.factory.Component;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 @Component
@@ -53,7 +52,6 @@ public class ElasticsearchDao {
     private final RestHighLevelClient esClient;
     private final BulkProcessor bulkProcessor;
 
-    @Inject
     public ElasticsearchDao(ObjectMapper mapper) {
         this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200")));
         // Automagically create index and mapping

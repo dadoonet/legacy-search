@@ -5,11 +5,11 @@ angular.
   module('personDetail').
   component('personDetail', {
     templateUrl: 'person-detail/person-detail.template.html',
-    controller: ['$http', '$routeParams',
-      function PersonDetailController($http, $routeParams) {
+    controller: ['$http', '$routeParams', '$location',
+      function PersonDetailController($http, $routeParams, $location) {
           var self = this;
 
-          $http.get('/api/1/person/_byid/'+ $routeParams.id).then(function(response) {
+          $http.get('/api/1/person/'+ $routeParams.id).then(function(response) {
               console.log(response.data);
               self.person = response.data;
           });
@@ -20,8 +20,8 @@ angular.
           };
 
           self.delete = function() {
-              $http.delete('/api/1/person/'+ $routeParams.id);
-              $location.path('/');
+              $http.delete('/api/1/person/'+ $routeParams.id)
+                  .then(function() { $location.path('/'); });
           };
       }
     ]
