@@ -6,22 +6,25 @@ import org.hibernate.query.Query;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import restx.factory.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
+import javax.persistence.EntityManagerFactory;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
-@Component
+@Service
 public class HibernateService {
     private final Logger logger = LoggerFactory.getLogger(HibernateService.class);
 
-    private final SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
-    @Inject
-    public HibernateService(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    @Autowired
+    public HibernateService(EntityManagerFactory factory) {
+        if(factory.unwrap(SessionFactory.class) == null){
+            throw new NullPointerException("factory is not a hibernate factory");
+        }
+        this.sessionFactory = factory.unwrap(SessionFactory.class);
     }
 
     public void beginTransaction() {
@@ -57,19 +60,5 @@ public class HibernateService {
             }
         }
         return queryObject.list();
-    }
-
-    public <T> T merge(final T entity) {
-        return (T) getSession().merge(entity);
-    }
-
-    public void delete(final Object entity) {
-        getSession().delete(entity);
-    }
-
-    public <T> void deleteAll(Collection<T> entities) {
-        for (Object entity : entities) {
-            getSession().delete(entity);
-        }
     }
 }

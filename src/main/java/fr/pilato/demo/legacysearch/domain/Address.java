@@ -25,7 +25,10 @@ import javax.persistence.*;
 
 @Entity
 public class Address {
-    private Integer id = null;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
 
     private String country;
     private String zipcode;
@@ -33,8 +36,6 @@ public class Address {
     private String countrycode;
     private GeoPoint location;
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     @JsonIgnore
     public Integer getId() {
         return id;

@@ -43,21 +43,21 @@ import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import restx.factory.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 @Component
 public class ElasticsearchDao {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    private final ObjectMapper mapper;
+    @Autowired
+    private ObjectMapper mapper;
     private final RestHighLevelClient esClient;
     private final BulkProcessor bulkProcessor;
 
-    @Inject
-    public ElasticsearchDao(ObjectMapper mapper) {
+    public ElasticsearchDao() {
         this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200")));
         // Automagically create index and mapping
         try {
@@ -65,7 +65,6 @@ public class ElasticsearchDao {
         } catch (Exception e) {
             logger.warn("can not create index and mappings", e);
         }
-        this.mapper = mapper;
         this.bulkProcessor = BulkProcessor.builder(
                 (request, bulkListener) -> esClient.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
                 new BulkProcessor.Listener() {

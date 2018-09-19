@@ -13,7 +13,10 @@ import javax.persistence.Id;
  */
 @Entity
 public class Marketing {
-    private Integer id = null;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
 
     private Integer cars;
     private Integer shoes;
@@ -25,19 +28,11 @@ public class Marketing {
     private Integer hifi;
     private Integer food;
 
-    /**
-     * Gets id (primary key).
-     */
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     @JsonIgnore
     public Integer getId() {
         return id;
     }
 
-    /**
-     * Sets id (primary key).
-     */
     public void setId(Integer id) {
         this.id = id;
     }
@@ -114,53 +109,17 @@ public class Marketing {
         this.food = food;
     }
 
-    /**
-     * Returns a string representation of the object.
-     */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(this.getClass().getName() + "-");
-        sb.append("  cars=" + cars);
-        sb.append("  shoes=" + shoes);
-        sb.append("  toys=" + toys);
-        sb.append("  fashion=" + fashion);
-        sb.append("  music=" + music);
-        sb.append("  garden=" + garden);
-        sb.append("  electronic=" + electronic);
-        sb.append("  hifi=" + hifi);
-        sb.append("  food=" + food);
-
-        return sb.toString();
+        return (this.getClass().getName() + "-") +
+                "  cars=" + cars +
+                "  shoes=" + shoes +
+                "  toys=" + toys +
+                "  fashion=" + fashion +
+                "  music=" + music +
+                "  garden=" + garden +
+                "  electronic=" + electronic +
+                "  hifi=" + hifi +
+                "  food=" + food;
     }
-
-    /**
-     * Indicates whether some other object is equal to this one.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Marketing other = (Marketing) obj;
-
-        if (cars != other.cars) return false;
-        if (shoes != other.shoes) return false;
-        if (toys != other.toys) return false;
-        if (fashion != other.fashion) return false;
-        if (music != other.music) return false;
-        if (garden != other.garden) return false;
-        if (electronic != other.electronic) return false;
-        if (hifi != other.hifi) return false;
-        if (food != other.food) return false;
-
-        return true;
-    }
-
-
-
 }
