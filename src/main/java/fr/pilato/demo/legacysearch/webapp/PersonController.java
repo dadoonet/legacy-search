@@ -14,20 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-@RestController
+@Controller
 public class PersonController {
     private final Logger logger = LoggerFactory.getLogger(PersonController.class);
 
-    private final PersonService personService;
-
-    @Autowired
-    public PersonController(PersonService personService) {
-        this.personService = personService;
-    }
+    @Autowired private PersonService personService;
 
     @GetMapping("/_byid/{id}")
     @ResponseBody

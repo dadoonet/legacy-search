@@ -24,7 +24,6 @@ import org.dozer.DozerBeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -35,13 +34,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("fr.pilato.demo.legacysearch.dao")
 @EntityScan("fr.pilato.demo.legacysearch.domain")
 @SpringBootApplication
-@EnableAutoConfiguration
 public class LegacySearchApp {
     private static final Logger logger = LoggerFactory.getLogger(LegacySearchApp.class);
-    public static final String WEB_INF_LOCATION = "src/main/webapp/WEB-INF/web.xml";
-    public static final String WEB_APP_LOCATION = "src/main/webapp";
 
     public static void main(String[] args) {
+        logger.info("Starting LegacySearch demo application");
         SpringApplication.run(LegacySearchApp.class, args);
     }
 
