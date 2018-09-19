@@ -20,7 +20,7 @@ Compile and restart the application
 
 ```
 # Compile and launch again
-mvn clean package jetty:run
+mvn clean spring-boot:run
 
 # We don't need to reindex data as they are already in elasticsearch.
 ```
