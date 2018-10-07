@@ -32,5 +32,5 @@ import org.springframework.data.repository.query.QueryByExampleExecutor;
 public interface PersonRepository extends PagingAndSortingRepository<Person, Integer>, QueryByExampleExecutor<Person> {
 
     @Query("select p from Person p where p.name like %?1% or p.address.country like %?1% or p.address.city like %?1%")
-    Page<Person> findLikeGoogle(String name, Pageable pageable);
+    Page<Person> findLikeGoogle(String query, Pageable pageable);
 }
