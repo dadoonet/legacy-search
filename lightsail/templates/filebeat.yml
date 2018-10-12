@@ -1,0 +1,44 @@
+filebeat.prospectors:
+
+{% if inventory_hostname_short == 'frontend' %}
+# Collect the JSON log files from the Spring Boot apps
+- type: log
+  paths:
+    - /var/log/apps/*.json
+  fields_under_root: true
+  fields:
+    application: java
+  json.message_key: log
+{% endif %}
+
+
+filebeat.modules:
+- module: auditd
+- module: nginx
+- module: system
+
+
+name: "{{ inventory_hostname }}"
+tags: ["{{ env }}", "lightsail"]
+
+
+processors:
+- add_cloud_metadata: ~
+- add_host_metadata: ~
+
+
+xpack.monitoring.enabled: true
+
+
+output.elasticsearch:
+  hosts: ["{{ elasticsearch_host }}"]
+  username: "{{ elasticsearch_user }}"
+  password: "{{ elasticsearch_password }}"
+
+
+setup:
+  kibana:
+    host: "{{ kibana_host }}"
+    username: "{{ elasticsearch_user }}"
+    password: "{{ elasticsearch_password }}"
+  dashboards.enabled: true

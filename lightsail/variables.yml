@@ -1,0 +1,34 @@
+# Versions to install
+elastic_version: 6.4.2
+elastic_download: https://artifacts.elastic.co
+apm_java: 0.7.0
+
+
+# Elastic Cloud credentials
+elasticsearch_host: "{{ lookup('env','ELASTICSEARCH_HOST') }}"
+elasticsearch_user: "{{ lookup('env','ELASTICSEARCH_USER') }}"
+elasticsearch_password: "{{ lookup('env','ELASTICSEARCH_PASSWORD') }}"
+kibana_host: "{{ lookup('env','KIBANA_HOST') }}"
+kibana_id: "{{ lookup('env','KIBANA_ID') }}"
+
+
+# Setup of the infrastructure
+env: production
+domain: xeraa.wtf
+
+
+# APM
+apm_server: https://monitor.{{ domain }}:8200
+apm_secret: secret
+
+
+# MySQL
+mysql_server: backend.{{ domain }}:3306
+mysql_user: "{{ lookup('env','MYSQL_USER') }}"
+mysql_password: "{{ lookup('env','MYSQL_PASSWORD') }}"
+mysql_database: person
+
+
+# Credentials for Kibana dashboard-only mode
+attendee_user: dashbaord
+attendee_password: secret

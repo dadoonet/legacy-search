@@ -1,4 +1,6 @@
 *.iml
+*.tfstate
 target/
 .idea/
+.terraform/
 

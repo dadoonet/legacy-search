@@ -1,116 +1,36 @@
-Add Search to Legacy Application
+Monitor Your Legacy Application
 ================================
 
-Introduction
-------------
+Lightsail Setup
+---------------
 
-This is a demo project to show how to add elasticsearch to a legacy SQL project.
+Make sure you have run this before the demo, because some steps take time and require a decent internet connection.
 
-In this branch, you will find the current legacy version of the project.
+1. Make sure you have your AWS account set up, access key created, and added as environment variables in `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. Protip: Use [https://github.com/sorah/envchain](https://github.com/sorah/envchain) to keep your environment variables safe.
+1. Create the Elastic Cloud instance with the same version as specified in *variables.yml*'s `elastic_version`, enable Kibana as well as the GeoIP & user agent plugins, and set the environment variables with the values for `ELASTICSEARCH_HOST`, `ELASTICSEARCH_USER`, `ELASTICSEARCH_PASSWORD`, `KIBANA_HOST`, `KIBANA_ID`, `MYSQL_USER`, and `MYSQL_PASSWORD`.
+1. Change into the *lightsail/* directory.
+1. Change the settings to a domain you have registered under Route53 in *inventory*, *variables.tf*, and *variables.yml*. Set the Hosted Zone for that domain and export the Zone ID under the environment variable `TF_VAR_zone_id`. If you haven't created the Hosted Zone yet, you should set it up in the AWS Console first and then set the environment variable.
+1. If you haven't installed the AWS plugin for Terraform, get it with `terraform init` first. Then create the keypair, DNS settings, and instances with `terraform apply`.
+1. Open HTTPS on the network configuration on the frontend and monitor instances, MySQL on the backend instance, and TCP 8200 on the monitoring instance (waiting for this [Terraform issue](https://github.com/terraform-providers/terraform-provider-aws/issues/700)).
+1. Apply the base configuration to all instances with `ansible-playbook configure_all.yml`.
+1. Apply the instance specific configurations with `ansible-playbook configure_backend.yml` and `ansible-playbook configure_monitor.yml`.
+1. Deploy the JARs with `ansible-playbook deploy_bad.yml`, `ansible-playbook deploy_backend.yml`, and `ansible-playbook deploy_frontend.yml` (Ansible is also building them).
+
+When you are done, remove the instances, DNS settings, and key with `terraform destroy`.
 
 
-Installation
-------------
+Let's Debug
+-----------
 
-You need to have:
+Prerequisite: Make sure MySQL is stopped and restart the Java app so it won't successfully come up.
 
-* Maven
-* JDK8 or higher
-* Postgresql or MySQL 5.7+ up and running
-
-Modify [src/main/resources/application.yml](src/main/resources/application.yml) file to reflect
-your own database settings:
-
-```yml
-# Database connection settings - postgresql
-spring.datasource.url: jdbc:postgresql://localhost:5432/dpilato
-spring.datasource.username: dpilato
-spring.datasource.password:
-```
-
-or
-
-```xml
-# Database connection settings - MySQL
-spring.datasource.url: jdbc:mysql://localhost:3306/person?serverTimezone=UTC&useSSL=false
-spring.datasource.username: root
-spring.datasource.password:
-```
-
-If you did not create your database yet, just run:
-
-```sh
-# Postgresql
-createdb person
-# MySQL
-mysqladmin -uroot create person
-```
-
-Build the application:
-
-```sh
-mvn clean install
-```
-
-Then run it with:
-
-```
-java -jar target/legacy-search-2.0-SNAPSHOT.jar
-```
-
-Or directly run from Maven:
-
-```sh
-mvn clean spring-boot:run
-```
-
-Note that while developing, you would probably prefer running `LegacySearchApp#main()`
-from your IDE to get hot reload of the application.
-
-Play!
------
-
-### Some CRUD operations
-
-```sh
-# Create one person
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -H "Content-Type: application/json" -d '{"name":"David Pilato"}'
-
-# Read that person
-curl http://127.0.0.1:8080/api/1/person/1
-
-# Update full document
-curl -XPUT http://127.0.0.1:8080/api/1/person/1 -H "Content-Type: application/json" -d '{"name":"David Pilato", "children":3}'
-
-# Check
-curl http://127.0.0.1:8080/api/1/person/1
-
-# Delete
-curl -XDELETE http://127.0.0.1:8080/api/1/person/1
-
-# Check (you should get a 404 error)
-curl http://127.0.0.1:8080/api/1/person/1
-```
-
-### Database Initialisation
-
-```sh
-# Initialize the database with 1 000 (default) or 10 000 persons
-curl http://127.0.0.1:8080/api/1/person/_init
-curl http://127.0.0.1:8080/api/1/person/_init?size=10000
-```
-
-## Search
-
-```sh
-# Search for something (`a la google`)
-curl "http://127.0.0.1:8080/api/1/person/_search?q=Joe"
-```
-
-You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
-You can also look at [advanced search](http://127.0.0.1:8080/#/advanced).
-
-Next step
----------
-
-Look at [branch 01-direct](https://github.com/dadoonet/legacy-search/tree/01-direct)
+1. Heartbeat dashboard: Site is indeed down
+1. Metricbeat system dashboard: Check the system, which servers do you even have what is running, and the load.
+1. You can also get a bit of an overview on the Monitoring page.
+1. Logs: Why not .log and .json instead, filter down to `application:java` and `json.severity:ERROR`.
+1. Heartbeat: MySQL data on visualizations with a filter on `tcp.port:3306` and then split on `monitor.status`.
+1. Restart MySQL via SSH and then the Java application with `ansible-playbook restart_frontend.yml`, so we have the event for annotations later on.
+1. Insert some data and let the audience go wild on the application. Show the results in Packetbeat and then Filebeat modules nginx.
+1. Application metrics with HTTP and JMX plus annotations in TSVB.
+1. APM: Show the init calls — that's not unexpected. But why is search doing so many calls? David will need to fix that.
+1. SSH dashboard, Auditbeat,...

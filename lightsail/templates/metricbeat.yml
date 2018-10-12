@@ -1,0 +1,132 @@
+metricbeat.modules:
+
+- module: system
+  metricsets:
+    - cpu
+    - load
+    - core
+    - diskio
+    - filesystem
+    - fsstat
+    - memory
+    - network
+    - process
+    - process_summary
+    - socket
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cgroups: true
+  process.include_top_n:
+    enabled: true
+    by_cpu: 20
+    by_memory: 20
+
+{% if inventory_hostname_short != 'backend' %}
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+  hosts: ["https://{{ inventory_hostname }}"]
+{% endif %}
+
+{% if inventory_hostname_short == 'backend' %}
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(backend.{{ domain }}:3306)/"]
+  username: "{{ mysql_user }}"
+  password: "{{ mysql_password }}"
+{% endif %}
+
+{% if inventory_hostname_short == 'frontend' %}
+- module: http
+  metricsets: ["json"]
+  period: 10s
+  hosts: ["localhost:8080"]
+  namespace: health
+  path: /health
+  method: GET
+
+{% for metric in ('http.server.requests', 'process.files.max', 'jvm.gc.memory.promoted', 'tomcat.cache.hit',
+                  'jvm.memory.committed', 'system.load.average.1m', 'tomcat.cache.access', 'jvm.memory.used',
+                  'jvm.gc.max.data.size', 'system.cpu.count', 'logback.events', 'tomcat.global.sent',
+                  'jvm.buffer.memory.used', 'tomcat.sessions.created', 'jvm.memory.max', 'jvm.threads.daemon',
+                  'system.cpu.usage', 'jvm.gc.memory.allocated', 'tomcat.global.request.max',
+                  'tomcat.global.request', 'tomcat.sessions.expired', 'jvm.threads.live', 'jvm.threads.peak',
+                  'tomcat.global.received', 'process.uptime', 'tomcat.sessions.rejected', 'process.cpu.usage',
+                  'jvm.gc.pause', 'tomcat.threads.config.max', 'jvm.classes.loaded', 'jvm.classes.unloaded',
+                  'tomcat.global.error', 'tomcat.sessions.active.current', 'tomcat.sessions.alive.max',
+                  'jvm.gc.live.data.size', 'tomcat.servlet.request.max', 'tomcat.threads.current',
+                  'tomcat.servlet.request', 'process.files.open', 'jvm.buffer.count', 'jvm.buffer.total.capacity',
+                  'tomcat.sessions.active.max', 'tomcat.threads.busy', 'process.start.time', 'tomcat.servlet.error') %}
+- module: http
+  metricsets: ["json"]
+  period: 10s
+  hosts: ["localhost:8080"]
+  namespace: metrics
+  path: "/metrics/{{ metric }}"
+  method: GET
+  dedot.enabled: true
+{% endfor %}
+
+- module: jolokia
+  metricsets: ["jmx"]
+  hosts: ["localhost:8080"]
+  namespace: metrics
+  jmx.mappings:
+    - mbean: "java.lang:type=Runtime"
+      attributes:
+        - attr: Uptime
+          field: uptime
+    - mbean: "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep"
+      attributes:
+        - attr: CollectionTime
+          field: gc.cms_collection_time
+          event: gc
+        - attr: CollectionCount
+          field: gc.cms_collection_count
+          event: gc
+    - mbean: "java.lang:type=Memory"
+      attributes:
+        - attr: HeapMemoryUsage
+          field: memory.heap_usage
+          event: heap
+        - attr: NonHeapMemoryUsage
+          field: memory.non_heap_usage
+          event: heap
+    - mbean: "java.lang:type=Threading"
+      attributes:
+        - attr: ThreadCount
+          field: thread.count
+          event: thread
+        - attr: DaemonThreadCount
+          field: thread.daemon
+          event: thread
+  jmx.instance: "{{ inventory_hostname }}"
+{% endif %}
+
+
+name: "{{ inventory_hostname }}"
+tags: ["{{ env }}", "lightsail"]
+
+
+processors:
+- add_cloud_metadata: ~
+- add_host_metadata: ~
+
+
+xpack.monitoring.enabled: true
+
+
+output.elasticsearch:
+  hosts: ["{{ elasticsearch_host }}"]
+  username: "{{ elasticsearch_user }}"
+  password: "{{ elasticsearch_password }}"
+
+
+setup:
+  kibana:
+    host: "{{ kibana_host }}"
+    username: "{{ elasticsearch_user }}"
+    password: "{{ elasticsearch_password }}"
+  dashboards.enabled: true

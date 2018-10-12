@@ -1,0 +1,27 @@
+- hosts: frontend
+  become: true
+  gather_facts: yes
+
+
+  vars_files:
+    - variables.yml
+
+
+  post_tasks:
+    - include_tasks: include_event.yml
+      vars:
+        application: restart_frontend
+
+
+  tasks:
+
+    - name: Restart the JAR, make sure it autostarts, and reload the configuration
+      systemd: name="frontend" state=restarted
+
+    - name: Wait for the Java application to start up
+      pause: seconds=30
+
+    - name: Check if the service is available
+      uri: url="https://{{ inventory_hostname }}/health"
+      register: response
+      ignore_errors: yes

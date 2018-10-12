@@ -1,0 +1,236 @@
+- hosts: all
+  become: true
+  gather_facts: yes
+
+
+  vars_files:
+    - variables.yml
+
+
+  vars:
+      kibana_basic_auth: "{{ attendee_user }}:{{ attendee_password  }}"
+
+
+  pre_tasks:
+    - name: Install Python2 to make Ansible work
+      raw: sudo apt-get update && sudo apt-get -y install python-minimal
+
+
+  post_tasks:
+    - include_tasks: include_event.yml
+      vars:
+        application: configure_all
+
+
+  tasks:
+
+
+    # System
+    - name: Update and upgrade apt packages
+      apt: upgrade=dist
+
+    - name: Install NTP to avoid time drift and PIP to manage Python dependencies plus its build tools
+      apt: name={{ item }}
+      with_items:
+        - ntp
+        - ntpdate
+        - python3-pip
+        - build-essential
+        - libssl-dev
+        - libffi-dev
+
+    - name: Install the JRE
+      apt: name=openjdk-8-jre-headless install_recommends=no
+
+    - name: Install the pyOpenSSL library, so Ansible can use it to check TLS certificates
+      pip: name=pyopenssl
+
+
+    # Global Elasticsearch configuration — this should run early on, so it is used for all later steps
+    - name: Register a global index template
+      uri:
+        url: "{{elasticsearch_host}}_template/template_global"
+        body_format: json
+        method: PUT
+        user: "{{ elasticsearch_user }}"
+        password: "{{ elasticsearch_password }}"
+        body:
+          template: "*"
+          settings:
+            number_of_shards: 1
+            number_of_replicas: 0
+            refresh_interval: 2s
+        status_code:
+          - 201
+          - 200
+      run_once: true
+
+
+    # Auditbeat
+    - name: Install Auditbeat
+      apt: deb={{ elastic_download }}/downloads/beats/auditbeat/auditbeat-{{ elastic_version }}-amd64.deb
+
+    - name: Change the Auditbeat configuration
+      template: src=templates/auditbeat.yml dest=/etc/auditbeat/auditbeat.yml
+
+    - name: Restart Auditbeat and make sure it autostarts
+      service: name=auditbeat state=restarted enabled=yes
+
+
+    # Filebeat
+    - name: Install Filebeat
+      apt: deb={{ elastic_download }}/downloads/beats/filebeat/filebeat-{{ elastic_version }}-amd64.deb
+
+    - name: Create (or replace) the Keystore for Filebeat
+      shell: filebeat keystore create --force
+
+    - name: Add (or overwrite) the Elasticsearch password for Filebeat
+      command: filebeat keystore add ES_PWD --stdin --force
+      args:
+        stdin: "{{ elasticsearch_password }}"
+
+    - name: Change the Filebeat configuration
+      template: src=templates/filebeat.yml dest=/etc/filebeat/filebeat.yml
+
+    - name: Restart Filebeat and make sure it autostarts
+      service: name=filebeat state=restarted enabled=yes
+
+
+    # Metricbeat
+    - name: Install Metricbeat
+      apt: deb={{ elastic_download }}/downloads/beats/metricbeat/metricbeat-{{ elastic_version }}-amd64.deb
+
+    - name: Change the Metricbeat configuration
+      template: src=templates/metricbeat.yml dest=/etc/metricbeat/metricbeat.yml
+
+    - name: Restart Metricbeat and make sure it autostarts
+      service: name=metricbeat state=restarted enabled=yes
+
+
+    # Packetbeat
+    - name: Install Packetbeat
+      apt: deb={{ elastic_download }}/downloads/beats/packetbeat/packetbeat-{{ elastic_version }}-amd64.deb
+
+    - name: Change the Packetbeat configuration
+      template: src=templates/packetbeat.yml dest=/etc/packetbeat/packetbeat.yml
+
+    - name: Restart Packetbeat and make sure it autostarts
+      service: name=packetbeat state=restarted enabled=yes
+
+    - name: Wait a moment to check if the Beats are up and running
+      pause: seconds=30
+
+    - name: Get the state of all services and check the status of Packetbeat
+      service_facts: ~
+      failed_when: ansible_facts.services.auditbeat.state != "running" OR
+                   ansible_facts.services.filebeat.state != "running" OR
+                   ansible_facts.services.metricbeat.state != "running" OR
+                   ansible_facts.services.packetbeat.state != "running"
+
+
+    # TLS
+    - name: Add the certbot repository
+      apt_repository: repo="ppa:certbot/certbot"
+
+    - name: Install certbot and update the cache for the new PPA
+      apt: name=python-certbot-nginx update_cache=yes
+
+    - name: Add the hostname to the certificates to create
+      set_fact:
+        certificates:
+          - "{{ inventory_hostname }}"
+
+    - name: Add more domains to the frontend certificate
+      set_fact:
+        certificates:
+          - "{{ inventory_hostname }}"
+          - "{{ domain }}"
+          - "www.{{ domain }}"
+      when: inventory_hostname_short == "frontend"
+
+    - name: Add more domains to the monitor certificate
+      set_fact:
+        certificates:
+          - "{{ inventory_hostname }}"
+          - "kibana.{{ domain }}"
+          - "dashboard.{{ domain }}"
+      when: inventory_hostname_short == "monitor"
+
+    - name: Just to be extra sure, explicitly stop nginx (if it is installed)
+      service: name=nginx state=stopped
+      ignore_errors: yes
+
+    - name: Create the certificate
+      command: >
+        certbot certonly --non-interactive --standalone
+        --agree-tos --email admin@{{ domain }}
+        -d {{ certificates | join(',') }}
+        creates=/etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+
+    - name: Generate strong dhparams, but only if the file doesn't exist
+      command: openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048 creates=/etc/ssl/certs/dhparam.pem
+
+
+    # APM
+    - name: Fetch the APM agent for the frondend instance
+      get_url:
+        url: "https://search.maven.org/remotecontent?filepath=co/elastic/apm/elastic-apm-agent/{{ apm_java }}/elastic-apm-agent-{{ apm_java }}.jar"
+        dest: "/opt/elastic-apm-agent-{{ apm_java }}.jar"
+        mode: 0444
+      when: inventory_hostname_short == "frontend"
+
+
+    # nginx
+    - name: Install nginx
+      apt: name=nginx
+      when: inventory_hostname_short != "backend"
+
+    - name: Set a global TLS configuration
+      template: src=templates/tls.conf dest=/etc/nginx/tls.conf
+      when: inventory_hostname_short != "backend"
+
+    - name: Change the nginx configuration
+      template: src=templates/nginx.conf dest=/etc/nginx/sites-available/default
+      when: inventory_hostname_short != "backend"
+
+    - name: Restart nginx and make sure it autostarts
+      service: name=nginx state=restarted enabled=yes
+      when: inventory_hostname_short != "backend"
+
+    - name: Check HTTP
+      uri:
+        url: "http://{{ inventory_hostname }}"
+        follow_redirects: none
+        status_code: 301
+      register: response
+      retries: 3
+      delay: 2
+      delegate_to: 127.0.0.1
+      become: false
+      when: inventory_hostname_short != "backend"
+
+    - name: Fail if HTTP is not being redirected to HTTPS
+      failed_when: response.status != 301
+      when: inventory_hostname_short != "backend"
+
+    - name: Check HTTPS
+      openssl_certificate:
+        path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+        provider: assertonly
+        issuer:
+          O: Let's Encrypt
+        has_expired: false
+        subject_alt_name:
+          - "DNS:{{ inventory_hostname }}"
+      when: inventory_hostname_short != "backend"
+
+    - name: Check HTTPS apex
+      openssl_certificate:
+        path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+        provider: assertonly
+        issuer:
+          O: Let's Encrypt
+        has_expired: false
+        subject_alt_name:
+          - "DNS:{{ domain }}"
+      when: inventory_hostname_short == "frontend"
