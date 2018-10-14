@@ -120,12 +120,13 @@
     - name: Wait a moment to check if the Beats are up and running
       pause: seconds=30
 
-    - name: Get the state of all services and check the status of Packetbeat
+    - name: Get the state of all services and check their status
       service_facts: ~
-      failed_when: ansible_facts.services.auditbeat.state != "running" OR
-                   ansible_facts.services.filebeat.state != "running" OR
-                   ansible_facts.services.metricbeat.state != "running" OR
-                   ansible_facts.services.packetbeat.state != "running"
+      failed_when: >
+        ansible_facts.services.auditbeat.state != "running" or
+        ansible_facts.services.filebeat.state != "running" or
+        ansible_facts.services.metricbeat.state != "running" or
+        ansible_facts.services.packetbeat.state != "running"
 
 
     # TLS
@@ -180,57 +181,54 @@
       when: inventory_hostname_short == "frontend"
 
 
-    # nginx
-    - name: Install nginx
-      apt: name=nginx
+    - name: nginx
       when: inventory_hostname_short != "backend"
+      block:
 
-    - name: Set a global TLS configuration
-      template: src=templates/tls.conf dest=/etc/nginx/tls.conf
-      when: inventory_hostname_short != "backend"
+        - name: Install nginx
+          apt: name=nginx
 
-    - name: Change the nginx configuration
-      template: src=templates/nginx.conf dest=/etc/nginx/sites-available/default
-      when: inventory_hostname_short != "backend"
+        - name: Set a global TLS configuration
+          template: src=templates/tls.conf dest=/etc/nginx/tls.conf
 
-    - name: Restart nginx and make sure it autostarts
-      service: name=nginx state=restarted enabled=yes
-      when: inventory_hostname_short != "backend"
+        - name: Change the nginx configuration
+          template: src=templates/nginx.conf dest=/etc/nginx/sites-available/default
 
-    - name: Check HTTP
-      uri:
-        url: "http://{{ inventory_hostname }}"
-        follow_redirects: none
-        status_code: 301
-      register: response
-      retries: 3
-      delay: 2
-      delegate_to: 127.0.0.1
-      become: false
-      when: inventory_hostname_short != "backend"
+        - name: Restart nginx and make sure it autostarts
+          service: name=nginx state=restarted enabled=yes
 
-    - name: Fail if HTTP is not being redirected to HTTPS
-      failed_when: response.status != 301
-      when: inventory_hostname_short != "backend"
+        - name: Check HTTP
+          uri:
+            url: "http://{{ inventory_hostname }}"
+            follow_redirects: none
+            status_code: 301
+          register: response
+          retries: 3
+          delay: 2
+          delegate_to: 127.0.0.1
+          become: false
 
-    - name: Check HTTPS
-      openssl_certificate:
-        path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
-        provider: assertonly
-        issuer:
-          O: Let's Encrypt
-        has_expired: false
-        subject_alt_name:
-          - "DNS:{{ inventory_hostname }}"
-      when: inventory_hostname_short != "backend"
+        - name: Fail if HTTP is not being redirected to HTTPS
+          fail: ~
+          when: response.status != 301
 
-    - name: Check HTTPS apex
-      openssl_certificate:
-        path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
-        provider: assertonly
-        issuer:
-          O: Let's Encrypt
-        has_expired: false
-        subject_alt_name:
-          - "DNS:{{ domain }}"
-      when: inventory_hostname_short == "frontend"
+        - name: Check HTTPS
+          openssl_certificate:
+            path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+            provider: assertonly
+            issuer:
+              O: Let's Encrypt
+            has_expired: false
+            subject_alt_name:
+              - "DNS:{{ inventory_hostname }}"
+
+        - name: Check HTTPS apex
+          openssl_certificate:
+            path: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+            provider: assertonly
+            issuer:
+              O: Let's Encrypt
+            has_expired: false
+            subject_alt_name:
+              - "DNS:{{ domain }}"
+          when: inventory_hostname_short == "frontend"
