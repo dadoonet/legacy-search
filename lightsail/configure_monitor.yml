@@ -73,14 +73,14 @@
 
 
     # Watcher
-    - name: Add an example Watch from a local file
+    - name: Add a Watch from a local file
       uri:
         url: "{{elasticsearch_host}}_xpack/watcher/watch/heapsize"
         body_format: json
         method: PUT
         user: "{{ elasticsearch_user }}"
         password: "{{ elasticsearch_password }}"
-        body: "{{ lookup('file','alerting_heapsize.json') }}"
+        body: "{{ lookup('file','alert_heartbeat.json') }}"
         status_code:
           - 201
           - 200

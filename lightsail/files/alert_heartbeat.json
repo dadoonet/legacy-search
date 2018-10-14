@@ -1,0 +1,55 @@
+{
+  "trigger": {
+    "schedule": {
+      "interval": "60s"
+    }
+  },
+  "input": {
+    "search": {
+      "request": {
+        "search_type": "query_then_fetch",
+        "indices": [
+          "heartbeat-*"
+        ],
+        "types": [],
+        "body": {
+          "size": 0,
+          "query": {
+            "bool": {
+              "filter": [
+                {
+                  "range": {
+                    "@timestamp": {
+                      "gte": "{{ctx.trigger.scheduled_time}}||-5m",
+                      "lte": "{{ctx.trigger.scheduled_time}}",
+                      "format": "strict_date_optional_time||epoch_millis"
+                    }
+                  }
+                },
+                {
+                  "term": {
+                    "monitor.status": "down"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+    "compare": {
+      "ctx.payload.hits.total": {
+        "gte": 2
+      }
+    }
+  },
+  "actions": {
+    "my-logging-action": {
+      "logging": {
+        "text": "{{ctx.payload.hits.total}} pings failed. The threshold is 2 per 5 minutes."
+      }
+    }
+  }
+}
