@@ -1,5 +1,6 @@
 *.iml
 *.tfstate
+*.tfstate.backup
 target/
 .idea/
 .terraform/
