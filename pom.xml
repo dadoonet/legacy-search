@@ -139,4 +139,20 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>jaxb</id>
+            <activation>
+                <jdk>[1.9)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                    <version>2.3.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
 </project>
