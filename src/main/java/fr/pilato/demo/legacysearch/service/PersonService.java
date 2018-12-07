@@ -18,6 +18,7 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
+import com.github.dozermapper.core.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +29,6 @@ import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
 import org.apache.logging.log4j.util.Strings;
-import org.dozer.DozerBeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +50,10 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final ObjectMapper mapper;
-    private final DozerBeanMapper dozerBeanMapper;
+    private final Mapper dozerBeanMapper;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, ObjectMapper mapper, DozerBeanMapper dozerBeanMapper) {
+    public PersonService(PersonRepository personRepository, ObjectMapper mapper, Mapper dozerBeanMapper) {
         this.personRepository = personRepository;
         this.mapper = mapper;
         this.dozerBeanMapper = dozerBeanMapper;
