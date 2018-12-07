@@ -18,13 +18,13 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
+import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
-import org.dozer.DozerBeanMapper;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -43,13 +43,13 @@ public class PersonService {
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
     private final PersonRepository personRepository;
-    private final DozerBeanMapper dozerBeanMapper;
+    private final Mapper dozerBeanMapper;
     private final ElasticsearchDao elasticsearchDao;
 
     @Autowired
     public PersonService(PersonRepository personRepository,
                          ElasticsearchDao elasticsearchDao,
-                         DozerBeanMapper dozerBeanMapper) {
+                         Mapper dozerBeanMapper) {
         this.personRepository = personRepository;
         this.dozerBeanMapper = dozerBeanMapper;
         this.elasticsearchDao = elasticsearchDao;
