@@ -20,7 +20,8 @@
 package fr.pilato.demo.legacysearch;
 
 
-import org.dozer.DozerBeanMapper;
+import com.github.dozermapper.core.DozerBeanMapperBuilder;
+import com.github.dozermapper.core.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -37,8 +38,8 @@ public class LegacySearchApp {
     }
 
     @Bean
-    public DozerBeanMapper dozerBeanMapper() {
+    public Mapper dozerBeanMapper() {
         logger.debug("creating dozen bean mapper");
-        return new DozerBeanMapper();
+        return DozerBeanMapperBuilder.buildDefault();
     }
 }
