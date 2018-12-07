@@ -5,7 +5,7 @@ import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.GeoPoint;
 import fr.pilato.demo.legacysearch.domain.Marketing;
 import fr.pilato.demo.legacysearch.domain.Person;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
