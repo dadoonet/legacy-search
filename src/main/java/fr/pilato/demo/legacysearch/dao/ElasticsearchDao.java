@@ -109,7 +109,7 @@ public class ElasticsearchDao {
                                         .field("dateOfBirth")
                                         .dateHistogramInterval(DateHistogramInterval.YEAR)
                                         .extendedBounds(new ExtendedBounds(1940L, 2009L))
-                                        .format("YYYY")
+                                        .format("8yyyy")
                         )
                         .from(from)
                         .size(size)
