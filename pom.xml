@@ -12,7 +12,7 @@
 
     <groupId>fr.pilato.demo</groupId>
     <artifactId>legacy-search</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
     <name>Add search to legacy demo</name>
     <description>
         This project is used for demos to add elasticsearch
@@ -32,10 +32,20 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <elasticsearch.version>6.6.1</elasticsearch.version>
+        <elasticsearch.version>7.0.0-rc1</elasticsearch.version>
         <jackson.version>2.9.8</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>oss-snapshots</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- Spring Boot -->

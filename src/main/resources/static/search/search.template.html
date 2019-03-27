@@ -15,7 +15,7 @@
   <div class="row">
     <div class="col-md-12">
       <p class="text-info" ng-if="!$ctrl.error">
-        Found <span class="label label-primary">{{$ctrl.result.hits.total}}</span> hits in
+        Found <span class="label label-primary">{{$ctrl.result.hits.total.value}}</span> hits in
         <span class="label label-primary">{{$ctrl.result.took}} ms</span>
         <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
         <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>

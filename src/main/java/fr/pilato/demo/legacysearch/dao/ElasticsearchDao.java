@@ -52,11 +52,11 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws IOException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person", "_doc", person.idAsString()).source(bytes, XContentType.JSON), RequestOptions.DEFAULT);
+        esClient.index(new IndexRequest("person").id(person.idAsString()).source(bytes, XContentType.JSON), RequestOptions.DEFAULT);
     }
 
     public void delete(String id) throws IOException {
-        esClient.delete(new DeleteRequest("person", "_doc", id), RequestOptions.DEFAULT);
+        esClient.delete(new DeleteRequest("person", id), RequestOptions.DEFAULT);
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
@@ -66,6 +66,7 @@ public class ElasticsearchDao {
                         .query(query)
                         .from(from)
                         .size(size)
+                        .trackTotalHits(true)
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
