@@ -23,115 +23,113 @@
         }
     },
     "mappings": {
-        "_doc": {
-            "properties": {
-                "fulltext": {
-                    "type": "text",
-                    "analyzer": "ngram",
-                    "search_analyzer": "simple"
-                },
-                "address": {
-                    "properties": {
-                        "city": {
-                            "type": "text",
-                            "copy_to": "fulltext",
-                            "fields": {
-                                "autocomplete": {
-                                    "type": "text",
-                                    "analyzer": "ngram",
-                                    "search_analyzer": "simple"
-                                },
-                                "aggs": {
-                                    "type": "keyword"
-                                }
+        "properties": {
+            "fulltext": {
+                "type": "text",
+                "analyzer": "ngram",
+                "search_analyzer": "simple"
+            },
+            "address": {
+                "properties": {
+                    "city": {
+                        "type": "text",
+                        "copy_to": "fulltext",
+                        "fields": {
+                            "autocomplete": {
+                                "type": "text",
+                                "analyzer": "ngram",
+                                "search_analyzer": "simple"
+                            },
+                            "aggs": {
+                                "type": "keyword"
                             }
-                        },
-                        "country": {
-                            "type": "text",
-                            "copy_to": "fulltext",
-                            "fields": {
-                                "autocomplete": {
-                                    "type": "text",
-                                    "analyzer": "ngram",
-                                    "search_analyzer": "simple"
-                                },
-                                "aggs": {
-                                    "type": "keyword"
-                                }
+                        }
+                    },
+                    "country": {
+                        "type": "text",
+                        "copy_to": "fulltext",
+                        "fields": {
+                            "autocomplete": {
+                                "type": "text",
+                                "analyzer": "ngram",
+                                "search_analyzer": "simple"
+                            },
+                            "aggs": {
+                                "type": "keyword"
                             }
-                        },
-                        "countrycode": {
-                            "type": "keyword"
-                        },
-                        "location": {
-                            "type": "geo_point"
-                        },
-                        "zipcode": {
-                            "type": "keyword"
                         }
+                    },
+                    "countrycode": {
+                        "type": "keyword"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    },
+                    "zipcode": {
+                        "type": "keyword"
                     }
-                },
-                "children": {
-                    "type": "long"
-                },
-                "dateOfBirth": {
-                    "type": "date",
-                    "format": "dateOptionalTime"
-                },
-                "gender": {
-                    "copy_to": "fulltext",
-                    "type": "text",
-                    "fields": {
-                        "aggs": {
-                            "type": "keyword"
-                        }
-                    }
-                },
-                "marketing": {
-                    "properties": {
-                        "cars": {
-                            "type": "long"
-                        },
-                        "electronic": {
-                            "type": "long"
-                        },
-                        "fashion": {
-                            "type": "long"
-                        },
-                        "food": {
-                            "type": "long"
-                        },
-                        "garden": {
-                            "type": "long"
-                        },
-                        "hifi": {
-                            "type": "long"
-                        },
-                        "music": {
-                            "type": "long"
-                        },
-                        "shoes": {
-                            "type": "long"
-                        },
-                        "toys": {
-                            "type": "long"
-                        }
-                    }
-                },
-                "name": {
-                    "type": "text",
-                    "copy_to": "fulltext",
-                    "fields": {
-                        "autocomplete": {
-                            "type": "text",
-                            "analyzer": "ngram",
-                            "search_analyzer": "simple"
-                        }
-                    }
-                },
-                "reference": {
-                    "type": "text"
                 }
+            },
+            "children": {
+                "type": "long"
+            },
+            "dateOfBirth": {
+                "type": "date",
+                "format": "yyyy-MM-dd||yyyy"
+            },
+            "gender": {
+                "copy_to": "fulltext",
+                "type": "text",
+                "fields": {
+                    "aggs": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "marketing": {
+                "properties": {
+                    "cars": {
+                        "type": "long"
+                    },
+                    "electronic": {
+                        "type": "long"
+                    },
+                    "fashion": {
+                        "type": "long"
+                    },
+                    "food": {
+                        "type": "long"
+                    },
+                    "garden": {
+                        "type": "long"
+                    },
+                    "hifi": {
+                        "type": "long"
+                    },
+                    "music": {
+                        "type": "long"
+                    },
+                    "shoes": {
+                        "type": "long"
+                    },
+                    "toys": {
+                        "type": "long"
+                    }
+                }
+            },
+            "name": {
+                "type": "text",
+                "copy_to": "fulltext",
+                "fields": {
+                    "autocomplete": {
+                        "type": "text",
+                        "analyzer": "ngram",
+                        "search_analyzer": "simple"
+                    }
+                }
+            },
+            "reference": {
+                "type": "text"
             }
         }
     }

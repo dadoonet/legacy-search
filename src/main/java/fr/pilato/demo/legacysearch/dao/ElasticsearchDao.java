@@ -89,11 +89,11 @@ public class ElasticsearchDao {
 
     public void save(Person person) throws JsonProcessingException {
         byte[] bytes = mapper.writeValueAsBytes(person);
-        bulkProcessor.add(new IndexRequest("person", "_doc", person.idAsString()).source(bytes, XContentType.JSON));
+        bulkProcessor.add(new IndexRequest("person").id(person.idAsString()).source(bytes, XContentType.JSON));
     }
 
     public void delete(String id) {
-        bulkProcessor.add(new DeleteRequest("person", "_doc", id));
+        bulkProcessor.add(new DeleteRequest("person", id));
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
@@ -113,6 +113,7 @@ public class ElasticsearchDao {
                         )
                         .from(from)
                         .size(size)
+                        .trackTotalHits(true)
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
