@@ -55,7 +55,7 @@ mvn clean install
 Then run it with:
 
 ```
-java -jar target/legacy-search-2.0-SNAPSHOT.jar
+java -jar target/legacy-search-7.0-SNAPSHOT.jar
 ```
 
 Or directly run from Maven:

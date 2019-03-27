@@ -239,22 +239,38 @@ public class PersonService {
         return response;
     }
 
+    public static class RestSearchTotal {
+        private long value;
+
+        public RestSearchTotal(long value) {
+            this.value = value;
+        }
+
+        public void setValue(long value) {
+            this.value = value;
+        }
+
+        public long getValue() {
+            return value;
+        }
+    }
+
     public static class RestSearchHits<T> {
         private RestSearchHit<T>[] hits;
-        private long total;
+        private RestSearchTotal total;
 
-        public long getTotal() {
+        public RestSearchTotal getTotal() {
             return total;
         }
 
         // Just for elasticsearch compatibility purpose
         @JsonIgnore
         public long getTotalHits() {
-            return total;
+            return total.value;
         }
 
         public RestSearchHits<T> setTotal(long total) {
-            this.total = total;
+            this.total = new RestSearchTotal(total);
             return this;
         }
 
