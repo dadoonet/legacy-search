@@ -17,12 +17,29 @@ You need to have completed [branch 02-bulk](https://github.com/dadoonet/legacy-s
 Run it!
 -------
 
-Compile and restart the application
-
 ```
 # Delete the index from Kibana Dev Console
 DELETE person
+```
 
+This branch is using [Elasticsearch Beyonder project](https://github.com/dadoonet/elasticsearch-beyonder)
+to create automatically the index settings and the right mapping when the project starts.
+
+But if you are running a live coding session, you can skip running this part
+and manually create the index from Kibana Dev Console:
+
+```
+PUT person
+{
+  // Index settings here
+}
+```
+
+You can get the index settings from: https://github.com/dadoonet/legacy-search/blob/03-mapping/src/main/resources/elasticsearch/person/_settings.json
+
+Compile and restart the application
+
+```
 # Compile and launch again
 mvn clean spring-boot:run
 
