@@ -34,10 +34,10 @@ You can open [Kibana](http://localhost:5601/) after some seconds.
 Manual Installation
 ------------
 
-Download and unzip elasticsearch:
+Install [elasticsearch](https://www.elastic.co/downloads/elasticsearch). On a Mac:
 
 ```
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.1.tar.gz
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.0.0-rc1-darwin-x86_64.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
