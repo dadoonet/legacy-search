@@ -16,34 +16,12 @@ You need to have:
 
 * Maven
 * JDK8 or higher
-* Postgresql or MySQL 5.7+ up and running
+* Docker
 
-Modify [src/main/resources/application.yml](src/main/resources/application.yml) file to reflect
-your own database settings:
+Run MySQL database using docker with:
 
-```yml
-# Database connection settings - postgresql
-spring.datasource.url: jdbc:postgresql://localhost:5432/dpilato
-spring.datasource.username: dpilato
-spring.datasource.password:
-```
-
-or
-
-```xml
-# Database connection settings - MySQL
-spring.datasource.url: jdbc:mysql://localhost:3306/person?serverTimezone=UTC&useSSL=false
-spring.datasource.username: root
-spring.datasource.password:
-```
-
-If you did not create your database yet, just run:
-
-```sh
-# Postgresql
-createdb person
-# MySQL
-mysqladmin -uroot create person
+```shell
+./mysql.sh
 ```
 
 Build the application:

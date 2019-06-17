@@ -3,6 +3,7 @@ version: '3'
 services:
 
   elasticsearch:
+    container_name: legacy-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:$ELASTIC_VERSION
     environment:
       - bootstrap.memory_lock=true
@@ -18,6 +19,7 @@ services:
     networks: ['stack']
 
   kibana:
+    container_name: legacy-kibana
     image: docker.elastic.co/kibana/kibana:$ELASTIC_VERSION
     links:
       - elasticsearch
