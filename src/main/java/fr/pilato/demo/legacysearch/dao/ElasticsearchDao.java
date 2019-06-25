@@ -105,7 +105,7 @@ public class ElasticsearchDao {
                                 AggregationBuilders.terms("by_country").field("address.country.aggs")
                                         .subAggregation(AggregationBuilders.dateHistogram("by_year")
                                                 .field("dateOfBirth")
-                                                .dateHistogramInterval(DateHistogramInterval.days(3652))
+                                                .fixedInterval(DateHistogramInterval.days(3652))
                                                 .extendedBounds(new ExtendedBounds(1940L, 2009L))
                                                 .format("8yyyy")
                                                 .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
@@ -114,7 +114,7 @@ public class ElasticsearchDao {
                         .aggregation(
                                 AggregationBuilders.dateHistogram("by_year")
                                         .field("dateOfBirth")
-                                        .dateHistogramInterval(DateHistogramInterval.YEAR)
+                                        .calendarInterval(DateHistogramInterval.YEAR)
                                         .extendedBounds(new ExtendedBounds(1940L, 2009L))
                                         .format("8yyyy")
                         )
