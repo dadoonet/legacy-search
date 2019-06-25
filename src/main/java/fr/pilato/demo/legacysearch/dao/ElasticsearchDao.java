@@ -107,7 +107,7 @@ public class ElasticsearchDao {
                         .aggregation(
                                 AggregationBuilders.dateHistogram("by_year")
                                         .field("dateOfBirth")
-                                        .dateHistogramInterval(DateHistogramInterval.YEAR)
+                                        .calendarInterval(DateHistogramInterval.YEAR)
                                         .extendedBounds(new ExtendedBounds(1940L, 2009L))
                                         .format("8yyyy")
                         )
