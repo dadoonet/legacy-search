@@ -32,7 +32,7 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <elasticsearch.version>7.3.2</elasticsearch.version>
+        <elasticsearch.version>7.4.0</elasticsearch.version>
         <beyonder.version>7.0</beyonder.version>
         <jackson.version>2.10.0</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -119,6 +119,13 @@
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>${elasticsearch.version}</version>
+            <!-- TODO Remove this with 7.4.1 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch.plugin</groupId>
+                    <artifactId>mapper-extras</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- this is now needed because of spring parent which forces a 6.4 version -->
         <dependency>
