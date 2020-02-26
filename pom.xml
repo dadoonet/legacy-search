@@ -32,7 +32,7 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <elasticsearch.version>7.4.0</elasticsearch.version>
+        <elasticsearch.version>7.6.0</elasticsearch.version>
         <beyonder.version>7.0</beyonder.version>
         <jackson.version>2.10.0</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
