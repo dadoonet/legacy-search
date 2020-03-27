@@ -10,24 +10,25 @@ services:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
       - cluster.routing.allocation.disk.threshold_enabled=false
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      - xpack.security.enabled=$ELASTIC_SECURITY
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    ports:
-      - 9200:9200
+    ports: ['9200:9200']
     networks: ['stack']
 
   kibana:
     container_name: legacy-kibana
     image: docker.elastic.co/kibana/kibana:$ELASTIC_VERSION
-    links:
-      - elasticsearch
-    ports:
-      - 5601:5601
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=$ELASTIC_PASSWORD
+    ports: ['5601:5601']
     networks: ['stack']
-    depends_on:
-      - elasticsearch
+    links: ['elasticsearch']
+    depends_on: ['elasticsearch']
 
 networks:
   stack: {}
