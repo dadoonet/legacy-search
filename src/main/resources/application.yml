@@ -14,3 +14,5 @@ spring.datasource.password: password
 
 # Do not restart the application when modifying it live
 spring.devtools.restart.enabled: false
+
+management.health.elasticsearch.enabled: false
