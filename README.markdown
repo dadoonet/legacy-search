@@ -10,6 +10,22 @@ This branch connect our project to elasticsearch directly.
 
 You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
 
+Running on cloud
+----------------
+
+If you want to run the demo using https://cloud.elastic.co, create a new
+instance (2gb of RAM should be enough) and change in `ElasticsearchDao`
+class the `CLOUD_URL` of the cluster (copy it from the cloud console)
+and the `CLOUD_PASSWORD`. Alternatively, you can also create a dedicated
+user for this demo and use it.
+
+```java
+final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "CLOUD_PASSWORD"));
+this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("CLOUD_URL"))
+  .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)));
+```
+
 Docker Compose Installation
 ------------
 
@@ -28,7 +44,8 @@ Then run:
 docker-compose up
 ```
 
-You can open [Kibana](http://localhost:5601/) after some seconds.
+You can open [Kibana](http://localhost:5601/) after some seconds and
+connect using `elastic` user with `changeme` as the password.
 
 
 Manual Installation
