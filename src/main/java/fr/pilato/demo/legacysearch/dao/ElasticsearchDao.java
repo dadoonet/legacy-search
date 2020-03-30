@@ -46,6 +46,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -115,7 +116,7 @@ public class ElasticsearchDao {
                 .source(new SearchSourceBuilder()
                         .query(query)
                         .aggregation(
-                                AggregationBuilders.terms("by_country").field("address.country.aggs")
+                                AggregationBuilders.terms("by_country").field("address.country.keyword")
                         )
                         .aggregation(
                                 AggregationBuilders.dateHistogram("by_year")
@@ -127,6 +128,8 @@ public class ElasticsearchDao {
                         .from(from)
                         .size(size)
                         .trackTotalHits(true)
+                        .sort(SortBuilders.scoreSort())
+                        .sort(SortBuilders.fieldSort("dateOfBirth"))
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());

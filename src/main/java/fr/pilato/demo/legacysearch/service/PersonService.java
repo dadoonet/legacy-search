@@ -23,10 +23,10 @@ import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
+import fr.pilato.demo.legacysearch.helper.Strings;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -105,14 +105,17 @@ public class PersonService {
         } else {
             query = QueryBuilders
                     .multiMatchQuery(q)
-                        .field("fulltext")
-                        .field("name", 3.0f);
+                        .field("name", 3.0f)
+                        .field("name.ngram")
+                        .field("gender.ngram")
+                        .field("address.city.ngram")
+                        .field("address.country.ngram");
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
             query = QueryBuilders.boolQuery().must(query);
             if (Strings.hasText(f_country)) {
-                ((BoolQueryBuilder) query).filter(QueryBuilders.termQuery("address.country.aggs", f_country));
+                ((BoolQueryBuilder) query).filter(QueryBuilders.termQuery("address.country.keyword", f_country));
             }
             if (Strings.hasText(f_date)) {
                 String endDate = "" + (Integer.parseInt(f_date) + 10);
@@ -137,17 +140,17 @@ public class PersonService {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             if (Strings.hasText(name)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name.autocomplete", name)
+                        QueryBuilders.matchQuery("name.ngram", name)
                 );
             }
             if (Strings.hasText(country)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country.autocomplete", country)
+                        QueryBuilders.matchQuery("address.country.ngram", country)
                 );
             }
             if (Strings.hasText(city)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city.autocomplete", city)
+                        QueryBuilders.matchQuery("address.city.ngram", city)
                 );
             }
 
