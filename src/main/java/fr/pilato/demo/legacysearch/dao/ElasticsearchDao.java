@@ -37,6 +37,7 @@ import org.elasticsearch.client.core.MainResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -80,6 +81,8 @@ public class ElasticsearchDao {
                         .from(from)
                         .size(size)
                         .trackTotalHits(true)
+                        .sort(SortBuilders.scoreSort())
+                        .sort(SortBuilders.fieldSort("dateOfBirth"))
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
