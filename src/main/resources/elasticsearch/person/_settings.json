@@ -24,37 +24,30 @@
     },
     "mappings": {
         "properties": {
-            "fulltext": {
-                "type": "text",
-                "analyzer": "ngram",
-                "search_analyzer": "simple"
-            },
             "address": {
                 "properties": {
                     "city": {
                         "type": "text",
-                        "copy_to": "fulltext",
                         "fields": {
-                            "autocomplete": {
+                            "ngram": {
                                 "type": "text",
                                 "analyzer": "ngram",
                                 "search_analyzer": "simple"
                             },
-                            "aggs": {
+                            "keyword": {
                                 "type": "keyword"
                             }
                         }
                     },
                     "country": {
                         "type": "text",
-                        "copy_to": "fulltext",
                         "fields": {
-                            "autocomplete": {
+                            "ngram": {
                                 "type": "text",
                                 "analyzer": "ngram",
                                 "search_analyzer": "simple"
                             },
-                            "aggs": {
+                            "keyword": {
                                 "type": "keyword"
                             }
                         }
@@ -78,10 +71,14 @@
                 "format": "yyyy-MM-dd||yyyy"
             },
             "gender": {
-                "copy_to": "fulltext",
                 "type": "text",
                 "fields": {
-                    "aggs": {
+                    "ngram": {
+                        "type": "text",
+                        "analyzer": "ngram",
+                        "search_analyzer": "simple"
+                    },
+                    "keyword": {
                         "type": "keyword"
                     }
                 }
@@ -119,9 +116,8 @@
             },
             "name": {
                 "type": "text",
-                "copy_to": "fulltext",
                 "fields": {
-                    "autocomplete": {
+                    "ngram": {
                         "type": "text",
                         "analyzer": "ngram",
                         "search_analyzer": "simple"
