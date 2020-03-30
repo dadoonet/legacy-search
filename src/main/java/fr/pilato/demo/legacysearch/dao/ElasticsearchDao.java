@@ -38,6 +38,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.MainResponse;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -56,11 +57,16 @@ public class ElasticsearchDao {
     private final RestHighLevelClient esClient;
     private final BulkProcessor bulkProcessor;
 
-    public ElasticsearchDao(ObjectMapper mapper) {
+    public ElasticsearchDao(ObjectMapper mapper) throws IOException {
+        String clusterUrl = "http://127.0.0.1:9200";
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
-        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("http://127.0.0.1:9200"))
+        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create(clusterUrl))
                 .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)));
+
+        MainResponse info = this.esClient.info(RequestOptions.DEFAULT);
+        logger.info("Connected to {} running version {}", clusterUrl, info.getVersion().getNumber());
+
         // Automagically create index and mapping
         try {
             ElasticsearchBeyonder.start(esClient.getLowLevelClient());
