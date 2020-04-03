@@ -27,6 +27,7 @@ import fr.pilato.demo.legacysearch.helper.Strings;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -110,7 +111,7 @@ public class PersonService {
                         .field("gender.ngram")
                         .field("address.city.ngram")
                         .field("address.country.ngram")
-                        .fuzziness(1);
+                        .fuzziness(Fuzziness.AUTO);
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
@@ -141,17 +142,17 @@ public class PersonService {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             if (Strings.hasText(name)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name.ngram", name).fuzziness(1)
+                        QueryBuilders.matchQuery("name.ngram", name).fuzziness(Fuzziness.AUTO)
                 );
             }
             if (Strings.hasText(country)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country.ngram", country).fuzziness(1)
+                        QueryBuilders.matchQuery("address.country.ngram", country).fuzziness(Fuzziness.AUTO)
                 );
             }
             if (Strings.hasText(city)) {
                 boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city.ngram", city).fuzziness(1)
+                        QueryBuilders.matchQuery("address.city.ngram", city).fuzziness(Fuzziness.AUTO)
                 );
             }
 
