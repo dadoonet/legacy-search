@@ -31,7 +31,7 @@ PUT person
 }
 ```
 
-You can get the index settings from this [script](https://gist.github.com/dadoonet/d6757d15fa0726a83bb619ecd81153f7)
+You can get the index settings from: https://github.com/dadoonet/legacy-search/blob/03-mapping/src/main/resources/elasticsearch/person/_settings.json
 
 Compile and restart the application
 
