@@ -33,7 +33,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <elasticsearch.version>7.9.2</elasticsearch.version>
-        <beyonder.version>7.5</beyonder.version>
         <jackson.version>2.11.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -130,11 +129,6 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.pilato.elasticsearch</groupId>
-            <artifactId>elasticsearch-beyonder</artifactId>
-            <version>${beyonder.version}</version>
         </dependency>
 
         <!-- Standard dependencies -->
