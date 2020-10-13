@@ -22,11 +22,7 @@ Run it!
 DELETE person
 ```
 
-This branch is using [Elasticsearch Beyonder project](https://github.com/dadoonet/elasticsearch-beyonder)
-to create automatically the index settings and the right mapping when the project starts.
-
-But if you are running a live coding session, you can skip running this part
-and manually create the index from Kibana Dev Console:
+When doing a live demo, you can also skip writing the create index part and manually create the index from Kibana Dev Console:
 
 ```
 PUT person
@@ -35,7 +31,7 @@ PUT person
 }
 ```
 
-You can get the index settings from: https://github.com/dadoonet/legacy-search/blob/03-mapping/src/main/resources/elasticsearch/person/_settings.json
+You can get the index settings from this [script](https://gist.github.com/dadoonet/d6757d15fa0726a83bb619ecd81153f7)
 
 Compile and restart the application
 
@@ -49,7 +45,7 @@ curl http://127.0.0.1:8080/api/1/person/_init?size=10000
 
 You can then access the application using your browser: [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
 
-You can use this [script](https://gist.github.com/dadoonet/d6757d15fa0726a83bb619ecd81153f7) to explain informations about mapping and analyzers.
+You can use this [script](https://gist.github.com/dadoonet/d6757d15fa0726a83bb619ecd81153f7) to explain mapping and analyzers.
 
 Next step
 ---------
