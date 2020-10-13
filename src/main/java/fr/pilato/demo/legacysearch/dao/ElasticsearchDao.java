@@ -22,6 +22,7 @@ package fr.pilato.demo.legacysearch.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class ElasticsearchDao {
@@ -73,139 +75,8 @@ public class ElasticsearchDao {
         logger.info("Connected to {} running version {}", clusterUrl, info.getVersion().getNumber());
 
         try {
-            this.esClient.indices().create(new CreateIndexRequest("person").source("{\n" +
-                            "    \"settings\": {\n" +
-                            "        \"analysis\": {\n" +
-                            "            \"analyzer\": {\n" +
-                            "                \"ngram\": {\n" +
-                            "                    \"tokenizer\": \"ngram_tokenizer\",\n" +
-                            "                    \"filter\": [\n" +
-                            "                        \"lowercase\"\n" +
-                            "                    ]\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"tokenizer\": {\n" +
-                            "                \"ngram_tokenizer\": {\n" +
-                            "                    \"type\": \"edge_ngram\",\n" +
-                            "                    \"min_gram\": \"1\",\n" +
-                            "                    \"max_gram\": \"10\",\n" +
-                            "                    \"token_chars\": [\n" +
-                            "                        \"letter\",\n" +
-                            "                        \"digit\"\n" +
-                            "                    ]\n" +
-                            "                }\n" +
-                            "            }\n" +
-                            "        }\n" +
-                            "    },\n" +
-                            "    \"mappings\": {\n" +
-                            "        \"properties\": {\n" +
-                            "            \"address\": {\n" +
-                            "                \"properties\": {\n" +
-                            "                    \"city\": {\n" +
-                            "                        \"type\": \"text\",\n" +
-                            "                        \"fields\": {\n" +
-                            "                            \"ngram\": {\n" +
-                            "                                \"type\": \"text\",\n" +
-                            "                                \"analyzer\": \"ngram\",\n" +
-                            "                                \"search_analyzer\": \"simple\"\n" +
-                            "                            },\n" +
-                            "                            \"keyword\": {\n" +
-                            "                                \"type\": \"keyword\"\n" +
-                            "                            }\n" +
-                            "                        }\n" +
-                            "                    },\n" +
-                            "                    \"country\": {\n" +
-                            "                        \"type\": \"text\",\n" +
-                            "                        \"fields\": {\n" +
-                            "                            \"ngram\": {\n" +
-                            "                                \"type\": \"text\",\n" +
-                            "                                \"analyzer\": \"ngram\",\n" +
-                            "                                \"search_analyzer\": \"simple\"\n" +
-                            "                            },\n" +
-                            "                            \"keyword\": {\n" +
-                            "                                \"type\": \"keyword\"\n" +
-                            "                            }\n" +
-                            "                        }\n" +
-                            "                    },\n" +
-                            "                    \"countrycode\": {\n" +
-                            "                        \"type\": \"keyword\"\n" +
-                            "                    },\n" +
-                            "                    \"location\": {\n" +
-                            "                        \"type\": \"geo_point\"\n" +
-                            "                    },\n" +
-                            "                    \"zipcode\": {\n" +
-                            "                        \"type\": \"keyword\"\n" +
-                            "                    }\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"children\": {\n" +
-                            "                \"type\": \"long\"\n" +
-                            "            },\n" +
-                            "            \"dateOfBirth\": {\n" +
-                            "                \"type\": \"date\",\n" +
-                            "                \"format\": \"yyyy-MM-dd||yyyy\"\n" +
-                            "            },\n" +
-                            "            \"gender\": {\n" +
-                            "                \"type\": \"text\",\n" +
-                            "                \"fields\": {\n" +
-                            "                    \"ngram\": {\n" +
-                            "                        \"type\": \"text\",\n" +
-                            "                        \"analyzer\": \"ngram\",\n" +
-                            "                        \"search_analyzer\": \"simple\"\n" +
-                            "                    },\n" +
-                            "                    \"keyword\": {\n" +
-                            "                        \"type\": \"keyword\"\n" +
-                            "                    }\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"marketing\": {\n" +
-                            "                \"properties\": {\n" +
-                            "                    \"cars\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"electronic\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"fashion\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"food\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"garden\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"hifi\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"music\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"shoes\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    },\n" +
-                            "                    \"toys\": {\n" +
-                            "                        \"type\": \"long\"\n" +
-                            "                    }\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"name\": {\n" +
-                            "                \"type\": \"text\",\n" +
-                            "                \"fields\": {\n" +
-                            "                    \"ngram\": {\n" +
-                            "                        \"type\": \"text\",\n" +
-                            "                        \"analyzer\": \"ngram\",\n" +
-                            "                        \"search_analyzer\": \"simple\"\n" +
-                            "                    }\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"reference\": {\n" +
-                            "                \"type\": \"text\"\n" +
-                            "            }\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "}\n", XContentType.JSON)
-                    , RequestOptions.DEFAULT);
+            String content = IOUtils.toString(ElasticsearchDao.class.getResource("/person.json"), StandardCharsets.UTF_8);
+            this.esClient.indices().create(new CreateIndexRequest("person").source(content, XContentType.JSON), RequestOptions.DEFAULT);
             logger.info("New index person has been created");
         } catch (ElasticsearchStatusException e) {
             if (e.status().getStatus() != 400) {
