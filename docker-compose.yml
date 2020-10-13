@@ -12,6 +12,7 @@ services:
       - cluster.routing.allocation.disk.threshold_enabled=false
       - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
       - xpack.security.enabled=$ELASTIC_SECURITY
+      - xpack.ml.enabled=false
     ulimits:
       memlock:
         soft: -1
