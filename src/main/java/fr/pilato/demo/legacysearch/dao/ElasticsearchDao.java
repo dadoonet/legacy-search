@@ -46,7 +46,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
+import org.elasticsearch.search.aggregations.bucket.histogram.LongBounds;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.slf4j.Logger;
@@ -128,7 +128,7 @@ public class ElasticsearchDao {
                                         .subAggregation(AggregationBuilders.dateHistogram("by_year")
                                                 .field("dateOfBirth")
                                                 .fixedInterval(DateHistogramInterval.days(3652))
-                                                .extendedBounds(new ExtendedBounds(1940L, 2009L))
+                                                .extendedBounds(new LongBounds(1940L, 2009L))
                                                 .format("8yyyy")
                                                 .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
                                         )
@@ -137,7 +137,7 @@ public class ElasticsearchDao {
                                 AggregationBuilders.dateHistogram("by_year")
                                         .field("dateOfBirth")
                                         .calendarInterval(DateHistogramInterval.YEAR)
-                                        .extendedBounds(new ExtendedBounds(1940L, 2009L))
+                                        .extendedBounds(new LongBounds(1940L, 2009L))
                                         .format("8yyyy")
                         )
                         .from(from)
