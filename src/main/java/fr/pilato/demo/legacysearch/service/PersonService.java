@@ -32,6 +32,7 @@ import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,6 +49,9 @@ import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatc
 @Service
 public class PersonService {
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
+
+    @Value("${app.batch.size:1}")
+    private int batchSize;
 
     private final PersonRepository personRepository;
     private final ObjectMapper mapper;
@@ -69,6 +74,14 @@ public class PersonService {
 
         logger.debug("Saved person [{}]", personDb.getId());
         return personDb;
+    }
+
+    private Iterable<Person> saveAll(Collection<Person> persons) {
+        Iterable<Person> personsDb = personRepository.saveAll(persons);
+        personsDb.forEach(personDb -> logger.debug("Saved person [{}]", personDb.getId()));
+        currentItem.getAndAdd(persons.size());
+        persons.clear();
+        return personsDb;
     }
 
     public Person upsert(Integer id, Person person) {
@@ -178,14 +191,15 @@ public class PersonService {
         logger.debug("Initializing database for {} persons", size);
         start = System.nanoTime();
 
+        Collection<Person> persons = new ArrayList<>();
+
         Person joe = PersonGenerator.personGenerator();
         joe.setName("Joe Smith");
         joe.getAddress().setCountry("France");
         joe.getAddress().setCity("Paris");
         joe.getAddress().setCountrycode("FR");
 
-        save(joe);
-        currentItem.incrementAndGet();
+        persons.add(joe);
 
         Person franceGall = PersonGenerator.personGenerator();
         franceGall.setName("France Gall");
@@ -194,15 +208,22 @@ public class PersonService {
         franceGall.getAddress().setCity("Ischia");
         franceGall.getAddress().setCountrycode("IT");
 
-        save(franceGall);
-        currentItem.incrementAndGet();
+        persons.add(franceGall);
+
+        if (size < 3) {
+            saveAll(persons);
+        }
 
         // We generate numPersons persons
         for (int i = 2; i < size; i++) {
             Person person = PersonGenerator.personGenerator();
-            save(person);
-            currentItem.incrementAndGet();
+            persons.add(person);
+            if (i % batchSize == 0) {
+                saveAll(persons);
+            }
         }
+
+        saveAll(persons);         // Save all remaining persons
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
