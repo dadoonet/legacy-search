@@ -5,12 +5,10 @@ import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.GeoPoint;
 import fr.pilato.demo.legacysearch.domain.Marketing;
 import fr.pilato.demo.legacysearch.domain.Person;
-import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
-import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Random;
 
 public class PersonGenerator {
@@ -83,15 +81,11 @@ public class PersonGenerator {
 
     }
 
-    private static Date buildBirthDate() {
-        String birthDate = "" + numberGenerator(1940, 70) + "-" + numberGenerator(1, 12) + "-" + numberGenerator(1, 28);
-        Date date = null;
-        try {
-            date = DateUtils.parseDate(birthDate, new String[]{"yyyy-MM-dd"});
-        } catch (ParseException e) {
-            System.err.println("buildBirthDate ->" + birthDate);
-        }
-        return date;
+    private static LocalDate buildBirthDate() {
+        int year = numberGenerator(1940, 70);
+        int month = numberGenerator(1, 12);
+        int day = numberGenerator(1, 28);
+        return LocalDate.of(year, month, day);
     }
 
     private static void buildGender(Person person) throws IOException {
