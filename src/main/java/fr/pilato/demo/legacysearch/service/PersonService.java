@@ -52,7 +52,6 @@ public class PersonService {
     private final ObjectMapper mapper;
     private final Mapper dozerBeanMapper;
 
-    @Autowired
     public PersonService(PersonRepository personRepository, ObjectMapper mapper, Mapper dozerBeanMapper) {
         this.personRepository = personRepository;
         this.mapper = mapper;
