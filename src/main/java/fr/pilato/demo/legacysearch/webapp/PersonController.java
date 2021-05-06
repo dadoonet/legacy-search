@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -44,7 +43,6 @@ public class PersonController {
     }
 
     @GetMapping("/api/1/person/{id}")
-    @ResponseBody
     public Person get(@PathVariable Integer id) {
         return personService.get(id);
     }
@@ -53,7 +51,6 @@ public class PersonController {
      * Create or update an entity
      */
     @PutMapping("/api/1/person/{id}")
-    @ResponseBody
     public Person upsert(@PathVariable Integer id, @RequestBody Person person) {
         logger.debug("upsert({}, {})", id, person);
         Person upsert = personService.upsert(id, person);
@@ -62,13 +59,11 @@ public class PersonController {
     }
 
     @DeleteMapping("/api/1/person/{id}")
-    @ResponseBody
     public void delete(@PathVariable Integer id) throws IOException {
         personService.delete(id);
     }
 
     @GetMapping("/api/1/person/_search")
-    @ResponseBody
     public String search(@RequestParam(required = false) String q, @RequestParam(required = false) String f_country,
                          @RequestParam(required = false) String f_date, @RequestParam(required = false, defaultValue = "0") Integer from,
                          @RequestParam(required = false, defaultValue = "10") Integer size) throws IOException {
@@ -76,7 +71,6 @@ public class PersonController {
     }
 
     @GetMapping("/api/1/person/_advanced_search")
-    @ResponseBody
     public String advancedSearch(@RequestParam(required = false) String name, @RequestParam(required = false) String country,
                                  @RequestParam(required = false) String city,
                                  @RequestParam(required = false, defaultValue = "0") Integer from,
@@ -85,13 +79,11 @@ public class PersonController {
     }
 
     @GetMapping("/api/1/person/_init")
-    @ResponseBody
     public InitResult init(@RequestParam(required = false, defaultValue = "1000") Integer size) throws IOException {
         return personService.init(size);
     }
 
     @GetMapping("/api/1/person/_init_status")
-    @ResponseBody
     public InitResult initStatus() {
         return personService.getInitCurrentAchievement();
     }
