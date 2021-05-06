@@ -46,7 +46,6 @@ public class PersonService {
     private final Mapper dozerBeanMapper;
     private final ElasticsearchDao elasticsearchDao;
 
-    @Autowired
     public PersonService(PersonRepository personRepository,
                          ElasticsearchDao elasticsearchDao,
                          Mapper dozerBeanMapper) {
