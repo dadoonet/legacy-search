@@ -32,15 +32,21 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class PersonService {
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
+
+    @Value("${app.batch.size:100}")
+    private int batchSize;
 
     private final PersonRepository personRepository;
     private final Mapper dozerBeanMapper;
@@ -61,15 +67,21 @@ public class PersonService {
     }
 
     public Person save(Person person) {
-        Person personDb = personRepository.save(person);
-        try {
-            elasticsearchDao.save(personDb);
-        } catch (Exception e) {
-            logger.error("Houston, we have a problem!", e);
-        }
+        return (saveAll(Collections.singleton(person)).iterator().next());
+    }
 
-        logger.debug("Saved person [{}]", personDb.getId());
-        return personDb;
+    private Iterable<Person> saveAll(Collection<Person> persons) {
+        Iterable<Person> personsDb = personRepository.saveAll(persons);
+        personsDb.forEach(person -> {
+            try {
+                elasticsearchDao.save(person);
+            } catch (Exception e) {
+                logger.error("Houston, we have a problem!", e);
+            }
+        });
+        logger.debug("Saved [{}] persons", persons.size());
+        persons.clear();
+        return personsDb;
     }
 
     public Person upsert(Integer id, Person person) {
@@ -160,13 +172,15 @@ public class PersonService {
         logger.debug("Initializing database for {} persons", size);
         start = System.nanoTime();
 
+        Collection<Person> persons = new ArrayList<>();
+
         Person joe = PersonGenerator.personGenerator();
         joe.setName("Joe Smith");
         joe.getAddress().setCountry("France");
         joe.getAddress().setCity("Paris");
         joe.getAddress().setCountrycode("FR");
 
-        save(joe);
+        persons.add(joe);
         currentItem.incrementAndGet();
 
         Person franceGall = PersonGenerator.personGenerator();
@@ -176,27 +190,33 @@ public class PersonService {
         franceGall.getAddress().setCity("Ischia");
         franceGall.getAddress().setCountrycode("IT");
 
-        save(franceGall);
+        persons.add(franceGall);
         currentItem.incrementAndGet();
 
-        // We generate numPersons persons
+        // We generate numPersons persons and every batchSize, we send them to the DB
         for (int i = 2; i < size; i++) {
             Person person = PersonGenerator.personGenerator();
-            save(person);
+            persons.add(person);
             currentItem.incrementAndGet();
+            if (i % batchSize == 0) {
+                saveAll(persons);
+            }
         }
+
+        // Save all remaining persons
+        saveAll(persons);
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
         logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
-                size, took, 1000 * size / took);
+                size, took, 1000L * size / took);
 
-        return new InitResult(took, 1000 * size / took, size);
+        return new InitResult(took, 1000L * size / took, size);
     }
 
     public InitResult getInitCurrentAchievement() {
         int current = currentItem.get();
         long took = (System.nanoTime() - start) / 1_000_000;
-        return new InitResult(took, 1000 * current / took, current);
+        return new InitResult(took, 1000L * current / took, current);
     }
 }
