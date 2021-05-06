@@ -172,7 +172,7 @@ public class PersonService {
         currentItem.set(0);
 
         logger.debug("Initializing database for {} persons", size);
-        start = System.currentTimeMillis();
+        start = System.nanoTime();
 
         Person joe = PersonGenerator.personGenerator();
         joe.setName("Joe Smith");
@@ -200,7 +200,7 @@ public class PersonService {
             currentItem.incrementAndGet();
         }
 
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
 
         logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
                 size, took, 1000 * size / took);
@@ -210,7 +210,7 @@ public class PersonService {
 
     public InitResult getInitCurrentAchievement() {
         int current = currentItem.get();
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
         return new InitResult(took, 1000 * current / took, current);
     }
 }
