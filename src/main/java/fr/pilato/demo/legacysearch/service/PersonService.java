@@ -95,7 +95,7 @@ public class PersonService {
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
 
         Page<Person> page;
 
@@ -107,7 +107,7 @@ public class PersonService {
 
         long total = page.getTotalElements();
         Collection<Person> personsFound = page.getContent();
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
 
@@ -147,13 +147,13 @@ public class PersonService {
 
         Example<Person> example = Example.of(person, matcher);
 
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
 
         Page<Person> page = personRepository.findAll(example, PageRequest.of(from / size, size));
 
         long total = page.getTotalElements();
         Collection<Person> personsFound = page.getContent();
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
 
         RestSearchResponse<Person> response = buildResponse(personsFound, total, took);
 
@@ -176,7 +176,7 @@ public class PersonService {
         currentItem.set(0);
 
         logger.debug("Initializing database for {} persons", size);
-        start = System.currentTimeMillis();
+        start = System.nanoTime();
 
         Person joe = PersonGenerator.personGenerator();
         joe.setName("Joe Smith");
@@ -204,7 +204,7 @@ public class PersonService {
             currentItem.incrementAndGet();
         }
 
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
 
         logger.debug("Database initialized with {} persons. Took: {} ms, around {} per second.",
                 size, took, 1000 * size / took);
@@ -214,7 +214,7 @@ public class PersonService {
 
     public InitResult getInitCurrentAchievement() {
         int current = currentItem.get();
-        long took = System.currentTimeMillis() - start;
+        long took = (System.nanoTime() - start) / 1_000_000;
         return new InitResult(took, 1000 * current / took, current);
     }
 
