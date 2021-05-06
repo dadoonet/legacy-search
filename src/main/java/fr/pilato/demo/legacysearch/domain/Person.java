@@ -19,16 +19,13 @@
 
 package fr.pilato.demo.legacysearch.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import fr.pilato.demo.legacysearch.serializer.CustomDateSerializer;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class Person {
@@ -38,7 +35,7 @@ public class Person {
     private Integer id = null;
 
     private String name = null;
-    private Date dateOfBirth = null;
+    private LocalDate dateOfBirth = null;
     private String gender = null;
     private Integer children;
 
@@ -68,12 +65,11 @@ public class Person {
         this.name = name;
     }
 
-    @JsonSerialize(using = CustomDateSerializer.class)
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
