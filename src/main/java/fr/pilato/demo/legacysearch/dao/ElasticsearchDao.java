@@ -100,7 +100,7 @@ public class ElasticsearchDao {
                     public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                         logger.warn("error while executing bulk", failure);
                     }
-                })
+                }, "persons-bulk-processor")
                 .setBulkActions(10000)
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .build();
@@ -128,7 +128,7 @@ public class ElasticsearchDao {
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
-        logger.trace("elasticsearch response: {} hits", response.toString());
+        logger.trace("elasticsearch response: {} hits", response);
 
         return response;
     }
