@@ -86,7 +86,7 @@ public class ElasticsearchDao {
                 ), RequestOptions.DEFAULT);
 
         logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
-        logger.trace("elasticsearch response: {} hits", response.toString());
+        logger.trace("elasticsearch response: {} hits", response);
 
         return response;
     }
