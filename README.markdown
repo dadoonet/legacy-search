@@ -12,7 +12,7 @@ and will provide search by prefix feature.
 Installation
 ------------
 
-You need to have completed [branch 02-bulk](https://github.com/dadoonet/legacy-search/tree/02-bulk)
+You need to have completed [branch 02-search](https://github.com/dadoonet/legacy-search/tree/02-search)
 
 Run it!
 -------
