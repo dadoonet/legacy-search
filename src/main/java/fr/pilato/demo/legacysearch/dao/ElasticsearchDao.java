@@ -27,7 +27,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -38,7 +38,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.MainResponse;
-import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -55,7 +55,6 @@ public class ElasticsearchDao {
 
     private final ObjectMapper mapper;
     private final RestHighLevelClient esClient;
-    private final BulkProcessor bulkProcessor;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
         String clusterUrl = "http://127.0.0.1:9200";
@@ -68,36 +67,25 @@ public class ElasticsearchDao {
         logger.info("Connected to {} running version {}", clusterUrl, info.getVersion().getNumber());
 
         this.mapper = mapper;
-        this.bulkProcessor = BulkProcessor.builder(
-                (request, bulkListener) -> esClient.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
-                new BulkProcessor.Listener() {
-                    @Override
-                    public void beforeBulk(long executionId, BulkRequest request) {
-                        logger.debug("going to execute bulk of {} requests", request.numberOfActions());
-                    }
-
-                    @Override
-                    public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                        logger.debug("bulk executed {} failures", response.hasFailures() ? "with" : "without");
-                    }
-
-                    @Override
-                    public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                        logger.warn("error while executing bulk", failure);
-                    }
-                }, "persons-bulk-processor")
-                .setBulkActions(10000)
-                .setFlushInterval(TimeValue.timeValueSeconds(5))
-                .build();
     }
 
-    public void save(Person person) throws JsonProcessingException {
-        byte[] bytes = mapper.writeValueAsBytes(person);
-        bulkProcessor.add(new IndexRequest("person").id(person.idAsString()).source(bytes, XContentType.JSON));
+    public void save(Iterable<Person> persons) throws IOException {
+        BulkRequest bulkRequest = new BulkRequest("person");
+        persons.forEach(p -> {
+            try {
+                bulkRequest.add(new IndexRequest().source(mapper.writeValueAsBytes(p), XContentType.JSON));
+            } catch (JsonProcessingException e) {
+                logger.warn("Can not serialize to JSON", e);
+            }
+        });
+        BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        if (bulkResponse.hasFailures()) {
+            logger.warn("We got failures... {}", bulkResponse.buildFailureMessage());
+        }
     }
 
-    public void delete(String id) {
-        bulkProcessor.add(new DeleteRequest("person", id));
+    public void delete(Integer id) throws IOException {
+        esClient.delete(new DeleteRequest("person", "" + id), RequestOptions.DEFAULT);
     }
 
     public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
