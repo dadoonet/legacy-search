@@ -18,10 +18,10 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
-import com.github.dozermapper.core.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dozermapper.core.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,10 +73,6 @@ public class PersonService {
         return person;
     }
 
-    public Person save(Person person) {
-        return (save(Collections.singleton(person)).iterator().next());
-    }
-
     private Iterable<Person> save(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
 
@@ -85,7 +81,7 @@ public class PersonService {
         return personsDb;
     }
 
-    public Person upsert(Integer id, Person person) {
+    public Person upsert(Integer id, Person person) throws IOException {
         // We try to find an existing document
         try {
             Person personDb = get(id);
@@ -93,9 +89,7 @@ public class PersonService {
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
-        person = save(person);
-
-        return person;
+        return save(Collections.singleton(person)).iterator().next();
     }
 
     public void delete(Integer id) throws IOException {
