@@ -19,7 +19,15 @@
 
 package fr.pilato.demo.legacysearch.dao;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.InfoResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
 import org.apache.http.HttpHost;
@@ -27,57 +35,95 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.MainResponse;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ElasticsearchDao {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    private final ObjectMapper mapper;
-    private final RestHighLevelClient esClient;
+    private final ElasticsearchClient esClient;
+    private final List<BulkOperation> operations;
+    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+        @Override public X509Certificate[] getAcceptedIssuers() { return null; }
+    }};
+    private final JacksonJsonpMapper jacksonJsonpMapper;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
-        String clusterUrl = "http://127.0.0.1:9200";
+        String clusterUrl = "https://127.0.0.1:9200";
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
-        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create(clusterUrl))
-                .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)));
 
-        MainResponse info = this.esClient.info(RequestOptions.DEFAULT);
-        logger.info("Connected to {} running version {}", clusterUrl, info.getVersion().getNumber());
+        // Create the low-level client
+        RestClient restClient = RestClient.builder(HttpHost.create(clusterUrl))
+                .setHttpClientConfigCallback(hcb -> {
+                            try {
+                                SSLContext sslContext = SSLContext.getInstance("SSL");
+                                sslContext.init(null, trustAllCerts, new SecureRandom());
+                                hcb
+                                    .setDefaultCredentialsProvider(credentialsProvider)
+                                    .setSSLContext(sslContext)
+                                    .setSSLHostnameVerifier((hostname, session) -> true);
+                                return hcb;
+                            } catch (KeyManagementException | NoSuchAlgorithmException e) {
+                                logger.warn("Failed to get SSL Context", e);
+                                throw new RuntimeException(e);
+                            }})
+                .build();
 
-        this.mapper = mapper;
+        // Create the transport with a Jackson mapper
+        jacksonJsonpMapper = new JacksonJsonpMapper(mapper);
+        ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
+
+        // And create the API client
+        this.esClient = new ElasticsearchClient(transport);
+
+        InfoResponse info = this.esClient.info();
+        logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
+
+        operations = new ArrayList<>();
     }
 
-    public void save(Iterable<Person> persons) throws IOException {
-        BulkRequest bulkRequest = new BulkRequest("person");
-        persons.forEach(p -> {
-            try {
-                bulkRequest.add(new IndexRequest().source(mapper.writeValueAsBytes(p), XContentType.JSON));
-            } catch (JsonProcessingException e) {
-                logger.warn("Can not serialize to JSON", e);
-            }
-        });
-        BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-        if (bulkResponse.hasFailures()) {
-            logger.warn("We got failures... {}", bulkResponse.buildFailureMessage());
+
+    public void save(Person person) throws IOException {
+        operations.add(new BulkOperation(IndexOperation.of(b -> b.index("person").id(person.idAsString()).document(person))));
+        executeIfNeeded();
+    }
+
+    public void delete(String id) throws IOException {
+        operations.add(new BulkOperation(DeleteOperation.of(b -> b.index("person").id(id))));
+        executeIfNeeded();
+    }
+
+    public void bulk() throws IOException {
+        BulkResponse response = esClient.bulk(br -> br.index("person").operations(operations));
+        if (response.errors()) {
+            response.items()
+                    .stream()
+                    .filter(i -> i.error() != null)
+                    .forEach(bri -> logger.warn("errors caught while injecting the data: {}", bri.error().reason()));
         }
+        operations.clear();
     }
 
-    public void delete(Integer id) throws IOException {
-        esClient.delete(new DeleteRequest("person", "" + id), RequestOptions.DEFAULT);
+    public void executeIfNeeded() throws IOException {
+        if (operations.size() > 10000) {
+            bulk();
+        }
     }
 }

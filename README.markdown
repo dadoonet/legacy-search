@@ -20,10 +20,9 @@ and the `CLOUD_PASSWORD`. Alternatively, you can also create a dedicated
 user for this demo and use it.
 
 ```java
+String clusterUrl = "CLOUD_URL";
 final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "CLOUD_PASSWORD"));
-this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create("CLOUD_URL"))
-  .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)));
 ```
 
 Docker Compose Installation
@@ -46,45 +45,6 @@ docker-compose up
 
 You can open [Kibana](http://localhost:5601/) after some seconds and
 connect using `elastic` user with `changeme` as the password.
-
-
-Manual Installation
-------------
-
-Install [elasticsearch](https://www.elastic.co/downloads/elasticsearch). On a Mac:
-
-```
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.1-darwin-x86_64.tar.gz
-tar xzf elasticsearch-*.tar.gz
-cd elasticsearch-*
-```
-
-### Optional (Kibana)
-
-Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
-
-```
-wget https://artifacts.elastic.co/downloads/kibana/kibana-7.17.1-darwin-x86_64.tar.gz
-tar xzf kibana-*.tar.gz
-cd kibana-*
-```
-
-### Launch elasticsearch
-
-Launch elasticsearch:
-
-```
-bin/elasticsearch
-```
-
-### Launch Kibana (optional)
-
-```
-bin/kibana
-```
-
-You can open [Console](http://localhost:5601/app/console) if needed.
-
 
 Run it!
 -------

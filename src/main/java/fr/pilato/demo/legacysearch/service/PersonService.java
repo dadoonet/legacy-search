@@ -18,10 +18,10 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
-import com.github.dozermapper.core.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Address;
@@ -74,23 +74,22 @@ public class PersonService {
         return person;
     }
 
-    public Person save(Person person) {
-        return (save(Collections.singleton(person)).iterator().next());
-    }
-
-    private Iterable<Person> save(Collection<Person> persons) {
+    private Iterable<Person> save(Collection<Person> persons) throws IOException {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        try {
-            elasticsearchDao.save(personsDb);
-        } catch (IOException e) {
-            logger.warn("Houston, we had a problem!", e);
-        }
+        personsDb.forEach(person -> {
+            try {
+                elasticsearchDao.save(person);
+            } catch (Exception e) {
+                logger.error("Houston, we have a problem!", e);
+            }
+        });
+        elasticsearchDao.bulk();
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
     }
 
-    public Person upsert(Integer id, Person person) {
+    public Person upsert(Integer id, Person person) throws IOException {
         // We try to find an existing document
         try {
             Person personDb = get(id);
@@ -98,9 +97,7 @@ public class PersonService {
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
-        person = save(person);
-
-        return person;
+        return save(Collections.singleton(person)).iterator().next();
     }
 
     public void delete(Integer id) throws IOException {
@@ -108,7 +105,7 @@ public class PersonService {
 
         if (id != null) {
             personRepository.deleteById(id);
-            elasticsearchDao.delete(id);
+            elasticsearchDao.delete("" + id);
         }
 
         logger.debug("Person deleted: {}", id);
