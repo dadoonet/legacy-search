@@ -51,7 +51,7 @@ public class PersonController {
      * Create or update an entity
      */
     @PutMapping("/api/1/person/{id}")
-    public Person upsert(@PathVariable Integer id, @RequestBody Person person) {
+    public Person upsert(@PathVariable Integer id, @RequestBody Person person) throws IOException {
         logger.debug("upsert({}, {})", id, person);
         Person upsert = personService.upsert(id, person);
         logger.debug("created/updated {}: {}", id, upsert);
