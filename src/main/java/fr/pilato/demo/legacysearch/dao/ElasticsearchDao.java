@@ -19,123 +19,170 @@
 
 package fr.pilato.demo.legacysearch.dao;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.InfoResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
+import co.elastic.clients.json.JsonpSerializable;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
-import org.apache.commons.io.IOUtils;
+import jakarta.json.stream.JsonGenerator;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.MainResponse;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.LongBounds;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.StringWriter;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ElasticsearchDao {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
-    private final ObjectMapper mapper;
-    private final RestHighLevelClient esClient;
+    private final ElasticsearchClient esClient;
+    private final List<BulkOperation> operations;
+    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+        @Override public X509Certificate[] getAcceptedIssuers() { return null; }
+    }};
+    private final JacksonJsonpMapper jacksonJsonpMapper;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
-        String clusterUrl = "http://127.0.0.1:9200";
+        String clusterUrl = "https://127.0.0.1:9200";
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
-        this.esClient = new RestHighLevelClient(RestClient.builder(HttpHost.create(clusterUrl))
-                .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)));
 
-        MainResponse info = this.esClient.info(RequestOptions.DEFAULT);
-        logger.info("Connected to {} running version {}", clusterUrl, info.getVersion().getNumber());
+        // Create the low-level client
+        RestClient restClient = RestClient.builder(HttpHost.create(clusterUrl))
+                .setHttpClientConfigCallback(hcb -> {
+                            try {
+                                SSLContext sslContext = SSLContext.getInstance("SSL");
+                                sslContext.init(null, trustAllCerts, new SecureRandom());
+                                hcb
+                                    .setDefaultCredentialsProvider(credentialsProvider)
+                                    .setSSLContext(sslContext)
+                                    .setSSLHostnameVerifier((hostname, session) -> true);
+                                return hcb;
+                            } catch (KeyManagementException | NoSuchAlgorithmException e) {
+                                logger.warn("Failed to get SSL Context", e);
+                                throw new RuntimeException(e);
+                            }})
+                .build();
+
+        // Create the transport with a Jackson mapper
+        jacksonJsonpMapper = new JacksonJsonpMapper(mapper);
+        ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
+
+        // And create the API client
+        this.esClient = new ElasticsearchClient(transport);
+
+        InfoResponse info = this.esClient.info();
+        logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
 
         try {
-            String content = IOUtils.toString(ElasticsearchDao.class.getResource("/person.json"), StandardCharsets.UTF_8);
-            this.esClient.indices().create(new CreateIndexRequest("person").source(content, XContentType.JSON), RequestOptions.DEFAULT);
+            esClient.indices().create(cir -> cir
+                    .index("person")
+                    .withJson(ElasticsearchDao.class.getResourceAsStream("/person.json"))
+            );
             logger.info("New index person has been created");
-        } catch (ElasticsearchStatusException e) {
-            if (e.status().getStatus() != 400) {
+        } catch (ElasticsearchException e) {
+            if (e.status() != 400) {
                 logger.warn("can not create index and mappings", e);
             } else {
                 logger.debug("Index person was already existing. Skipping creating it again.");
             }
         }
-        this.mapper = mapper;
+
+        operations = new ArrayList<>();
     }
 
-    public void save(Iterable<Person> persons) throws IOException {
-        BulkRequest bulkRequest = new BulkRequest("person");
-        persons.forEach(p -> {
-            try {
-                bulkRequest.add(new IndexRequest().source(mapper.writeValueAsBytes(p), XContentType.JSON));
-            } catch (JsonProcessingException e) {
-                logger.warn("Can not serialize to JSON", e);
-            }
-        });
-        BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-        if (bulkResponse.hasFailures()) {
-            logger.warn("We got failures... {}", bulkResponse.buildFailureMessage());
+
+    public void save(Person person) throws IOException {
+        operations.add(new BulkOperation(IndexOperation.of(b -> b.index("person").id(person.idAsString()).document(person))));
+        executeIfNeeded();
+    }
+
+    public void delete(String id) throws IOException {
+        operations.add(new BulkOperation(DeleteOperation.of(b -> b.index("person").id(id))));
+        executeIfNeeded();
+    }
+
+    public void bulk() throws IOException {
+        BulkResponse response = esClient.bulk(br -> br.index("person").operations(operations));
+        if (response.errors()) {
+            response.items()
+                    .stream()
+                    .filter(i -> i.error() != null)
+                    .forEach(bri -> logger.warn("errors caught while injecting the data: {}", bri.error().reason()));
+        }
+        operations.clear();
+    }
+
+    public void executeIfNeeded() throws IOException {
+        if (operations.size() > 10000) {
+            bulk();
         }
     }
 
-    public void delete(Integer id) throws IOException {
-        esClient.delete(new DeleteRequest("person", "" + id), RequestOptions.DEFAULT);
-    }
-
-    public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
-        logger.debug("elasticsearch query: {}", query.toString());
-        SearchResponse response = esClient.search(new SearchRequest("person")
-                .source(new SearchSourceBuilder()
+    public String search(Query query, Integer from, Integer size) throws IOException {
+        SearchResponse<Person> response = esClient.search(sr -> sr
+                        .index("person")
                         .query(query)
-                        .aggregation(
-                                AggregationBuilders.terms("by_country").field("address.country.keyword")
-                                        .subAggregation(AggregationBuilders.dateHistogram("by_year")
-                                                .field("dateOfBirth")
-                                                .fixedInterval(DateHistogramInterval.days(3652))
-                                                .extendedBounds(new LongBounds(1940L, 2009L))
-                                                .format("8yyyy")
-                                                .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
-                                        )
-                        )
-                        .aggregation(
-                                AggregationBuilders.dateHistogram("by_year")
-                                        .field("dateOfBirth")
-                                        .calendarInterval(DateHistogramInterval.YEAR)
-                                        .extendedBounds(new LongBounds(1940L, 2009L))
-                                        .format("8yyyy")
-                        )
                         .from(from)
                         .size(size)
-                        .trackTotalHits(true)
-                        .sort(SortBuilders.scoreSort())
-                        .sort(SortBuilders.fieldSort("dateOfBirth"))
-                ), RequestOptions.DEFAULT);
+                        .aggregations("by_country", ab -> ab.terms(tb -> tb.field("address.country.keyword"))
+                                .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
+                                        .field("dateOfBirth")
+                                        .fixedInterval(d -> d.time("3653d"))
+                                        .extendedBounds(b -> b
+                                                .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
+                                                .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
+                                        .format("8yyyy"))
+                                        .aggregations("avg_children", ssab -> ssab.avg(avg -> avg.field("children"))))
+                        )
+                        .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
+                                        .field("dateOfBirth")
+                                        .fixedInterval(d -> d.time("3653d"))
+                                        .extendedBounds(b -> b
+                                                .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
+                                                .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
+                                        .format("8yyyy")))
+                        .sort(sb -> sb.score(scs -> scs))
+                        .sort(sb -> sb.field(fs -> fs.field("dateOfBirth")))
+                , Person.class);
 
-        logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
-        logger.trace("elasticsearch response: {} hits", response);
+        return jsonToString(response);
+    }
 
-        return response;
+    private String jsonToString(JsonpSerializable json) {
+        StringWriter writer = new StringWriter();
+        JsonGenerator generator = jacksonJsonpMapper.jsonProvider().createGenerator(writer);
+        json.serialize(generator, jacksonJsonpMapper);
+        generator.close();
+        return writer.toString();
     }
 }

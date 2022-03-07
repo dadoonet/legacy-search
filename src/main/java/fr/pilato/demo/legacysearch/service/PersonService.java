@@ -18,6 +18,7 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
@@ -26,11 +27,6 @@ import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.helper.Strings;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PersonService {
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
-    @Value("${app.batch.size:10000}")
+    @Value("${app.batch.size:100}")
     private int batchSize;
 
     private final PersonRepository personRepository;
@@ -67,23 +63,22 @@ public class PersonService {
         return person;
     }
 
-    public Person save(Person person) {
-        return (save(Collections.singleton(person)).iterator().next());
-    }
-
-    private Iterable<Person> save(Collection<Person> persons) {
+    private Iterable<Person> save(Collection<Person> persons) throws IOException {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        try {
-            elasticsearchDao.save(personsDb);
-        } catch (IOException e) {
-            logger.warn("Houston, we had a problem!", e);
-        }
+        personsDb.forEach(person -> {
+            try {
+                elasticsearchDao.save(person);
+            } catch (Exception e) {
+                logger.error("Houston, we have a problem!", e);
+            }
+        });
+        elasticsearchDao.bulk();
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
     }
 
-    public Person upsert(Integer id, Person person) {
+    public Person upsert(Integer id, Person person) throws IOException {
         // We try to find an existing document
         try {
             Person personDb = get(id);
@@ -91,9 +86,7 @@ public class PersonService {
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
-        person = save(person);
-
-        return person;
+        return save(Collections.singleton(person)).iterator().next();
     }
 
     public void delete(Integer id) throws IOException {
@@ -101,78 +94,74 @@ public class PersonService {
 
         if (id != null) {
             personRepository.deleteById(id);
-            elasticsearchDao.delete(id);
+            elasticsearchDao.delete("" + id);
         }
 
         logger.debug("Person deleted: {}", id);
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
-        QueryBuilder query;
+        Query query;
+        Query textQuery;
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(q)) {
-            query = QueryBuilders.matchAllQuery();
+            textQuery = Query.of(qb -> qb.matchAll(maq -> maq));
         } else {
-            query = QueryBuilders
-                    .multiMatchQuery(q)
-                        .field("name", 3.0f)
-                        .field("name.ngram")
-                        .field("gender.ngram")
-                        .field("address.city.ngram")
-                        .field("address.country.ngram")
-                        .fuzziness(Fuzziness.AUTO);
+            textQuery = Query.of(qb -> qb.multiMatch(
+                    mm -> mm.query(q)
+                            .fields("name^3",
+                                    "name.ngram",
+                                    "gender.ngram",
+                                    "address.city.ngram",
+                                    "address.country.ngram")
+                            .fuzziness("auto")));
         }
 
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
-            query = QueryBuilders.boolQuery().must(query);
-            if (Strings.hasText(f_country)) {
-                ((BoolQueryBuilder) query).filter(QueryBuilders.termQuery("address.country.keyword", f_country));
-            }
-            if (Strings.hasText(f_date)) {
-                String endDate = "" + (Integer.parseInt(f_date) + 10);
-                ((BoolQueryBuilder) query).filter(QueryBuilders.rangeQuery("dateOfBirth").gte(f_date).lt(endDate));
-            }
+            query = Query.of(qb -> qb.bool(
+                    bq -> {
+                        bq.must(textQuery);
+                        if (Strings.hasText(f_country)) {
+                            bq.filter(fb -> fb.term(tq -> tq.field("address.country.keyword").value(f_country)));
+                        }
+                        if (Strings.hasText(f_date)) {
+                            String endDate = "" + (Integer.parseInt(f_date) + 10);
+                            bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).to(endDate)));
+                        }
+                        return bq;
+                    })
+            );
+        } else {
+            query = textQuery;
         }
 
-        SearchResponse response = elasticsearchDao.search(query, from, size);
-
-        if (logger.isDebugEnabled()) logger.debug("search({},{},{})={} persons", q, f_country, f_date, response.getHits().getTotalHits());
-
-        return response.toString();
+        return elasticsearchDao.search(query, from, size);
     }
 
     public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws IOException {
-        QueryBuilder query;
+        Query query;
 
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(name) && Strings.isEmpty(country) && Strings.isEmpty(city)) {
-            query = QueryBuilders.matchAllQuery();
+            query = Query.of(qb -> qb.matchAll(maq -> maq));
         } else {
-            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-            if (Strings.hasText(name)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name.ngram", name).fuzziness(Fuzziness.AUTO)
-                );
-            }
-            if (Strings.hasText(country)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country.ngram", country).fuzziness(Fuzziness.AUTO)
-                );
-            }
-            if (Strings.hasText(city)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city.ngram", city).fuzziness(Fuzziness.AUTO)
-                );
-            }
-
-            query = boolQueryBuilder;
+            query = Query.of(qb -> qb.bool(
+                    bq -> {
+                        if (Strings.hasText(name)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("name.ngram").query(name).fuzziness("auto")));
+                        }
+                        if (Strings.hasText(country)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("address.country.ngram").query(country).fuzziness("auto")));
+                        }
+                        if (Strings.hasText(city)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("address.city.ngram").query(city).fuzziness("auto")));
+                        }
+                        return bq;
+                    })
+            );
         }
 
-        SearchResponse response = elasticsearchDao.search(query, from, size);
-
-        logger.debug("advancedSearch({},{},{})={} persons", name, country, city, response.getHits().getTotalHits());
-
-        return response.toString();
+        return elasticsearchDao.search(query, from, size);
     }
 
     private AtomicInteger currentItem = new AtomicInteger();
