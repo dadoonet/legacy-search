@@ -68,18 +68,16 @@ public class PersonService {
     }
 
     public Person save(Person person) {
-        return (saveAll(Collections.singleton(person)).iterator().next());
+        return (save(Collections.singleton(person)).iterator().next());
     }
 
-    private Iterable<Person> saveAll(Collection<Person> persons) {
+    private Iterable<Person> save(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        personsDb.forEach(person -> {
-            try {
-                elasticsearchDao.save(person);
-            } catch (Exception e) {
-                logger.error("Houston, we have a problem!", e);
-            }
-        });
+        try {
+            elasticsearchDao.save(personsDb);
+        } catch (IOException e) {
+            logger.warn("Houston, we had a problem!", e);
+        }
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
@@ -98,12 +96,12 @@ public class PersonService {
         return person;
     }
 
-    public void delete(Integer id) {
+    public void delete(Integer id) throws IOException {
         logger.debug("Person: {}", id);
 
         if (id != null) {
             personRepository.deleteById(id);
-            elasticsearchDao.delete("" + id);
+            elasticsearchDao.delete(id);
         }
 
         logger.debug("Person deleted: {}", id);
@@ -213,12 +211,12 @@ public class PersonService {
             persons.add(person);
             currentItem.incrementAndGet();
             if (i % batchSize == 0) {
-                saveAll(persons);
+                save(persons);
             }
         }
 
         // Save all remaining persons
-        saveAll(persons);
+        save(persons);
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
