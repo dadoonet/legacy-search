@@ -22,6 +22,9 @@ import com.github.dozermapper.core.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.Person;
@@ -57,7 +60,8 @@ public class PersonService {
     private final ObjectMapper mapper;
     private final Mapper dozerBeanMapper;
 
-    public PersonService(PersonRepository personRepository, ObjectMapper mapper, Mapper dozerBeanMapper) {
+    public PersonService(PersonRepository personRepository, ObjectMapper mapper,
+                         Mapper dozerBeanMapper) {
         this.personRepository = personRepository;
         this.mapper = mapper;
         this.dozerBeanMapper = dozerBeanMapper;
@@ -70,10 +74,10 @@ public class PersonService {
     }
 
     public Person save(Person person) {
-        return (saveAll(Collections.singleton(person)).iterator().next());
+        return (save(Collections.singleton(person)).iterator().next());
     }
 
-    private Iterable<Person> saveAll(Collection<Person> persons) {
+    private Iterable<Person> save(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
 
         logger.debug("Saved [{}] persons", persons.size());
@@ -215,12 +219,12 @@ public class PersonService {
             persons.add(person);
             currentItem.incrementAndGet();
             if (i % batchSize == 0) {
-                saveAll(persons);
+                save(persons);
             }
         }
 
         // Save all remaining persons
-        saveAll(persons);
+        save(persons);
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
