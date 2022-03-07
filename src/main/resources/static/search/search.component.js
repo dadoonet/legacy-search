@@ -20,7 +20,7 @@ angular.
             .then(function successCallback(response) {
               self.error = null;
               self.result = response.data;
-              self.totalItems = self.result.hits.total;
+              self.totalItems = self.result.hits.total.value;
               // Group data every 10 years (facets don't support it yet)
               self.dates = new Array();
 
