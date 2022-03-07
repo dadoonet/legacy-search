@@ -6,7 +6,7 @@ Introduction
 
 This is a demo project to show how to add elasticsearch to a legacy SQL project.
 
-This branch connect our project to elasticsearch directly.
+This branch connects our project to elasticsearch directly using Bulk.
 
 You need to have completed [branch 00-legacy](https://github.com/dadoonet/legacy-search/tree/00-legacy)
 
@@ -54,7 +54,7 @@ Manual Installation
 Install [elasticsearch](https://www.elastic.co/downloads/elasticsearch). On a Mac:
 
 ```
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.13.0-darwin-x86_64.tar.gz
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.1-darwin-x86_64.tar.gz
 tar xzf elasticsearch-*.tar.gz
 cd elasticsearch-*
 ```
@@ -64,7 +64,7 @@ cd elasticsearch-*
 Install [Kibana](https://www.elastic.co/downloads/kibana). On a Mac:
 
 ```
-wget https://artifacts.elastic.co/downloads/kibana/kibana-7.13.0-darwin-x86_64.tar.gz
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.17.1-darwin-x86_64.tar.gz
 tar xzf kibana-*.tar.gz
 cd kibana-*
 ```
@@ -101,4 +101,4 @@ You can then access the application using your browser: [http://127.0.0.1:8080/]
 Next step
 ---------
 
-Look at [branch 02-bulk](https://github.com/dadoonet/legacy-search/tree/02-bulk)
+Look at [branch 02-search](https://github.com/dadoonet/legacy-search/tree/02-search)

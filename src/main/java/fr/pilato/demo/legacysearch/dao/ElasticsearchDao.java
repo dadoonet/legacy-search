@@ -19,6 +19,7 @@
 
 package fr.pilato.demo.legacysearch.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
 import org.apache.http.HttpHost;
@@ -26,18 +27,15 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.MainResponse;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -64,30 +62,22 @@ public class ElasticsearchDao {
         this.mapper = mapper;
     }
 
-    public void save(Person person) throws IOException {
-        byte[] bytes = mapper.writeValueAsBytes(person);
-        esClient.index(new IndexRequest("person").id(person.idAsString()).source(bytes, XContentType.JSON), RequestOptions.DEFAULT);
+    public void save(Iterable<Person> persons) throws IOException {
+        BulkRequest bulkRequest = new BulkRequest("person");
+        persons.forEach(p -> {
+            try {
+                bulkRequest.add(new IndexRequest().source(mapper.writeValueAsBytes(p), XContentType.JSON));
+            } catch (JsonProcessingException e) {
+                logger.warn("Can not serialize to JSON", e);
+            }
+        });
+        BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        if (bulkResponse.hasFailures()) {
+            logger.warn("We got failures... {}", bulkResponse.buildFailureMessage());
+        }
     }
 
-    public void delete(String id) throws IOException {
-        esClient.delete(new DeleteRequest("person", id), RequestOptions.DEFAULT);
-    }
-
-    public SearchResponse search(QueryBuilder query, Integer from, Integer size) throws IOException {
-        logger.debug("elasticsearch query: {}", query.toString());
-        SearchResponse response = esClient.search(new SearchRequest("person")
-                .source(new SearchSourceBuilder()
-                        .query(query)
-                        .from(from)
-                        .size(size)
-                        .trackTotalHits(true)
-                        .sort(SortBuilders.scoreSort())
-                        .sort(SortBuilders.fieldSort("dateOfBirth"))
-                ), RequestOptions.DEFAULT);
-
-        logger.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
-        logger.trace("elasticsearch response: {} hits", response);
-
-        return response;
+    public void delete(Integer id) throws IOException {
+        esClient.delete(new DeleteRequest("person", "" + id), RequestOptions.DEFAULT);
     }
 }
