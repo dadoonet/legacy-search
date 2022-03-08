@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PersonService {
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
-    @Value("${app.batch.size:100}")
+    @Value("${app.batch.size:10000}")
     private int batchSize;
 
     private final PersonRepository personRepository;
