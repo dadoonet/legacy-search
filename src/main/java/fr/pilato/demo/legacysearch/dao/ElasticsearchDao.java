@@ -23,12 +23,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
-import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
-import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.json.JsonpSerializable;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -55,15 +51,12 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ElasticsearchDao {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     private final ElasticsearchClient esClient;
-    private final List<BulkOperation> operations;
     private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
         @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
         @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
@@ -116,36 +109,17 @@ public class ElasticsearchDao {
                 logger.debug("Index person was already existing. Skipping creating it again.");
             }
         }
-
-        operations = new ArrayList<>();
     }
 
-
-    public void save(Person person) throws IOException {
-        operations.add(new BulkOperation(IndexOperation.of(b -> b.index("person").id(person.idAsString()).document(person))));
-        executeIfNeeded();
+    public void saveAll(Iterable<Person> persons) throws IOException {
+        esClient.bulk(br -> br.index("person").operations(ops -> {
+            persons.forEach(person -> ops.index(i -> i.id(person.idAsString()).document(person)));
+            return ops;
+        }));
     }
 
-    public void delete(String id) throws IOException {
-        operations.add(new BulkOperation(DeleteOperation.of(b -> b.index("person").id(id))));
-        executeIfNeeded();
-    }
-
-    public void bulk() throws IOException {
-        BulkResponse response = esClient.bulk(br -> br.index("person").operations(operations));
-        if (response.errors()) {
-            response.items()
-                    .stream()
-                    .filter(i -> i.error() != null)
-                    .forEach(bri -> logger.warn("errors caught while injecting the data: {}", bri.error().reason()));
-        }
-        operations.clear();
-    }
-
-    public void executeIfNeeded() throws IOException {
-        if (operations.size() > 10000) {
-            bulk();
-        }
+    public void delete(Integer id) throws IOException {
+        esClient.delete(d -> d.index("person").id("" + id));
     }
 
     public String search(Query query, Integer from, Integer size) throws IOException {
