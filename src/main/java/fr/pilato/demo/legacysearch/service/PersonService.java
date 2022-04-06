@@ -81,7 +81,7 @@ public class PersonService {
         return personsDb;
     }
 
-    public Person upsert(Integer id, Person person) throws IOException {
+    public Person upsert(Integer id, Person person) {
         // We try to find an existing document
         try {
             Person personDb = get(id);
