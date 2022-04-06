@@ -74,22 +74,19 @@ public class PersonService {
         return person;
     }
 
-    private Iterable<Person> save(Collection<Person> persons) throws IOException {
+    private Iterable<Person> save(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        personsDb.forEach(person -> {
-            try {
-                elasticsearchDao.save(person);
-            } catch (Exception e) {
-                logger.error("Houston, we have a problem!", e);
-            }
-        });
-        elasticsearchDao.bulk();
+        try {
+            elasticsearchDao.saveAll(personsDb);
+        } catch (Exception e) {
+            logger.error("Houston, we have a problem!", e);
+        }
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
     }
 
-    public Person upsert(Integer id, Person person) throws IOException {
+    public Person upsert(Integer id, Person person) {
         // We try to find an existing document
         try {
             Person personDb = get(id);
@@ -105,7 +102,7 @@ public class PersonService {
 
         if (id != null) {
             personRepository.deleteById(id);
-            elasticsearchDao.delete("" + id);
+            elasticsearchDao.delete(id);
         }
 
         logger.debug("Person deleted: {}", id);
