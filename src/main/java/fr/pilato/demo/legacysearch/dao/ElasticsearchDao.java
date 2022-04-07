@@ -21,7 +21,6 @@ package fr.pilato.demo.legacysearch.dao;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -91,7 +90,7 @@ public class ElasticsearchDao {
         ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
 
         // And create the API client
-        this.esClient = new ElasticsearchClient(transport);
+        esClient = new ElasticsearchClient(transport);
 
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
@@ -112,10 +111,11 @@ public class ElasticsearchDao {
     }
 
     public void saveAll(Iterable<Person> persons) throws IOException {
-        esClient.bulk(br -> br.index("person").operations(ops -> {
-            persons.forEach(person -> ops.index(i -> i.id(person.idAsString()).document(person)));
-            return ops;
-        }));
+        esClient.bulk(br -> {
+            br.index("person");
+            persons.forEach(person -> br.operations(ops -> ops.index(i -> i.document(person))));
+            return br;
+        });
     }
 
     public void delete(Integer id) throws IOException {
@@ -128,6 +128,7 @@ public class ElasticsearchDao {
                         .query(query)
                         .from(from)
                         .size(size)
+                        .trackTotalHits(tth -> tth.enabled(true))
                         .sort(sb -> sb.score(scs -> scs))
                         .sort(sb -> sb.field(fs -> fs.field("dateOfBirth")))
                 , Person.class);
