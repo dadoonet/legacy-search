@@ -84,17 +84,18 @@ public class ElasticsearchDao {
         ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
 
         // And create the API client
-        this.esClient = new ElasticsearchClient(transport);
+        esClient = new ElasticsearchClient(transport);
 
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
     }
 
     public void saveAll(Iterable<Person> persons) throws IOException {
-        esClient.bulk(br -> br.index("person").operations(ops -> {
-            persons.forEach(person -> ops.index(i -> i.id(person.idAsString()).document(person)));
-            return ops;
-        }));
+        esClient.bulk(br -> {
+            br.index("person");
+            persons.forEach(person -> br.operations(ops -> ops.index(i -> i.document(person))));
+            return br;
+        });
     }
 
     public void delete(Integer id) throws IOException {
