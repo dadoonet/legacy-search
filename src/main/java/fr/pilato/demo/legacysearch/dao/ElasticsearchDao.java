@@ -21,6 +21,7 @@ package fr.pilato.demo.legacysearch.dao;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
@@ -91,7 +92,7 @@ public class ElasticsearchDao {
         ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
 
         // And create the API client
-        this.esClient = new ElasticsearchClient(transport);
+        esClient = new ElasticsearchClient(transport);
 
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
@@ -112,10 +113,11 @@ public class ElasticsearchDao {
     }
 
     public void saveAll(Iterable<Person> persons) throws IOException {
-        esClient.bulk(br -> br.index("person").operations(ops -> {
-            persons.forEach(person -> ops.index(i -> i.id(person.idAsString()).document(person)));
-            return ops;
-        }));
+        esClient.bulk(br -> {
+            br.index("person");
+            persons.forEach(person -> br.operations(ops -> ops.index(i -> i.document(person))));
+            return br;
+        });
     }
 
     public void delete(Integer id) throws IOException {
@@ -128,6 +130,7 @@ public class ElasticsearchDao {
                         .query(query)
                         .from(from)
                         .size(size)
+                        .trackTotalHits(tth -> tth.enabled(true))
                         .aggregations("by_country", ab -> ab.terms(tb -> tb.field("address.country.keyword"))
                                 .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
                                         .field("dateOfBirth")
@@ -139,12 +142,12 @@ public class ElasticsearchDao {
                                         .aggregations("avg_children", ssab -> ssab.avg(avg -> avg.field("children"))))
                         )
                         .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
-                                        .field("dateOfBirth")
-                                        .fixedInterval(d -> d.time("3653d"))
-                                        .extendedBounds(b -> b
-                                                .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
-                                                .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
-                                        .format("8yyyy")))
+                                .field("dateOfBirth")
+                                .calendarInterval(CalendarInterval.Year)
+                                .extendedBounds(b -> b
+                                        .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
+                                        .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
+                                .format("8yyyy")))
                         .sort(sb -> sb.score(scs -> scs))
                         .sort(sb -> sb.field(fs -> fs.field("dateOfBirth")))
                 , Person.class);
