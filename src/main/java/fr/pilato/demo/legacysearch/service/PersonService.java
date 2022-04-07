@@ -19,6 +19,7 @@
 package fr.pilato.demo.legacysearch.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.json.JsonData;
 import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
@@ -98,7 +99,7 @@ public class PersonService {
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
-        Query query;
+
         Query textQuery;
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(q)) {
@@ -113,6 +114,7 @@ public class PersonService {
                                     "address.country.ngram")));
         }
 
+        Query query;
         if (Strings.hasText(f_country) || Strings.hasText(f_date)) {
             query = Query.of(qb -> qb.bool(
                     bq -> {
@@ -122,7 +124,7 @@ public class PersonService {
                         }
                         if (Strings.hasText(f_date)) {
                             String endDate = "" + (Integer.parseInt(f_date) + 10);
-                            bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).to(endDate)));
+                            bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).lt(JsonData.of(endDate))));
                         }
                         return bq;
                     })
