@@ -18,6 +18,7 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
@@ -26,10 +27,6 @@ import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.helper.Strings;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
 import fr.pilato.demo.legacysearch.webapp.PersonNotFoundException;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,16 +63,12 @@ public class PersonService {
         return person;
     }
 
-    public Person save(Person person) {
-        return (save(Collections.singleton(person)).iterator().next());
-    }
-
-    private Iterable<Person> save(Collection<Person> persons) {
+    private Iterable<Person> saveAll(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
         try {
-            elasticsearchDao.save(personsDb);
-        } catch (IOException e) {
-            logger.warn("Houston, we had a problem!", e);
+            elasticsearchDao.saveAll(personsDb);
+        } catch (Exception e) {
+            logger.error("Houston, we have a problem!", e);
         }
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
@@ -90,9 +83,7 @@ public class PersonService {
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
-        person = save(person);
-
-        return person;
+        return saveAll(Collections.singleton(person)).iterator().next();
     }
 
     public void delete(Integer id) throws IOException {
@@ -107,58 +98,46 @@ public class PersonService {
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
-        QueryBuilder query;
+        Query textQuery;
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(q)) {
-            query = QueryBuilders.matchAllQuery();
+            textQuery = Query.of(qb -> qb.matchAll(maq -> maq));
         } else {
-            query = QueryBuilders
-                    .multiMatchQuery(q)
-                        .field("name")
-                        .field("gender")
-                        .field("address.country")
-                        .field("address.city");
+            textQuery = Query.of(qb -> qb.multiMatch(
+                    mm -> mm.query(q)
+                            .fields("name",
+                                    "gender",
+                                    "address.city",
+                                    "address.country")));
         }
 
-        SearchResponse response = elasticsearchDao.search(query, from, size);
-
-        if (logger.isDebugEnabled()) logger.debug("search({})={} persons", q, response.getHits().getTotalHits());
-
-        return response.toString();
+        return elasticsearchDao.search(textQuery, from, size);
     }
 
     public String advancedSearch(String name, String country, String city, Integer from, Integer size) throws IOException {
-        QueryBuilder query;
+        Query query;
 
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(name) && Strings.isEmpty(country) && Strings.isEmpty(city)) {
-            query = QueryBuilders.matchAllQuery();
+            query = Query.of(qb -> qb.matchAll(maq -> maq));
         } else {
-            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-            if (Strings.hasText(name)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("name", name)
-                );
-            }
-            if (Strings.hasText(country)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.country", country)
-                );
-            }
-            if (Strings.hasText(city)) {
-                boolQueryBuilder.must(
-                        QueryBuilders.matchQuery("address.city", city)
-                );
-            }
-
-            query = boolQueryBuilder;
+            query = Query.of(qb -> qb.bool(
+                    bq -> {
+                        if (Strings.hasText(name)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("name").query(name)));
+                        }
+                        if (Strings.hasText(country)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("address.country").query(country)));
+                        }
+                        if (Strings.hasText(city)) {
+                            bq.must(mb -> mb.match(mq -> mq.field("address.city").query(city)));
+                        }
+                        return bq;
+                    })
+            );
         }
 
-        SearchResponse response = elasticsearchDao.search(query, from, size);
-
-        logger.debug("advancedSearch({},{},{})={} persons", name, country, city, response.getHits().getTotalHits());
-
-        return response.toString();
+        return elasticsearchDao.search(query, from, size);
     }
 
     private AtomicInteger currentItem = new AtomicInteger();
@@ -197,12 +176,12 @@ public class PersonService {
             persons.add(person);
             currentItem.incrementAndGet();
             if (i % batchSize == 0) {
-                save(persons);
+                saveAll(persons);
             }
         }
 
         // Save all remaining persons
-        save(persons);
+        saveAll(persons);
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
