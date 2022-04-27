@@ -3,6 +3,7 @@
         "analysis": {
             "analyzer": {
                 "ngram": {
+                    "type": "custom",
                     "tokenizer": "ngram_tokenizer",
                     "filter": [
                         "lowercase"
