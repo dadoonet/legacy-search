@@ -18,13 +18,10 @@
  */
 package fr.pilato.demo.legacysearch.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dozermapper.core.Mapper;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.Address;
 import fr.pilato.demo.legacysearch.domain.Person;
@@ -73,11 +70,7 @@ public class PersonService {
         return person;
     }
 
-    public Person save(Person person) {
-        return (save(Collections.singleton(person)).iterator().next());
-    }
-
-    private Iterable<Person> save(Collection<Person> persons) {
+    private Iterable<Person> saveAll(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
 
         logger.debug("Saved [{}] persons", persons.size());
@@ -93,9 +86,7 @@ public class PersonService {
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
-        person = save(person);
-
-        return person;
+        return saveAll(Collections.singleton(person)).iterator().next();
     }
 
     public void delete(Integer id) throws IOException {
@@ -219,12 +210,12 @@ public class PersonService {
             persons.add(person);
             currentItem.incrementAndGet();
             if (i % batchSize == 0) {
-                save(persons);
+                saveAll(persons);
             }
         }
 
         // Save all remaining persons
-        save(persons);
+        saveAll(persons);
 
         long took = (System.nanoTime() - start) / 1_000_000;
 
