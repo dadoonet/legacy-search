@@ -28,16 +28,7 @@ credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredential
 Docker Compose Installation
 ------------
 
-You must have Docker installed obviously and 4gb memory assigned to it.
-Or you can edit `docker-compose.yml` file and replace the following line depending on what memory you assigned:
-
-```
-- "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-```
-
-Best practice: no more than the half of available RAM.
-
-Then run:
+Run:
 
 ```sh
 docker-compose up
