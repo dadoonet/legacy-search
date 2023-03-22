@@ -33,7 +33,8 @@ PUT person
 
 You can get the index settings from: https://github.com/dadoonet/legacy-search/blob/03-mapping/src/main/resources/elasticsearch/person/_settings.json
 
-Compile and restart the application
+Compile. If you are using you IDE, and spring-boot is still running, 
+you should directly see the changes. Otherwise, restart the application:
 
 ```
 # Compile and launch again
