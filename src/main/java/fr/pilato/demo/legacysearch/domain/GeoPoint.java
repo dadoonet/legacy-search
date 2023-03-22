@@ -19,7 +19,7 @@
 
 package fr.pilato.demo.legacysearch.domain;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class GeoPoint {
