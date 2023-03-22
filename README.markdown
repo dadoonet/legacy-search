@@ -16,7 +16,8 @@ You need to have completed [branch 03-mapping](https://github.com/dadoonet/legac
 Run it!
 -------
 
-Compile and restart the application
+Compile. If you are using you IDE, and spring-boot is still running, 
+you should directly see the changes. Otherwise, restart the application:
 
 ```
 # Compile and launch again
