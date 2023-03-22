@@ -22,6 +22,7 @@ import fr.pilato.demo.legacysearch.domain.Person;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
@@ -29,7 +30,7 @@ import org.springframework.data.repository.query.QueryByExampleExecutor;
 /**
  * Person Repository.
  */
-public interface PersonRepository extends PagingAndSortingRepository<Person, Integer>, QueryByExampleExecutor<Person> {
+public interface PersonRepository extends PagingAndSortingRepository<Person, Integer>, QueryByExampleExecutor<Person>, CrudRepository<Person, Integer> {
 
     @Query("select p from Person p where p.name like %?1% or p.address.country like %?1% or p.address.city like %?1%")
     Page<Person> findLikeGoogle(String query, Pageable pageable);
