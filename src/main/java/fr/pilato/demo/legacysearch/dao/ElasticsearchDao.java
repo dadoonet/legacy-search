@@ -26,13 +26,11 @@ import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.json.JsonpSerializable;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
-import jakarta.json.stream.JsonGenerator;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -47,11 +45,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+
+import static co.elastic.clients.json.JsonpUtils.toJsonString;
 
 @Component
 public class ElasticsearchDao {
@@ -143,14 +142,6 @@ public class ElasticsearchDao {
                         .sort(sb -> sb.field(fs -> fs.field("dateOfBirth")))
                 , Person.class);
 
-        return jsonToString(response);
-    }
-
-    private String jsonToString(JsonpSerializable json) {
-        StringWriter writer = new StringWriter();
-        JsonGenerator generator = jacksonJsonpMapper.jsonProvider().createGenerator(writer);
-        json.serialize(generator, jacksonJsonpMapper);
-        generator.close();
-        return writer.toString();
+        return toJsonString(response, jacksonJsonpMapper);
     }
 }
