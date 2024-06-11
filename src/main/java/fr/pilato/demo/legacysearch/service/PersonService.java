@@ -22,6 +22,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
+import fr.pilato.demo.legacysearch.domain.GeoPoint;
 import fr.pilato.demo.legacysearch.domain.Person;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.helper.Strings;
@@ -67,7 +68,6 @@ public class PersonService {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
         elasticsearchDao.saveAll(personsDb);
         logger.debug("Saved [{}] persons", persons.size());
-        persons.clear();
         return personsDb;
     }
 
@@ -154,6 +154,7 @@ public class PersonService {
         joe.getAddress().setCountry("France");
         joe.getAddress().setCity("Paris");
         joe.getAddress().setCountrycode("FR");
+        joe.getAddress().setLocation(new GeoPoint(48.84, 2.31));
 
         persons.add(joe);
         currentItem.incrementAndGet();
@@ -164,6 +165,7 @@ public class PersonService {
         franceGall.getAddress().setCountry("Italy");
         franceGall.getAddress().setCity("Ischia");
         franceGall.getAddress().setCountrycode("IT");
+        franceGall.getAddress().setLocation(new GeoPoint(40.72, 13.90));
 
         persons.add(franceGall);
         currentItem.incrementAndGet();
