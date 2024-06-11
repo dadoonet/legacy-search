@@ -20,12 +20,14 @@
 package fr.pilato.demo.legacysearch.dao;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.JsonpUtils;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
@@ -49,11 +51,10 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-
-import static co.elastic.clients.json.JsonpUtils.toJsonString;
+import java.util.concurrent.TimeUnit;
 
 @Component
-public class ElasticsearchDao {
+public class ElasticsearchDao implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     private final ElasticsearchClient esClient;
@@ -63,6 +64,8 @@ public class ElasticsearchDao {
         @Override public X509Certificate[] getAcceptedIssuers() { return null; }
     }};
     private final JacksonJsonpMapper jacksonJsonpMapper;
+
+    private final BulkIngester<Person> bulkIngester;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
         String clusterUrl = "https://127.0.0.1:9200";
@@ -96,6 +99,7 @@ public class ElasticsearchDao {
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
 
+        // Create the person index
         try {
             esClient.indices().create(cir -> cir
                     .index("person")
@@ -109,18 +113,27 @@ public class ElasticsearchDao {
                 logger.debug("Index person was already existing. Skipping creating it again.");
             }
         }
+
+        // Use the BulkIngester helper
+        bulkIngester = BulkIngester.of(bi -> bi
+                .client(esClient)
+                .maxOperations(10000)
+                .flushInterval(5, TimeUnit.SECONDS));
     }
 
-    public void saveAll(Iterable<Person> persons) throws IOException {
-        esClient.bulk(br -> {
-            br.index("person");
-            persons.forEach(person -> br.operations(ops -> ops.index(i -> i.document(person))));
-            return br;
-        });
+    public void saveAll(Iterable<Person> persons) {
+        persons.forEach(person -> bulkIngester.add(o -> o.index(i -> i
+                .index("person")
+                .id(person.idAsString())
+                .document(person)
+        )));
     }
 
-    public void delete(Integer id) throws IOException {
-        esClient.delete(d -> d.index("person").id("" + id));
+    public void delete(Integer id) {
+        bulkIngester.add(o -> o.delete(dr -> dr
+                .index("person")
+                .id(String.valueOf(id))
+        ));
     }
 
     public String search(Query query, Integer from, Integer size) throws IOException {
@@ -131,26 +144,29 @@ public class ElasticsearchDao {
                         .size(size)
                         .trackTotalHits(tth -> tth.enabled(true))
                         .aggregations("by_country", ab -> ab.terms(tb -> tb.field("address.country.keyword"))
-                                .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
-                                        .field("dateOfBirth")
-                                        .fixedInterval(d -> d.time("3653d"))
-                                        .extendedBounds(b -> b
-                                                .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
-                                                .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
-                                        .format("8yyyy"))
-                                        .aggregations("avg_children", ssab -> ssab.avg(avg -> avg.field("children"))))
+                          .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
+                            .field("dateOfBirth")
+                            .fixedInterval(d -> d.time("3653d"))
+                            .extendedBounds(b -> b
+                              .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
+                              .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
+                              .format("8yyyy"))
+                                .aggregations("avg_children", ssab -> ssab.avg(avg -> avg.field("children"))))
                         )
                         .aggregations("by_year", sab -> sab.dateHistogram(dhb -> dhb
-                                .field("dateOfBirth")
-                                .calendarInterval(CalendarInterval.Year)
-                                .extendedBounds(b -> b
-                                        .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
-                                        .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
-                                .format("8yyyy")))
-                        .sort(sb -> sb.score(scs -> scs))
-                        .sort(sb -> sb.field(fs -> fs.field("dateOfBirth")))
+                        .field("dateOfBirth")
+                        .calendarInterval(CalendarInterval.Year)
+                        .extendedBounds(b -> b
+                          .min(FieldDateMath.of(fdm -> fdm.expr("1940")))
+                          .max(FieldDateMath.of(fdm -> fdm.expr("2009"))))
+                          .format("8yyyy")))
                 , Person.class);
 
-        return toJsonString(response, jacksonJsonpMapper);
+        return JsonpUtils.toJsonString(response, jacksonJsonpMapper);
+    }
+
+    @Override
+    public void close() {
+        bulkIngester.close();
     }
 }
