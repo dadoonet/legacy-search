@@ -138,7 +138,7 @@ public class PersonService {
         return elasticsearchDao.search(query, from, size);
     }
 
-    private AtomicInteger currentItem = new AtomicInteger();
+    private final AtomicInteger currentItem = new AtomicInteger();
     private long start = 0;
 
     public InitResult init(Integer size) throws IOException {
