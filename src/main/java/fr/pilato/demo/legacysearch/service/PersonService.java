@@ -76,11 +76,7 @@ public class PersonService {
 
     private Iterable<Person> saveAll(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        try {
-            elasticsearchDao.saveAll(personsDb);
-        } catch (Exception e) {
-            logger.error("Houston, we have a problem!", e);
-        }
+        elasticsearchDao.saveAll(personsDb);
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
@@ -112,7 +108,6 @@ public class PersonService {
         long start = System.nanoTime();
 
         Page<Person> page;
-
         if (Strings.isEmpty(q)) {
             page = personRepository.findAll(PageRequest.of(from / size, size));
         } else {

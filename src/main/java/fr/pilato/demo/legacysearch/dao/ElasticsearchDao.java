@@ -20,6 +20,7 @@
 package fr.pilato.demo.legacysearch.dao;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -44,9 +45,10 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 @Component
-public class ElasticsearchDao {
+public class ElasticsearchDao implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     private final ElasticsearchClient esClient;
@@ -56,6 +58,8 @@ public class ElasticsearchDao {
         @Override public X509Certificate[] getAcceptedIssuers() { return null; }
     }};
     private final JacksonJsonpMapper jacksonJsonpMapper;
+
+    private final BulkIngester<Person> bulkIngester;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
         String clusterUrl = "https://127.0.0.1:9200";
@@ -88,17 +92,31 @@ public class ElasticsearchDao {
 
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
+
+        // Use the BulkIngester helper
+        bulkIngester = BulkIngester.of(bi -> bi
+                .client(esClient)
+                .maxOperations(10000)
+                .flushInterval(5, TimeUnit.SECONDS));
     }
 
-    public void saveAll(Iterable<Person> persons) throws IOException {
-        esClient.bulk(br -> {
-            br.index("person");
-            persons.forEach(person -> br.operations(ops -> ops.index(i -> i.document(person))));
-            return br;
-        });
+    public void saveAll(Iterable<Person> persons) {
+        persons.forEach(person -> bulkIngester.add(o -> o.index(i -> i
+                .index("person")
+                .id(person.idAsString())
+                .document(person)
+        )));
     }
 
-    public void delete(Integer id) throws IOException {
-        esClient.delete(d -> d.index("person").id("" + id));
+    public void delete(Integer id) {
+        bulkIngester.add(o -> o.delete(dr -> dr
+                .index("person")
+                .id(String.valueOf(id))
+        ));
+    }
+
+    @Override
+    public void close() {
+        bulkIngester.close();
     }
 }
