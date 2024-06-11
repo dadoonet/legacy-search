@@ -66,11 +66,7 @@ public class PersonService {
 
     private Iterable<Person> saveAll(Collection<Person> persons) {
         Iterable<Person> personsDb = personRepository.saveAll(persons);
-        try {
-            elasticsearchDao.saveAll(personsDb);
-        } catch (Exception e) {
-            logger.error("Houston, we have a problem!", e);
-        }
+        elasticsearchDao.saveAll(personsDb);
         logger.debug("Saved [{}] persons", persons.size());
         persons.clear();
         return personsDb;
@@ -99,8 +95,8 @@ public class PersonService {
     }
 
     public String search(String q, String f_country, String f_date, Integer from, Integer size) throws IOException {
-
         Query textQuery;
+
         // If the user does not provide any text to query, let's match all documents
         if (Strings.isEmpty(q)) {
             textQuery = Query.of(qb -> qb.matchAll(maq -> maq));
@@ -123,8 +119,8 @@ public class PersonService {
                             bq.filter(fb -> fb.term(tq -> tq.field("address.country.keyword").value(f_country)));
                         }
                         if (Strings.hasText(f_date)) {
-                            String endDate = "" + (Integer.parseInt(f_date) + 10);
-                            bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).lt(JsonData.of(endDate))));
+                          String endDate = "" + (Integer.parseInt(f_date) + 10);
+                          bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).lt(JsonData.of(endDate))));
                         }
                         return bq;
                     })
