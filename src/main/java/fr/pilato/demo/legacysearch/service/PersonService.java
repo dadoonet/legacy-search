@@ -83,7 +83,7 @@ public class PersonService {
         return saveAll(Collections.singleton(person)).iterator().next();
     }
 
-    public void delete(Integer id) throws IOException {
+    public void delete(Integer id) {
         logger.debug("Person: {}", id);
 
         if (id != null) {
