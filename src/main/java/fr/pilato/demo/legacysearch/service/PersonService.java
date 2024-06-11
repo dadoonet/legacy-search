@@ -178,7 +178,7 @@ public class PersonService {
         return json;
     }
 
-    private AtomicInteger currentItem = new AtomicInteger();
+    private final AtomicInteger currentItem = new AtomicInteger();
     private long start = 0;
 
     public InitResult init(Integer size) throws IOException {
