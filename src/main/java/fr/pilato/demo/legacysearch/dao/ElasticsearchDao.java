@@ -30,6 +30,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
+import fr.pilato.demo.legacysearch.helper.SSLUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -40,14 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -55,11 +49,6 @@ public class ElasticsearchDao implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(ElasticsearchDao.class);
 
     private final ElasticsearchClient esClient;
-    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
-        @Override public X509Certificate[] getAcceptedIssuers() { return null; }
-    }};
     private final JacksonJsonpMapper jacksonJsonpMapper;
 
     private final BulkIngester<Person> bulkIngester;
@@ -71,19 +60,10 @@ public class ElasticsearchDao implements AutoCloseable {
 
         // Create the low-level client
         RestClient restClient = RestClient.builder(HttpHost.create(clusterUrl))
-                .setHttpClientConfigCallback(hcb -> {
-                            try {
-                                SSLContext sslContext = SSLContext.getInstance("SSL");
-                                sslContext.init(null, trustAllCerts, new SecureRandom());
-                                hcb
-                                    .setDefaultCredentialsProvider(credentialsProvider)
-                                    .setSSLContext(sslContext)
-                                    .setSSLHostnameVerifier((hostname, session) -> true);
-                                return hcb;
-                            } catch (KeyManagementException | NoSuchAlgorithmException e) {
-                                logger.warn("Failed to get SSL Context", e);
-                                throw new RuntimeException(e);
-                            }})
+                .setHttpClientConfigCallback(hcb -> hcb
+                        .setDefaultCredentialsProvider(credentialsProvider)
+                        .setSSLContext(SSLUtils.createTrustAllCertsContext())
+                )
                 .build();
 
         // Create the transport with a Jackson mapper
