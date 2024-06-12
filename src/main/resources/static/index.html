@@ -1,16 +1,19 @@
-<!DOCTYPE html>
-<html ng-app="legacyApp">
+<!doctype html>
+<html lang="en" ng-app="legacyApp">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Advanced search for your legacy application</title>
-    <link rel='stylesheet' href='/css/bootstrap.min.css'/>
-    <link rel='stylesheet' href='/css/bootstrap-theme.min.css'/>
-    <link rel='stylesheet' href='/css/app.css'/>
+    <link rel='stylesheet' media='screen' href='/webjars/bootstrap/5.3.3/css/bootstrap.min.css'>
+</head>
 
-    <script src="js/angular/angular.min.js"></script>
-    <script src="js/angular-route/angular-route.min.js"></script>
-    <script src="js/jquery/jquery-3.1.1.min.js"></script>
-    <script src="js/bootstrap/bootstrap.min.js"></script>
-    <script src="js/ui-bootstrap/ui-bootstrap-tpls-2.5.0.min.js"></script>
+<body>
+    <script type='text/javascript' src='/webjars/angularjs/1.6.2/angular.min.js'></script>
+    <script type='text/javascript' src='/webjars/angularjs/1.6.2/angular-route.min.js'></script>
+
+    <script type='text/javascript' src='/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js'></script>
+    <script type='text/javascript' src='/webjars/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js'></script>
+
     <script src="app.module.js"></script>
     <script src="app.config.js"></script>
     <script src="init/init.module.js"></script>
@@ -25,39 +28,44 @@
     <script src="kibana/kibana.component.js"></script>
     <script src="person-detail/person-detail.module.js"></script>
     <script src="person-detail/person-detail.component.js"></script>
-</head>
-<body>
 
-<nav class="navbar navbar-fixed-top">
-    <div class="container">
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Contacts</a>
-        </div>
+        <a class="navbar-brand" href="#">People</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li><a href="/#!/init">Init</a></li>
-                <li class="active"><a href="/">Search</a></li>
-                <li><a href="/#!/advanced">Advanced</a></li>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/#!/init">Init</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/#!/advanced">Advanced</a>
+                </li>
                 <!-- For future use in latest branch -->
-                <li><a href="/#!/compute">Compute</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/#!/compute">Compute</a>
+                </li>
             </ul>
-            <ul class="nav navbar-nav pull-right">
-                <li><a href="/#!/kibana">Kibana</a></li>
+
+            <ul class="navbar-nav justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link" href="/#!/kibana">Kibana</a>
+                </li>
             </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
+        </div>
+    </div>
 </nav>
 
-<div ng-view></div>
+<div ng-view>
+
+</div>
 
 </body>
 </html>
