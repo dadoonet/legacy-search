@@ -1,41 +1,49 @@
-<div class="container" >
+<div class="container-fluid" >
 
   <div class="row">
-    <div class="col-md-2">
-      <input ng-model="$ctrl.name" type="text" class="form-control"
-             name="name"  placeholder="Name..." autocomplete="off"
-             ng-keyup="$ctrl.advanced_search()">
+    <div class="col">
+      <div class="form-floating mb-3">
+        <input id="nameBox" ng-model="$ctrl.name" type="text" class="form-control"
+               name="name"  placeholder="Name" autocomplete="off"
+               ng-keyup="$ctrl.advanced_search()">
+        <label for="nameBox">Name</label>
+      </div>
     </div>
-    <div class="col-md-2">
-      <input ng-model="$ctrl.country" type="text" class="form-control"
-             name="country"  placeholder="Country..." autocomplete="off"
-             ng-keyup="$ctrl.advanced_search()">
+
+    <div class="col">
+      <div class="form-floating mb-3">
+        <input id="countryBox" ng-model="$ctrl.country" type="text" class="form-control"
+               name="country"  placeholder="Country" autocomplete="off"
+               ng-keyup="$ctrl.advanced_search()">
+        <label for="countryBox">Country</label>
+      </div>
     </div>
-    <div class="col-md-2">
-      <input ng-model="$ctrl.city" type="text" class="form-control"
-             name="city"  placeholder="City..." autocomplete="off"
-             ng-keyup="$ctrl.advanced_search()">
+
+    <div class="col">
+      <div class="form-floating mb-3">
+        <input id="cityBox" ng-model="$ctrl.city" type="text" class="form-control"
+               name="city"  placeholder="City" autocomplete="off"
+               ng-keyup="$ctrl.advanced_search()">
+        <label for="cityBox">City</label>
+      </div>
     </div>
-    <div class="col-md-2">
-      <button ng-click="$ctrl.advanced_search()" type="submit" class="btn btn-primary">Search</button>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <p ng-if="!$ctrl.error">
+        Found <span class="badge text-bg-primary">{{$ctrl.result.hits.total.value}}</span> hits in
+        <span class="badge text-bg-primary">{{$ctrl.result.took}} ms</span>
+      </p>
+      <p ng-if="$ctrl.error">
+        <span class="badge text-bg-danger">{{$ctrl.error}}</span>
+      </p>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-12">
-        <p class="text-info" ng-if="!$ctrl.error">
-            Found <span class="label label-primary">{{$ctrl.result.hits.total.value}}</span> hits in
-            <span class="label label-primary">{{$ctrl.result.took}} ms</span>
-        </p>
-        <p class="text-info" ng-if="$ctrl.error">
-            <span class="label label-danger">{{$ctrl.error}}</span>
-        </p>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-12">
-      <table class="table" >
+      <table class="table table-striped table-bordered table-hover table-condensed" >
         <thead>
         <tr>
           <th>Name</th>
