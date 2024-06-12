@@ -8,7 +8,7 @@ angular.
     controller: ['$http', '$interval', 'config', function InitController($http, $interval, config) {
       var self = this;
       self.persons = "";
-      self.status = "active";
+      self.status = "";
       self.progress = {
         took: 0,
         rate: 0,
@@ -44,7 +44,7 @@ angular.
       };
 
       self.init = function() {
-        self.status = "active";
+        self.status = "";
         self.result = null;
         self.progress = {
           took: 0,
@@ -59,7 +59,7 @@ angular.
             .then(function successCallback(response) {
               self.result = response.data;
               self.progress = self.result;
-              self.status = "progress-bar-success";
+              self.status = "bg-success";
               self.stopWatch();
         });
       }
