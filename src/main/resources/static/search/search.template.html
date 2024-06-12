@@ -1,34 +1,33 @@
-<div class="container" >
+<div class="container-fluid" >
 
   <div class="row">
-    <div class="col-md-6">
-      <input ng-model="$ctrl.query" type="text" class="form-control"
-             name="query"  placeholder="Type something..." autocomplete="off"
-             ng-keyup="$ctrl.search(1)">
+    <div class="col">
+      <div class="form-floating mb-3">
+        <input id="searchBox" type="text" class="form-control"
+               placeholder="Type something..." name="query"  autocomplete="off"
+               ng-model="$ctrl.query" ng-keyup="$ctrl.search(1)">
+        <label for="searchBox">Type something...</label>
+      </div>
     </div>
-    <div class="col-md-2">
-      <button ng-click="$ctrl.search(1)" type="submit" class="btn btn-primary">Search</button>
-    </div>
-
   </div>
 
   <div class="row">
-    <div class="col-md-12">
-      <p class="text-info" ng-if="!$ctrl.error">
-        Found <span class="label label-primary">{{$ctrl.result.hits.total.value}}</span> hits in
-        <span class="label label-primary">{{$ctrl.result.took}} ms</span>
-        <span class="label label-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
-        <span class="label label-success" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>
+    <div class="col">
+      <p ng-if="!$ctrl.error">
+        Found <span class="badge text-bg-primary">{{$ctrl.result.hits.total.value}}</span> hits in
+        <span class="badge text-bg-primary">{{$ctrl.result.took}} ms</span>
+        <span class="badge text-bg-success" ng-if="$ctrl.f_country.length>0" ng-click="$ctrl.f_country='';$ctrl.search(1);">{{$ctrl.f_country}}</span>
+        <span class="badge text-bg-info" ng-if="$ctrl.f_date.length>0" ng-click="$ctrl.f_date='';$ctrl.search(1);">{{$ctrl.f_date}}</span>
       </p>
-      <p class="text-info" ng-if="$ctrl.error">
-        <span class="label label-danger">{{$ctrl.error}}</span>
+      <p ng-if="$ctrl.error">
+        <span class="badge text-bg-danger">{{$ctrl.error}}</span>
       </p>
     </div>
   </div>
 
   <div class="row" ng-show="$ctrl.result.aggregations != null">
     <div class="col-md-3">
-      <table class="table table-striped table-bordered table-hover table-condensed" >
+      <table class="table table-success table-striped table-bordered table-hover table-condensed" >
         <thead>
         <tr>
           <th>Country</th>
@@ -40,12 +39,11 @@
           <td>{{bucket.key}}</td>
           <td>{{bucket.doc_count}}</td>
         </tr>
-
         <tbody>
       </table>
     </div>
     <div class="col-md-9">
-      <table class="table table-striped table-bordered table-hover table-condensed" >
+      <table class="table table-info table-striped table-bordered table-hover table-condensed" >
         <thead>
         <tr>
           <th ng-repeat="bucket in $ctrl.dates" ng-click="$ctrl.addFilterDate(bucket);">{{bucket.key}}0</th>
@@ -63,7 +61,7 @@
 
   <div class="row">
     <div class="col-md-12">
-      <table class="table" >
+      <table class="table table-striped table-bordered table-hover table-condensed" >
         <thead>
         <tr>
           <th>Name</th>
@@ -87,12 +85,18 @@
         <tbody>
       </table>
     </div>
-    <div class="col-md-12">
-      <div>
-        <ul uib-pagination total-items="$ctrl.totalItems" ng-model="$ctrl.currentPage"
-            class="pagination-sm" force-ellipses="true" max-size="5"
-            ng-change="$ctrl.changePage()"></ul>
-      </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li uib-pagination total-items="$ctrl.totalItems" ng-model="$ctrl.currentPage"
+              class="page-link" force-ellipses="true" max-size="5"
+              ng-change="$ctrl.changePage()"></li>
+        </ul>
+      </nav>
     </div>
+  </div>
 
 </div>
