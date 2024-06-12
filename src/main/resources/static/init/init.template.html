@@ -9,18 +9,19 @@
       </div>
     </div>
     <div class="col">
-      <button ng-click="$ctrl.init()" type="submit" class="btn btn-primary">Inject</button>
+      <button ng-click="$ctrl.init()" type="submit" class="btn btn-primary btn-lg">Inject<span ng-show="$ctrl.persons>0"> {{$ctrl.persons}} persons</span></button>
     </div>
   </div>
 
   <div class="row">
     <div class="col">
-      <div class="progress">
+      <div class="progress" role="progressbar" aria-label="Injector" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
+           style="height: 25px">
         <div class="progress-bar progress-bar-striped {{$ctrl.status}}" role="progressbar"
              aria-valuenow="{{$ctrl.progress.current/$ctrl.persons}}"
              aria-valuemin="0"
              aria-valuemax="{{$ctrl.goal}}"
-             style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%; height: 100%;">
+             style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%">
           <span ng-show="$ctrl.progress.current>0">{{$ctrl.progress.current}} on {{$ctrl.goal}}</span>
         </div>
       </div>
@@ -28,21 +29,35 @@
   </div>
 
   <div class="row">
-    <div class="col">
-      <h2>Elapsed: <span class="badge text-bg-primary">{{$ctrl.took}} s</span></h2>
+    <div class="col-3">
+      <b>Elapsed</b>
+    </div>
+    <div class="col-9">
+      <b>
+        <span class="badge rounded-pill text-bg-primary">{{$ctrl.took}} s</span>
+      </b>
     </div>
   </div>
   <div class="row">
-    <div class="col">
-      <h2>Estimated time left: <span class="badge text-bg-warning">{{$ctrl.remaining}} s</span></h2>
+    <div class="col-3">
+      <b>Estimated time left</b>
+    </div>
+    <div class="col-9">
+      <b>
+        <span class="badge rounded-pill text-bg-warning">{{$ctrl.remaining}} s</span>
+      </b>
     </div>
   </div>
   <div class="row">
-    <div class="col">
-      <h2>Rate: <span class="badge text-bg-danger">{{$ctrl.progress.rate}} persons per sec</span></h2>
+    <div class="col-3">
+      <b>Rate</b>
+    </div>
+    <div class="col-9">
+      <b>
+        <span class="badge rounded-pill text-bg-danger">{{$ctrl.progress.rate}} persons per sec</span>
+      </b>
     </div>
   </div>
-
 </div>
 
 
