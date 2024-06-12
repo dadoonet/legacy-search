@@ -1,25 +1,26 @@
-<div class="container">
+<div class="container-fluid">
 
   <div class="row">
-    <div class="col-md-3 col-md-offset-2">
-      <input ng-model="$ctrl.persons" type="text" class="form-control"
-             name="persons"  placeholder="Number of persons to inject" autocomplete="off">
+    <div class="col">
+      <div class="form-floating mb-3">
+        <input id="nbBox" ng-model="$ctrl.persons" type="text" class="form-control"
+               name="persons"  placeholder="Number of persons to inject" autocomplete="off">
+        <label for="nbBox">Number of persons to inject</label>
+      </div>
     </div>
-    <div class="col-md-1">
+    <div class="col">
       <button ng-click="$ctrl.init()" type="submit" class="btn btn-primary">Inject</button>
     </div>
   </div>
 
   <div class="row">
-    &nbsp;
-  </div>
-
-  <div class="row">
-    <div class="col-md-6 col-md-offset-2">
+    <div class="col">
       <div class="progress">
         <div class="progress-bar progress-bar-striped {{$ctrl.status}}" role="progressbar"
-             aria-valuenow="{{$ctrl.progress.current/$ctrl.persons}}" aria-valuemin="0" aria-valuemax="{{$ctrl.goal}}"
-             style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%;">
+             aria-valuenow="{{$ctrl.progress.current/$ctrl.persons}}"
+             aria-valuemin="0"
+             aria-valuemax="{{$ctrl.goal}}"
+             style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%; height: 100%;">
           <span ng-show="$ctrl.progress.current>0">{{$ctrl.progress.current}} on {{$ctrl.goal}}</span>
         </div>
       </div>
@@ -27,18 +28,18 @@
   </div>
 
   <div class="row">
-    <div class="col-md-12">
-      <h2>Elapsed: <span class="label label-primary">{{$ctrl.took}} s</span></h2>
+    <div class="col">
+      <h2>Elapsed: <span class="badge text-bg-primary">{{$ctrl.took}} s</span></h2>
     </div>
   </div>
   <div class="row">
-    <div class="col-md-12">
-      <h2>Estimated time left: <span class="label label-warning">{{$ctrl.remaining}} s</span></h2>
+    <div class="col">
+      <h2>Estimated time left: <span class="badge text-bg-warning">{{$ctrl.remaining}} s</span></h2>
     </div>
   </div>
   <div class="row">
-    <div class="col-md-12">
-      <h2>Rate: <span class="label label-danger">{{$ctrl.progress.rate}} persons per sec</span></h2>
+    <div class="col">
+      <h2>Rate: <span class="badge text-bg-danger">{{$ctrl.progress.rate}} persons per sec</span></h2>
     </div>
   </div>
 
