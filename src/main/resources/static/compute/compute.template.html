@@ -23,21 +23,21 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-show="$ctrl.result.aggregations['sterms#by_country'] != null">
     <div class="col-md-12">
       <table class="table table-success table-striped table-bordered table-hover table-condensed">
         <thead>
         <tr>
           <th>Country</th>
           <th>Count</th>
-          <th>Per Year</th>
+          <th ng-show="bucket['date_histogram#by_year'].buckets != null">Per Year</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="bucket in $ctrl.result.aggregations['sterms#by_country'].buckets">
           <td>{{bucket.key}}</td>
           <td>{{bucket.doc_count}}</td>
-          <td>
+          <td ng-show="bucket['date_histogram#by_year'].buckets != null">
             <table class="table table-info table-striped table-bordered table-hover table-condensed">
               <thead>
               <tr>
