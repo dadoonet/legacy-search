@@ -16,13 +16,13 @@
   <div class="row">
     <div class="col">
       <div class="progress" role="progressbar" aria-label="Injector" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
-           style="height: 25px">
+           style="height: 50px">
         <div class="progress-bar progress-bar-striped {{$ctrl.status}}" role="progressbar"
              aria-valuenow="{{$ctrl.progress.current/$ctrl.persons}}"
              aria-valuemin="0"
              aria-valuemax="{{$ctrl.goal}}"
              style="width: {{$ctrl.progress.current/$ctrl.goal*100}}%">
-          <span ng-show="$ctrl.progress.current>0">{{$ctrl.progress.current}} on {{$ctrl.goal}}</span>
+          <h2><span ng-show="$ctrl.progress.current>0">{{$ctrl.progress.current}} on {{$ctrl.goal}}</span></h2>
         </div>
       </div>
     </div>
@@ -30,32 +30,26 @@
 
   <div class="row">
     <div class="col-3">
-      <b>Elapsed</b>
+      <h2>Elapsed</h2>
     </div>
     <div class="col-9">
-      <b>
-        <span class="badge rounded-pill text-bg-primary">{{$ctrl.took}} s</span>
-      </b>
+      <h2><span class="badge rounded-pill text-bg-primary">{{$ctrl.took}} s</span></h2>
     </div>
   </div>
   <div class="row">
     <div class="col-3">
-      <b>Estimated time left</b>
+      <h2>Estimated time left</h2>
     </div>
     <div class="col-9">
-      <b>
-        <span class="badge rounded-pill text-bg-warning">{{$ctrl.remaining}} s</span>
-      </b>
+      <h2><span class="badge rounded-pill text-bg-warning">{{$ctrl.remaining}} s</span></h2>
     </div>
   </div>
   <div class="row">
     <div class="col-3">
-      <b>Rate</b>
+      <h2>Rate</h2>
     </div>
     <div class="col-9">
-      <b>
-        <span class="badge rounded-pill text-bg-danger">{{$ctrl.progress.rate}} persons per sec</span>
-      </b>
+      <h2><span class="badge rounded-pill text-bg-danger">{{$ctrl.progress.rate}} persons per sec</span></h2>
     </div>
   </div>
 </div>
