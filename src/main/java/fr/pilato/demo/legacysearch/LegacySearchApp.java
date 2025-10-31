@@ -20,13 +20,10 @@
 package fr.pilato.demo.legacysearch;
 
 
-import com.github.dozermapper.core.DozerBeanMapperBuilder;
-import com.github.dozermapper.core.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class LegacySearchApp {
@@ -35,11 +32,5 @@ public class LegacySearchApp {
     public static void main(String[] args) {
         logger.info("Starting LegacySearch demo application");
         SpringApplication.run(LegacySearchApp.class, args);
-    }
-
-    @Bean
-    public Mapper dozerBeanMapper() {
-        logger.debug("creating dozen bean mapper");
-        return DozerBeanMapperBuilder.buildDefault();
     }
 }
