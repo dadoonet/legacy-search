@@ -9,6 +9,7 @@ import fr.pilato.demo.legacysearch.domain.Person;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class PersonGenerator {
@@ -92,7 +93,7 @@ public class PersonGenerator {
         int pos = numberGenerator(0, names.size());
 
         String line = names.get(pos);
-        ArrayList<String> temp =  CsvReader.extractFromCommas(line);
+        List<String> temp =  CsvReader.extractFromCommas(line);
         person.setName(temp.get(0) + " " + CsvReader.extractFromCommas(
                 names.get(numberGenerator(0, names.size()))).get(0));
         person.setGender(temp.get(1));
