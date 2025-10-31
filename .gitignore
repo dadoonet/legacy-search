@@ -1,4 +1,12 @@
+# IDE
+.vscode/
 *.iml
 target/
 .idea/
 
+# Frontend / Node.js
+node_modules/
+
+# Frontend build artifacts
+src/main/resources/static/assets/
+src/main/resources/static/index.html
