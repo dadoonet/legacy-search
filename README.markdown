@@ -16,13 +16,26 @@ Running on cloud
 If you want to run the demo using https://cloud.elastic.co, create a new
 instance (2gb of RAM should be enough) and change in `ElasticsearchDao`
 class the `CLOUD_URL` of the cluster (copy it from the cloud console)
-and the `CLOUD_PASSWORD`. Alternatively, you can also create a dedicated
-user for this demo and use it.
+and the `CLOUD_PASSWORD`.
 
 ```java
 String clusterUrl = "CLOUD_URL";
-final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "CLOUD_PASSWORD"));
+esClient = ElasticsearchClient.of(b -> b
+    .host(clusterUrl)
+    .usernameAndPassword("elastic", "CLOUD_PASSWORD")
+    .jsonMapper(jacksonJsonpMapper)
+);
+```
+
+A better way is to use an API key instead of username and password:
+
+```java
+String clusterUrl = "CLOUD_URL";
+esClient = ElasticsearchClient.of(b -> b
+    .host(clusterUrl)
+    .apiKey("OR-BETTER-PASTE-THE-APIKEY-HERE")
+    .jsonMapper(jacksonJsonpMapper)
+);
 ```
 
 Docker Compose Installation
