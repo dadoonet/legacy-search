@@ -3,6 +3,7 @@ package fr.pilato.demo.legacysearch.helper;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 class CsvReader {
 
@@ -19,7 +20,7 @@ class CsvReader {
         return data;
     }
 
-    static ArrayList extractFromCommas(String dataLine) {
+    static List<String> extractFromCommas(String dataLine) {
         //Gives back the data that is found between commas in a String
         ArrayList<String> data = new ArrayList<>();
         String theString = "";
