@@ -12,7 +12,7 @@
 
     <groupId>fr.pilato.demo</groupId>
     <artifactId>legacy-search</artifactId>
-    <version>8.14-SNAPSHOT</version>
+    <version>9.2-SNAPSHOT</version>
     <name>Add search to legacy demo</name>
     <description>
         This project is used for demos to add elasticsearch
@@ -30,9 +30,9 @@
     </licenses>
 
     <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <elasticsearch.version>8.14.1</elasticsearch.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <elasticsearch.version>9.2.0</elasticsearch.version>
         <jackson.version>2.17.1</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
