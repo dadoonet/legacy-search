@@ -19,11 +19,11 @@
 package fr.pilato.demo.legacysearch.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
 import fr.pilato.demo.legacysearch.domain.GeoPoint;
 import fr.pilato.demo.legacysearch.domain.Person;
+import fr.pilato.demo.legacysearch.helper.BeanMapper;
 import fr.pilato.demo.legacysearch.helper.PersonGenerator;
 import fr.pilato.demo.legacysearch.helper.Strings;
 import fr.pilato.demo.legacysearch.webapp.InitResult;
@@ -47,14 +47,11 @@ public class PersonService {
     private int batchSize;
 
     private final PersonRepository personRepository;
-    private final Mapper dozerBeanMapper;
     private final ElasticsearchDao elasticsearchDao;
 
     public PersonService(PersonRepository personRepository,
-                         ElasticsearchDao elasticsearchDao,
-                         Mapper dozerBeanMapper) {
+                         ElasticsearchDao elasticsearchDao) {
         this.personRepository = personRepository;
-        this.dozerBeanMapper = dozerBeanMapper;
         this.elasticsearchDao = elasticsearchDao;
     }
 
@@ -75,7 +72,7 @@ public class PersonService {
         // We try to find an existing document
         try {
             Person personDb = get(id);
-            dozerBeanMapper.map(person, personDb);
+            BeanMapper.map(person, personDb);
             person = personDb;
             person.setId(id);
         } catch (PersonNotFoundException ignored) { }
