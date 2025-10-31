@@ -19,7 +19,6 @@
 package fr.pilato.demo.legacysearch.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.json.JsonData;
 import com.github.dozermapper.core.Mapper;
 import fr.pilato.demo.legacysearch.dao.ElasticsearchDao;
 import fr.pilato.demo.legacysearch.dao.PersonRepository;
@@ -120,7 +119,7 @@ public class PersonService {
                         }
                         if (Strings.hasText(f_date)) {
                           String endDate = "" + (Integer.parseInt(f_date) + 10);
-                          bq.filter(fb -> fb.range(rq -> rq.field("dateOfBirth").from(f_date).lt(JsonData.of(endDate))));
+                          bq.filter(fb -> fb.range(rq -> rq.date(d -> d.field("dateOfBirth").gte(f_date).lt(endDate))));
                         }
                         return bq;
                     })
