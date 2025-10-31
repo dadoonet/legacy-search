@@ -15,7 +15,7 @@ Installation
 You need to have:
 
 * Maven
-* JDK8 or higher
+* JDK17 or higher
 * Docker
 
 Run MySQL database using docker with:
@@ -33,7 +33,7 @@ mvn clean install
 Then run it with:
 
 ```
-java -jar target/legacy-search-8.0-SNAPSHOT.jar
+java -jar target/legacy-search-9.2-SNAPSHOT.jar
 ```
 
 Or directly run from Maven:
