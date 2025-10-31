@@ -19,6 +19,7 @@
 
 package fr.pilato.demo.legacysearch.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,8 @@ public class Person {
     private Integer id = null;
 
     private String name = null;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth = null;
     private String gender = null;
     private Integer children;
