@@ -38,13 +38,16 @@ esClient = ElasticsearchClient.of(b -> b
 );
 ```
 
-Docker Compose Installation
-------------
+Start-local
+-----------
+
+Thanks to the [start-local](https://github.com/elastic/start-local) project, it's super easy and convenient to start 
+Elasticsearch and Kibana locally:
 
 Run:
 
 ```sh
-docker-compose up
+curl -fsSL https://elastic.co/start-local | ES_LOCAL_PASSWORD="changeme" sh
 ```
 
 You can open [Kibana](http://localhost:5601/) after some seconds and
