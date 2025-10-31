@@ -13,3 +13,6 @@ spring.datasource.username: root
 spring.datasource.password: password
 
 management.health.elasticsearch.enabled: false
+
+spring.thymeleaf.check-template-location: false
+spring.jpa.open-in-view: false
