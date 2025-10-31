@@ -27,17 +27,8 @@ import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonpUtils;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pilato.demo.legacysearch.domain.Person;
-import fr.pilato.demo.legacysearch.helper.SSLUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -55,24 +46,14 @@ public class ElasticsearchDao implements AutoCloseable {
     private final BulkIngester<Person> bulkIngester;
 
     public ElasticsearchDao(ObjectMapper mapper) throws IOException {
-        String clusterUrl = "https://127.0.0.1:9200";
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
-
-        // Create the low-level client
-        RestClient restClient = RestClient.builder(HttpHost.create(clusterUrl))
-                .setHttpClientConfigCallback(hcb -> hcb
-                        .setDefaultCredentialsProvider(credentialsProvider)
-                        .setSSLContext(SSLUtils.createTrustAllCertsContext())
-                )
-                .build();
-
-        // Create the transport with a Jackson mapper
+        String clusterUrl = "http://127.0.0.1:9200";
         jacksonJsonpMapper = new JacksonJsonpMapper(mapper);
-        ElasticsearchTransport transport = new RestClientTransport(restClient, jacksonJsonpMapper);
-
-        // And create the API client
-        esClient = new ElasticsearchClient(transport);
+        esClient = ElasticsearchClient.of(b -> b
+                .host(clusterUrl)
+                .usernameAndPassword("elastic", "changeme")
+                .jsonMapper(jacksonJsonpMapper)
+                // .apiKey("OR-BETTER-PASTE-THE-APIKEY-HERE")
+        );
 
         InfoResponse info = this.esClient.info();
         logger.info("Connected to {} running version {}", clusterUrl, info.version().number());
