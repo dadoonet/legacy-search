@@ -8,7 +8,7 @@
     "@types/react-dom": "^18.2.18",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3",
+    "react-router-dom": "^6.30.3",
     "react-bootstrap": "^2.9.2",
     "bootstrap": "^5.3.3",
     "axios": "^1.6.5",
